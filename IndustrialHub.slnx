@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/Modbus/">
+    <Project Path="IndustrialHub.Modbus/IndustrialHub.Modbus.csproj" />
+    <Project Path="Test/Test.csproj" />
+    <Project Path="ThabeSoft.IndustriaHub.Abstractions/ThabeSoft.IndustriaHub.Abstractions.csproj" Id="367a1fea-5437-4afc-be36-84a905784534" />
+    <Project Path="ThabeSoft.IndustriaHub.Modbus.Abstractions/ThabeSoft.IndustriaHub.Modbus.Abstractions.csproj" Id="761dff6b-7978-40df-ba8f-b7db99446b24" />
+    <Project Path="ThabeSoft.IndustriaHub.Modbus.Rtu/ThabeSoft.IndustriaHub.Modbus.Rtu.csproj" Id="ba6ae36a-314f-4243-8730-7d008a18aeaa" />
+  </Folder>
+  <Project Path="IndustrialHub/ThabeSoft.IndustrialHub.csproj" />
+</Solution>
