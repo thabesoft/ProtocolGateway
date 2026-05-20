@@ -44,7 +44,6 @@ public sealed class ModbusRtuProtocolTests
     }
 
 
-
     [DataRow((byte)01, (ushort)100, (ushort)3, DisplayName = "从站01, 线圈(100~103]")]
     [DataRow((byte)03, (ushort)200, (ushort)5, DisplayName = "从站03, 线圈(200~205]")]
     [TestMethod(DisplayName = "写多个线圈打包解包")]
@@ -78,7 +77,78 @@ public sealed class ModbusRtuProtocolTests
         Console.WriteLine($"数据: {ToString(unpack_values)}");
     }
 
+    [DataRow((byte)01, (ushort)100, true, DisplayName = "从站01, 线圈100, 值True")]
+    [DataRow((byte)03, (ushort)200, false, DisplayName = "从站03, 线圈200, 值False")]
+    [TestMethod(DisplayName = "写单个线圈打包解包")]
+    public async Task WriteSingleCoil_Pack_Unpack(byte slaveId, ushort address, bool value)
+    {
+        var layout = RtuProtocol.WriteSingleCoil();
 
+        Span<byte> span = stackalloc byte[layout.TotalLength];
+        layout.TryPack(span, slaveId, address, value);
+
+        // Unpack
+        layout.TryUnpack(span, out var unpack_slave_id, out var unpack_address, out var unpack_value);
+
+        // Assert
+        Assert.AreEqual(slaveId, unpack_slave_id);
+        Assert.AreEqual(address, unpack_address);
+        Assert.AreEqual(value, unpack_value);
+
+        Console.WriteLine($"写入线圈: {ToString(span.ToArray())}");
+        Console.WriteLine($"从站Id: {unpack_slave_id}");
+        Console.WriteLine($"起始地址: {unpack_address}");
+        Console.WriteLine($"值: {value}");
+    }
+
+    [DataRow((byte)01, (ushort)100, (ushort)0xFF, DisplayName = "从站01, 线圈100, 值0xFF")]
+    [DataRow((byte)03, (ushort)200, (ushort)0xF0, DisplayName = "从站03, 线圈200, 值0xF0")]
+    [DataRow((byte)05, (ushort)300, (ushort)0x0F, DisplayName = "从站05, 线圈300, 值0x0F")]
+    [TestMethod(DisplayName = "写单个寄存器打包解包")]
+    public async Task WriteSingleRegister_Pack_Unpack(byte slaveId, ushort address, ushort value)
+    {
+        var layout = RtuProtocol.WriteSingleRegister();
+
+        Span<byte> span = stackalloc byte[layout.TotalLength];
+        layout.TryPack(span, slaveId, address, value);
+
+        // Unpack
+        layout.TryUnpack(span, out var unpack_slave_id, out var unpack_address, out var unpack_value);
+
+        // Assert
+        Assert.AreEqual(slaveId, unpack_slave_id);
+        Assert.AreEqual(address, unpack_address);
+        Assert.AreEqual(value, unpack_value);
+
+        Console.WriteLine($"写入线圈: {ToString(span.ToArray())}");
+        Console.WriteLine($"从站Id: {unpack_slave_id}");
+        Console.WriteLine($"起始地址: {unpack_address}");
+        Console.WriteLine($"值: {value}");
+    }
+
+    [DataRow((byte)01, (ushort)100, (ushort)3, DisplayName = "从站01, 线圈100, 数量3")]
+    [DataRow((byte)03, (ushort)200, (ushort)5, DisplayName = "从站03, 线圈200, 数量5")]
+    [TestMethod(DisplayName = "读取线圈打包解包")]
+    public async Task ReadCoils_Pack_Unpack(byte slaveId, ushort address, ushort quantity)
+    {
+        var layout = RtuProtocol.ReadCoils();
+
+        Span<byte> span = stackalloc byte[layout.TotalLength];
+        layout.TryPack(span, slaveId, address, quantity);
+
+        // Unpack
+        layout.TryUnpack(span, out var unpack_slave_id, out var unpack_address, out var unpack_quantity);
+
+        // Assert
+        Assert.AreEqual(slaveId, unpack_slave_id);
+        Assert.AreEqual(address, unpack_address);
+        Assert.AreEqual(quantity, unpack_quantity);
+
+        Console.WriteLine($"写入线圈: {ToString(span.ToArray())}");
+        Console.WriteLine($"从站Id: {unpack_slave_id}");
+        Console.WriteLine($"起始地址: {unpack_address}");
+        Console.WriteLine($"数量: {quantity}");
+    }
 
 
     // 转为字节字符串
@@ -95,7 +165,6 @@ public sealed class ModbusRtuProtocolTests
         var bytes = items.SelectMany<ushort, byte>(x => [(byte)(x >> 8), (byte)x]);
         return ToString(bytes);
     }
-
     // 随机填充数据
     private static void RandomFill(Span<ushort> values, int min, int max)
     {

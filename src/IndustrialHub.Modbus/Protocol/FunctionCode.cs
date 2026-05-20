@@ -103,9 +103,30 @@ public readonly struct FunctionCode : IEquatable<FunctionCode>
         };
     }
 
+    /// <summary>
+    /// 尝试从功能码值创建
+    /// </summary>
+    public static bool TryFromCode(byte code, out FunctionCode result)
+    {
+        result = code switch
+        {
+            ReadCoilsValue => ReadCoils,
+            ReadDiscreteInputsValue => ReadDiscreteInputs,
+            ReadHoldingRegistersValue => ReadHoldingRegisters,
+            ReadInputRegistersValue => ReadInputRegisters,
+            WriteSingleCoilValue => WriteSingleCoil,
+            WriteSingleRegisterValue => WriteSingleRegister,
+            WriteMultipleCoilsValue => WriteMultipleCoils,
+            WriteMultipleRegistersValue => WriteMultipleRegisters,
+            _ => default
+        };
+
+        return result != default;
+    }
+
 
     public static implicit operator byte(FunctionCode code) => code._value;
-    public static implicit operator FunctionCode(byte code) => FromCode(code);
+    public static explicit operator FunctionCode(byte code) => FromCode(code);
 
 
     public override string ToString() => $"[0x{_value:X2}]";

@@ -13,15 +13,18 @@ public interface IRtuWriteSingleFrameLayout : IRtuFrameLayout
 /// <summary>
 /// Rtu写单个线圈帧布局
 /// </summary>
-public interface IRtuWriteSingleCoilFrameLayout
+public interface IRtuWriteSingleCoilFrameLayout : IRtuWriteSingleFrameLayout
 {
     bool TryPack(Span<byte> destination, byte slaveId, ushort address, bool value);
+
+    bool TryUnpack(ReadOnlySpan<byte> source, out byte slaveId, out ushort address, out bool value);
 }
 
 /// <summary>
 /// Rtu写单个寄存器帧布局
 /// </summary>
-public interface IRtuWriteSingleRegisterFrameLayout
+public interface IRtuWriteSingleRegisterFrameLayout : IRtuWriteSingleFrameLayout
 {
     bool TryPack(Span<byte> destination, byte slaveId, ushort address, ushort value);
+    bool TryUnpack(ReadOnlySpan<byte> source, out byte slaveId, out ushort address, out ushort value);
 }

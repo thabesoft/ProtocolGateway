@@ -7,7 +7,7 @@ namespace IndustrialHub.Modbus.Protocol.Rtu;
 /// <summary>
 /// Rtu读帧布局
 /// </summary>
-internal sealed class RtuReadFrameLayouts : IRtuReadFrameLayout,
+internal sealed class RtuReadFrameLayouts : 
     IRtuReadCoilsFrameLayout,
     IRtuReadDiscreteInputsFrameLayout,
     IRtuReadHoldingRegistersFrameLayout,
@@ -25,14 +25,15 @@ internal sealed class RtuReadFrameLayouts : IRtuReadFrameLayout,
 
     private RtuReadFrameLayouts()
     {
-        SlaveIdIndex = 1;
-        FunctionCodeIndex = 2;
+        SlaveIdIndex = 0;
+        FunctionCodeIndex = 1;
         AddressRange = new(2, 4);
         QuantityRange = new(4, 6);
-        PayloadRange = new(0, 7);
-        CrcRange = new(7, 9);
+        PayloadRange = new(0, 6);
+        CrcRange = new(6, 8);
         TotalLength = 8;
     }
+
 
     private bool TryPack(
         Span<byte> destination,
@@ -56,6 +57,48 @@ internal sealed class RtuReadFrameLayouts : IRtuReadFrameLayout,
         var crc = CrcCalculator.Calculate(destination[PayloadRange]);
         return crc.TryToByte(destination[CrcRange], Endianness.LittleEndian);
     }
+    private bool TryUnpack(
+        ReadOnlySpan<byte> source,
+        out byte slaveId,
+        out FunctionCode functionCode,
+        out ushort address,
+        out ushort quantity,
+        out ushort crc
+        )
+    {
+        slaveId = default;
+        functionCode = default;
+        address = default;
+        quantity = default;
+        crc = default;
+
+        // 缓冲区长度不足
+        if (source.Length < TotalLength) return false;
+
+        // 从站
+        var received_slaveId = source[SlaveIdIndex];
+        // 功能码
+        if (!FunctionCode.TryFromCode(source[FunctionCodeIndex], out var received_function_code)) return false;
+        if (!received_function_code.IsRead) return false;
+        // 起始地址
+        if (!source[AddressRange].TryToUInt16(out var received_address, Endianness.BigEndian)) return false;
+        // 数量
+        if (!source[QuantityRange].TryToUInt16(out var received_quantity, Endianness.BigEndian)) return false;
+        // Crc
+        if (!source[CrcRange].TryToUInt16(out var received_crc, Endianness.LittleEndian)) return false;
+        // 验证
+        if (!CrcCalculator.Validate(source[PayloadRange], received_crc)) return false;
+
+        slaveId = received_slaveId;
+        functionCode = received_function_code;
+        address = received_address;
+        quantity = received_quantity;
+        crc = received_crc;
+
+        return true;
+    }
+
+
 
     bool IRtuReadCoilsFrameLayout.TryPack(
         Span<byte> destination,
@@ -65,6 +108,16 @@ internal sealed class RtuReadFrameLayouts : IRtuReadFrameLayout,
     {
         return TryPack(destination, slaveId, FunctionCode.ReadCoils, address, quantity);
     }
+    bool IRtuReadCoilsFrameLayout.TryUnpack(
+        ReadOnlySpan<byte> source,
+        out byte slaveId,
+        out ushort address,
+        out ushort quantity)
+    {
+        return TryUnpack(source: source, out slaveId, out _, out address, out quantity, out _);
+    }
+
+
     bool IRtuReadDiscreteInputsFrameLayout.TryPack(
         Span<byte> destination,
         byte slaveId,
@@ -73,6 +126,16 @@ internal sealed class RtuReadFrameLayouts : IRtuReadFrameLayout,
     {
         return TryPack(destination, slaveId, FunctionCode.ReadDiscreteInputs, address, quantity);
     }
+    bool IRtuReadDiscreteInputsFrameLayout.TryUnpack(
+        ReadOnlySpan<byte> source,
+        out byte slaveId,
+        out ushort address,
+        out ushort quantity)
+    {
+        return TryUnpack(source: source, out slaveId, out _, out address, out quantity, out _);
+    }
+
+
     bool IRtuReadHoldingRegistersFrameLayout.TryPack(
         Span<byte> destination,
         byte slaveId,
@@ -81,6 +144,16 @@ internal sealed class RtuReadFrameLayouts : IRtuReadFrameLayout,
     {
         return TryPack(destination, slaveId, FunctionCode.ReadHoldingRegisters, address, quantity);
     }
+    bool IRtuReadHoldingRegistersFrameLayout.TryUnpack(
+        ReadOnlySpan<byte> source,
+        out byte slaveId,
+        out ushort address,
+        out ushort quantity)
+    {
+        return TryUnpack(source: source, out slaveId, out _, out address, out quantity, out _);
+    }
+
+
     bool IRtuReadInputRegistersFrameLayout.TryPack(
         Span<byte> destination,
         byte slaveId,
@@ -88,5 +161,13 @@ internal sealed class RtuReadFrameLayouts : IRtuReadFrameLayout,
         ushort quantity)
     {
         return TryPack(destination, slaveId, FunctionCode.ReadInputRegisters, address, quantity);
+    }
+    bool IRtuReadInputRegistersFrameLayout.TryUnpack(
+        ReadOnlySpan<byte> source,
+        out byte slaveId,
+        out ushort address,
+        out ushort quantity)
+    {
+        return TryUnpack(source: source, out slaveId, out _, out address, out quantity, out _);
     }
 }

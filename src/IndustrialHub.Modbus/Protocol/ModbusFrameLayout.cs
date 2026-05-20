@@ -30,4 +30,18 @@ public sealed class ModbusFrameLayout
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ushort GetSingleCoilValue(bool value) => value ? (ushort)0xFF00 : (ushort)0x0000;
+
+    /// <summary>
+    /// 获取单线圈的值
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool GetSingleCoilValue(ushort value)
+    {
+        return value switch
+        {
+            0xFF00 => true,
+            0x0000 => false,
+            _ => throw new ArgumentException($"无效的 Modbus 线圈值: 0x{value:X4}，有效值为 0xFF00 (ON) 或 0x0000 (OFF)", nameof(value))
+        };
+    }
 }
