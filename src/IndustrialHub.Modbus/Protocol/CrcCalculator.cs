@@ -1,13 +1,17 @@
 ﻿namespace IndustrialHub.Modbus.Protocol;
 
+
+/// <summary>
+/// Crc校验码计算器
+/// </summary>
 public static class CrcCalculator
 {
-    public static ushort Compute(ReadOnlyMemory<byte> data)
-    {
-        return Compute(data.Span);
-    }
-
-    public static ushort Compute(ReadOnlySpan<byte> data)
+    /// <summary>
+    /// 计算CRC16校验码
+    /// </summary>
+    /// <param name="data">数据</param>
+    /// <returns>CrcCode</returns>
+    public static ushort Calculate(ReadOnlySpan<byte> data)
     {
         ushort crc = 0xFFFF;
 
@@ -26,8 +30,13 @@ public static class CrcCalculator
         return crc;
     }
 
-    public static bool Compute(ReadOnlySpan<byte> data, ushort value)
+    /// <summary>
+    /// 验证数据
+    /// </summary>
+    /// <param name="data">数据</param>
+    /// <param name="crcCode">校验码</param>
+    public static bool Validate(ReadOnlySpan<byte> data, ushort crcCode)
     {
-        return Compute(data) == value;
+        return Calculate(data) == crcCode;
     }
 }

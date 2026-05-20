@@ -1,6 +1,4 @@
-﻿using IndustrialHub.Modbus.Options;
-
-namespace IndustrialHub.Modbus.Transporters;
+﻿namespace ThabeSoft.IndustriaHub.Protocol;
 
 
 /// <summary>
@@ -17,7 +15,7 @@ public interface ITransporter : IAsyncDisposable
     /// <summary>
     /// 连接
     /// </summary>
-    ValueTask ConnectAsync(IModbusOptions options, CancellationToken cancellationToken = default);
+    ValueTask ConnectAsync(IProtocolOptions options, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 断开

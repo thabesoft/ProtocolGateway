@@ -18,26 +18,6 @@ public readonly struct Bits8 : IBits<Bits8>
     private Bits8(byte value) => _value = value;
 
 
-    public static Bits8 FromBits(ReadOnlySpan<bool> bits, bool bigEndian = false)
-    {
-        if (bits.Length < 0 || bits.Length > MaxLength)
-        {
-            throw new ArgumentOutOfRangeException(nameof(bits.Length), $"位长度范围在必须在 [0, {MaxLength}] 之间");
-        }
-
-        byte result = 0;
-
-        for (int i = 0; i < bits.Length; i++)
-        {
-            if (!bits[i]) continue;
-
-            int bitIndex = bigEndian ? MaxLength - 1 - i : i;
-            result |= (byte)(1 << bitIndex);
-        }
-
-        return new Bits8(result);
-    }
-
     public static implicit operator Bits8(byte value) => new(value);
     public static implicit operator byte(Bits8 value) => value._value;
 
@@ -77,22 +57,9 @@ public readonly struct Bits8 : IBits<Bits8>
     {
         return (_value & (1 << index)) != 0;
     }
-    public readonly byte ToUInt8()
+    public readonly byte ToByte()
     {
         return _value;
-    }
-
-    public readonly void CopyTo(Span<bool> destination, bool bigEndian = false)
-    {
-        if (destination.Length == 0) return;
-
-        int bits_to_copy = destination.Length > MaxLength ? MaxLength : destination.Length;
-
-        for (int i = 0; i < bits_to_copy; i++)
-        {
-            var cur_index = bigEndian ? i : bits_to_copy - 1 - i;
-            destination[cur_index] = (_value & (1 << cur_index)) != 0;
-        }
     }
 
     public override int GetHashCode() => _value.GetHashCode();

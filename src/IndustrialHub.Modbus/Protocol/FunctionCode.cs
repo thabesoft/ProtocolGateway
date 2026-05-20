@@ -24,6 +24,10 @@ public readonly struct FunctionCode : IEquatable<FunctionCode>
     /// 是否是写操作码
     /// </summary>
     public bool IsWrite => _value is WriteSingleCoilValue or WriteSingleRegisterValue or WriteMultipleCoilsValue or WriteMultipleRegistersValue;
+    /// <summary>
+    /// 是否是写入单值
+    /// </summary>
+    public bool IsWriteSingle => _value is WriteSingleCoilValue or WriteSingleRegisterValue;
 
 
 

@@ -1,11 +1,13 @@
 ﻿using System.IO.Ports;
+using ThabeSoft.IndustriaHub.Protocol;
 
 namespace IndustrialHub.Modbus.Options;
+
 
 /// <summary>
 /// Modus串口配置
 /// </summary>
-public interface IModbusSerialOptions : IModbusOptions
+public interface IModbusSerialOptions : IProtocolOptions
 {
     /// <summary>
     /// 端口名
@@ -15,7 +17,7 @@ public interface IModbusSerialOptions : IModbusOptions
     /// <summary>
     /// 波特率
     /// </summary>
-    int BaudRate { get; }
+    BaudRate BaudRate { get; }
 
     /// <summary>
     /// 校验
@@ -42,17 +44,17 @@ public interface IModbusSerialOptions : IModbusOptions
 /// <summary>
 /// Modbus 串口选项
 /// </summary>
-public record class ModbusSerialOptions : IModbusSerialOptions
+public sealed class ModbusSerialOptions : ProtocolOptions, IModbusSerialOptions
 {
     /// <summary>
     /// 端口名
     /// </summary>
-    public string PortName { get; private set; }
+    public string PortName { get; }
 
     /// <summary>
     /// 波特率
     /// </summary>
-    public int BaudRate { get; private set; } = 9600;
+    public BaudRate BaudRate { get; private set; } = BaudRate.Rate9600;
 
     /// <summary>
     /// 校验
@@ -74,63 +76,22 @@ public record class ModbusSerialOptions : IModbusSerialOptions
     /// </summary>
     public DuplexMode DuplexMode { get; private set; } = DuplexMode.FullDuplex;
 
-    /// <summary>
-    /// 重试次数
-    /// </summary>
-    public int RetryCount { get; private set; } = 30;
-
-    /// <summary>
-    /// 重试间隔
-    /// </summary>
-    public TimeSpan RetryInterval { get; private set; } = TimeSpan.FromSeconds(3);
-
-    /// <summary>
-    /// 读取超时时间
-    /// </summary>
-    public TimeSpan ReadTimeout { get; private set; } = TimeSpan.FromSeconds(1);
-    /// <summary>
-    /// 写入超时时间
-    /// </summary>
-    public TimeSpan WriteTimeout { get; private set; } = TimeSpan.FromSeconds(1);
 
 
-
-    private ModbusSerialOptions(string portName)
-    {
-        PortName = portName;
-    }
-
+    private ModbusSerialOptions(string portName) => PortName = portName;
     public static ModbusSerialOptions Create(string portName)
     {
+        if (string.IsNullOrWhiteSpace(portName)) throw new ArgumentException(nameof(portName), "串口名不可为空");
         return new ModbusSerialOptions(portName);
     }
+    public IModbusSerialOptions Build() => this;
 
-    public ModbusSerialOptions SetBaudRate(int value)
+
+    public ModbusSerialOptions SetBaudRate(BaudRate baudRate)
     {
-        BaudRate = value;
+        if (baudRate == BaudRate.Empty) throw new ArgumentException(nameof(baudRate), "波特率不可为空");
+
+        BaudRate = baudRate;
         return this;
     }
-
-    public IModbusSerialOptions Build()
-    {
-        return new ModbusSerialOptions(this);
-    }
-}
-
-
-
-/// <summary>
-/// 双工模式
-/// </summary>
-public enum DuplexMode
-{
-    /// <summary>
-    /// 全双工, 如: RS-232 / RS-422 / TTL
-    /// </summary>
-    FullDuplex,
-
-    /// <summary>
-    /// 半双工, 如: RS-485 两线制
-    /// </summary>
-    HalfDuplex
 }

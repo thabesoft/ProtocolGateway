@@ -1,4 +1,4 @@
-﻿namespace IndustrialHub.Modbus.Transporters;
+﻿namespace ThabeSoft.IndustriaHub.Protocol;
 
 
 /// <summary>

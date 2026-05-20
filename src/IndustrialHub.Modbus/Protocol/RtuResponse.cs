@@ -45,7 +45,7 @@ public readonly struct RtuResponse
         var content = responseBytes.AsSpan(0, content_length);
         var crc = (ushort)(responseBytes[total_length - 2] | (responseBytes[total_length - 1] << 8));
 
-        if (CrcCalculator.Compute(content) != crc)
+        if (CrcCalculator.Calculate(content) != crc)
         {
             throw new CrcException("CRC校验失败");
         }
@@ -56,7 +56,6 @@ public readonly struct RtuResponse
     /// <summary>
     /// 错误数据
     /// </summary>
-    /// <param name="bytes"></param>
     /// <exception cref="InvalidDataException"></exception>
     /// <exception cref="ModbusException"></exception>
     [DoesNotReturn]
@@ -76,7 +75,7 @@ public readonly struct RtuResponse
         var data = bytes.AsSpan(0, content_length);
         var crc = (ushort)(bytes[3] | (bytes[4] << 8));
 
-        if (CrcCalculator.Compute(data) == crc)
+        if (CrcCalculator.Calculate(data) == crc)
         {
             throw new InvalidDataException("CRC校验失败");
         }

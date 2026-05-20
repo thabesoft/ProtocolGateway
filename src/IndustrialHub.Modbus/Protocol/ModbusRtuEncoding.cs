@@ -65,7 +65,7 @@ public static class ModbusRtuEncoding
         buffer[4] = (byte)(data >> 8);
         buffer[5] = (byte)data;
 
-        var crc = CrcCalculator.Compute(buffer[..6]);
+        var crc = CrcCalculator.Calculate(buffer[..6]);
         buffer[6] = (byte)crc;
         buffer[7] = (byte)(crc >> 8);
     }
@@ -92,7 +92,7 @@ public static class ModbusRtuEncoding
             data_span[(i * 2) + 1] = (byte)values[i];       // 低字节
         }
 
-        var crc = CrcCalculator.Compute(buffer[0..(7 + byte_count)]);
+        var crc = CrcCalculator.Calculate(buffer[0..(7 + byte_count)]);
         buffer[7 + byte_count] = (byte)crc;
         buffer[8 + byte_count] = (byte)(crc >> 8);
     }
@@ -167,7 +167,7 @@ public static class ModbusRtuEncoding
         buffer[4] = (byte)(value >> 8);
         buffer[5] = (byte)value;
 
-        var crc = CrcCalculator.Compute(buffer[..6]);
+        var crc = CrcCalculator.Calculate(buffer[..6]);
         buffer[6] = (byte)crc;
         buffer[7] = (byte)(crc >> 8);
     }
@@ -204,7 +204,7 @@ public static class ModbusRtuEncoding
             }
         }
 
-        var crc = CrcCalculator.Compute(buffer[0..(7 + byte_count)]);
+        var crc = CrcCalculator.Calculate(buffer[0..(7 + byte_count)]);
         buffer[7 + byte_count] = (byte)crc;
         buffer[8 + byte_count] = (byte)(crc >> 8);
     }
@@ -235,7 +235,7 @@ public static class ModbusRtuEncoding
             data_span[(i * 2) + 1] = (byte)values[i];       // 低字节
         }
 
-        var crc = CrcCalculator.Compute(buffer[0..(7 + byte_count)]);
+        var crc = CrcCalculator.Calculate(buffer[0..(7 + byte_count)]);
         buffer[7 + byte_count] = (byte)crc;
         buffer[8 + byte_count] = (byte)(crc >> 8);
     }

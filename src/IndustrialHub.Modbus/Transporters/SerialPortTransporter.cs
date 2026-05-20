@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO.Ports;
+using ThabeSoft.IndustriaHub.Protocol;
 
 namespace IndustrialHub.Modbus.Transporters;
 
@@ -37,7 +38,7 @@ public sealed class SerialPortTransporter : ITransporter, INotifyPropertyChanged
     } = TransporterState.Pending;
 
 
-    public async ValueTask ConnectAsync(IModbusOptions options, CancellationToken cancellation = default)
+    public async ValueTask ConnectAsync(IProtocolOptions options, CancellationToken cancellation = default)
     {
         if (options is not IModbusSerialOptions serialOptions)
         {
