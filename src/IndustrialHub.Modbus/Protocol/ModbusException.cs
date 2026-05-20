@@ -4,12 +4,22 @@
 /// <summary>
 /// Modbus异常
 /// </summary>
-/// <param name="slaveId"></param>
-/// <param name="functionCode"></param>
-/// <param name="errorCode"></param>
-public sealed class ModbusException(byte slaveId, ErrorFunctionCode functionCode, byte errorCode) : Exception
+public sealed class ModbusException: Exception
 {
-    public byte SlaveId { get; } = slaveId;
-    public ErrorFunctionCode FunctionCode { get; } = functionCode;
-    public byte ErrorCode { get; } = errorCode;
+    public byte SlaveId { get; set; }
+    public ErrorFunctionCode FunctionCode { get; set; }
+    public byte ErrorCode { get; set; }
+
+
+    public ModbusException()
+    {
+    }
+
+    public ModbusException(string message) : base(message)
+    {
+    }
+
+    public ModbusException(string message, Exception innerException) : base(message, innerException)
+    {
+    }
 }

@@ -23,7 +23,25 @@ public interface IRtuWriteMultipleFrameLayout : IRtuFrameLayout
 /// </summary>
 public interface IRtuWriteMultipleRegistersFrameLayout : IRtuWriteMultipleFrameLayout
 {
-    bool TryPack(Span<byte> source, byte slaveId, ushort address, ReadOnlySpan<ushort> values);
+    /// <summary>
+    /// 打包写多寄存器帧到目标缓冲区
+    /// </summary>
+    /// <param name="destination">目标缓冲区</param>
+    /// <param name="slaveId">站号</param>
+    /// <param name="address">地址</param>
+    /// <param name="values">寄存器值</param>
+    /// <returns>是否打包成功</returns>
+    bool TryPack(Span<byte> destination, byte slaveId, ushort address, ReadOnlySpan<ushort> values);
+
+    /// <summary>
+    /// 解包写多寄存器帧从源数据
+    /// </summary>
+    /// <param name="source">源数据</param>
+    /// <param name="slaveId">从站号</param>
+    /// <param name="address">地址</param>
+    /// <param name="values">寄存器值</param>
+    /// <returns>是否解包成功</returns>
+    bool TryUnpack(ReadOnlySpan<byte> source, out byte slaveId, out ushort address, Span<ushort> values);
 }
 
 /// <summary>
@@ -31,5 +49,23 @@ public interface IRtuWriteMultipleRegistersFrameLayout : IRtuWriteMultipleFrameL
 /// </summary>
 public interface IRtuWriteMultipleCoilsFrameLayout : IRtuWriteMultipleFrameLayout
 {
-    bool TryPack(Span<byte> source, byte slaveId, ushort address, ReadOnlySpan<bool> values);
+    /// <summary>
+    /// 打包写多线圈帧到目标缓冲区
+    /// </summary>
+    /// <param name="destination">目标缓冲区</param>
+    /// <param name="slaveId">站号</param>
+    /// <param name="address">地址</param>
+    /// <param name="values">线圈值</param>
+    /// <returns>是否打包成功</returns>
+    bool TryPack(Span<byte> destination, byte slaveId, ushort address, ReadOnlySpan<bool> values);
+
+    /// <summary>
+    /// 解包写多线圈帧从源数据
+    /// </summary>
+    /// <param name="source">源数据</param>
+    /// <param name="slaveId">从站号</param>
+    /// <param name="address">地址</param>
+    /// <param name="values">线圈值</param>
+    /// <returns>是否解包成功</returns>
+    bool TryUnpack(ReadOnlySpan<byte> source, out byte slaveId, out ushort address, Span<bool> values);
 }

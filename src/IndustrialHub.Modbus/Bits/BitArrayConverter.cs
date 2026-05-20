@@ -49,10 +49,10 @@ public static class BitArrayConverter
     /// <returns>是否转换成功</returns>
     public static bool TryToBit(this byte source, Span<bool> destination, Endianness endianness = Endianness.BigEndian)
     {
-        if (destination.Length < BitsPerByte) return false;
+        //if (destination.Length < BitsPerByte) return false;
         if (endianness is not (Endianness.LittleEndian or Endianness.BigEndian)) return false;
 
-        for (int i = 0; i < BitsPerByte; i++)
+        for (int i = 0; i < destination.Length; i++)
         {
             if (endianness == Endianness.BigEndian)
             {

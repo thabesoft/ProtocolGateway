@@ -2,6 +2,10 @@
 
 namespace IndustrialHub.Modbus.Protocol;
 
+
+/// <summary>
+/// Modbus 帧布局
+/// </summary>
 public sealed class ModbusFrameLayout
 {
     /// <summary>

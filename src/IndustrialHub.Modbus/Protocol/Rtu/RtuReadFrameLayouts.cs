@@ -15,23 +15,23 @@ internal sealed class RtuReadFrameLayouts : IRtuReadFrameLayout,
 {
     internal static readonly RtuReadFrameLayouts Instance = new();
 
-    public int SalveIdIndex { get; }
+    public int SlaveIdIndex { get; }
     public int FunctionCodeIndex { get; }
     public Range AddressRange { get; }
     public Range QuantityRange { get; }
-    public Range ContentRange { get; }
+    public Range PayloadRange { get; }
     public Range CrcRange { get; }
-    public int FullByteLength { get; }
+    public int TotalLength { get; }
 
     private RtuReadFrameLayouts()
     {
-        SalveIdIndex = 1;
+        SlaveIdIndex = 1;
         FunctionCodeIndex = 2;
         AddressRange = new(2, 4);
         QuantityRange = new(4, 6);
-        ContentRange = new(0, 7);
+        PayloadRange = new(0, 7);
         CrcRange = new(7, 9);
-        FullByteLength = 8;
+        TotalLength = 8;
     }
 
     private bool TryPack(
@@ -42,18 +42,18 @@ internal sealed class RtuReadFrameLayouts : IRtuReadFrameLayout,
         ushort quantity)
     {
         // 缓冲区长度不足
-        if (destination.Length < FullByteLength) return false;
+        if (destination.Length < TotalLength) return false;
         if (!function.IsRead) return false;
 
         // 从站
-        destination[SalveIdIndex] = slaveId;
+        destination[SlaveIdIndex] = slaveId;
         // 功能码
         destination[FunctionCodeIndex] = function;
         // 起始地址
         if (!address.TryToByte(destination[AddressRange], Endianness.BigEndian)) return false;
         if (!quantity.TryToByte(destination[QuantityRange], Endianness.BigEndian)) return false;
         // 验证
-        var crc = CrcCalculator.Calculate(destination[ContentRange]);
+        var crc = CrcCalculator.Calculate(destination[PayloadRange]);
         return crc.TryToByte(destination[CrcRange], Endianness.LittleEndian);
     }
 

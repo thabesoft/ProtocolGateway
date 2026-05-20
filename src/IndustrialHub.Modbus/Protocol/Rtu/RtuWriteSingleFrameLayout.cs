@@ -8,24 +8,24 @@ internal sealed class RtuWriteSingleFrameLayout : IRtuWriteSingleFrameLayout,
 {
     internal static RtuWriteSingleFrameLayout Instance { get; } = new();
 
-    public int SalveIdIndex { get; }
+    public int SlaveIdIndex { get; }
     public int FunctionCodeIndex { get; } = 1;
     public Range AddressRange { get; } = new(2, 4);
     public Range ValueRange { get; }
-    public Range ContentRange { get; }
+    public Range PayloadRange { get; }
     public Range CrcRange { get; } = new(6, 8);
-    public int FullByteLength { get; } = 8;
+    public int TotalLength { get; } = 8;
 
 
     private RtuWriteSingleFrameLayout()
     {
-        SalveIdIndex = 1;
+        SlaveIdIndex = 1;
         FunctionCodeIndex = 2;
         AddressRange = new(2, 4);
         ValueRange = new(4, 6);
-        ContentRange = new(0, 7);
+        PayloadRange = new(0, 7);
         CrcRange = new(7, 9);
-        FullByteLength = 8;
+        TotalLength = 8;
     }
 
 
@@ -37,11 +37,11 @@ internal sealed class RtuWriteSingleFrameLayout : IRtuWriteSingleFrameLayout,
         ushort value)
     {
         // 缓冲区长度不足
-        if (destination.Length < FullByteLength) return false;
+        if (destination.Length < TotalLength) return false;
         if (!function.IsWriteSingle) return false;
 
         // 从站
-        destination[SalveIdIndex] = slaveId;
+        destination[SlaveIdIndex] = slaveId;
         // 功能码
         destination[FunctionCodeIndex] = function;
         // 起始地址
@@ -49,7 +49,7 @@ internal sealed class RtuWriteSingleFrameLayout : IRtuWriteSingleFrameLayout,
         // 值
         if (!value.TryToByte(destination[ValueRange], Endianness.BigEndian)) return false;
         // 验证
-        var crc = CrcCalculator.Calculate(destination[ContentRange]);
+        var crc = CrcCalculator.Calculate(destination[PayloadRange]);
         return crc.TryToByte(destination[CrcRange], Endianness.LittleEndian);
     }
 

@@ -80,7 +80,7 @@ public readonly struct RtuResponse
             throw new InvalidDataException("CRC校验失败");
         }
 
-        throw new ModbusException(slave_id, function_code, error_code);
+        throw new ModbusException();
     }
 
 
