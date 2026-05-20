@@ -1,7 +1,0 @@
-<Solution>
-  <Folder Name="/Tests/">
-    <Project Path="tests/IndustrialHub.UnitTests/IndustrialHub.UnitTests.csproj" />
-  </Folder>
-  <Project Path="src/IndustrialHub.Modbus/IndustrialHub.Modbus.csproj" />
-  <Project Path="src/ThabeSoft.IndustriaHub.Abstractions/ThabeSoft.IndustriaHub.Abstractions.csproj" />
-</Solution>

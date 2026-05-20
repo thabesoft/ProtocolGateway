@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.1</TargetFrameworks>
+		<LangVersion>preview</LangVersion>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<RootNamespace>ThabeSoft.ProtocolGateway</RootNamespace>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Remove="Protocols\Serializer\hsp0cjnw.dqb~" />
+	</ItemGroup>
+
+	<!--引入-->
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="11.0.0-preview.2.26159.112" />
+		<PackageReference Include="System.IO.Ports" Version="10.0.4" />
+		<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.Abstractions\ThabeSoft.ProtocolGateway.Abstractions.csproj" />
+	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.Common\ThabeSoft.ProtocolGateway.Utilities.csproj" />
+	</ItemGroup>
+
+</Project>
