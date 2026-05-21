@@ -10,5 +10,5 @@ public interface IWriteChannel : IChannel
     /// <summary>
     /// 写入数据
     /// </summary>
-    ValueTask<ErrorType> WriteAsync(IWriteRequest request, ReadOnlyMemory<byte> source, CancellationToken cancellationToken = default);
+    ValueTask<Result> WriteAsync(IWriteRequest request, ReadOnlyMemory<byte> source, CancellationToken cancellationToken = default);
 }

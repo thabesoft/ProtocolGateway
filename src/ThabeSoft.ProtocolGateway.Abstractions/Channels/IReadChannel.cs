@@ -10,5 +10,5 @@ public interface IReadChannel : IChannel
     /// <summary>
     /// 读取数据
     /// </summary>
-    ValueTask<ErrorType> ReadAsync(IReadRequest request, Memory<byte> destination, CancellationToken cancellationToken = default);
+    ValueTask<Result> ReadAsync(IReadRequest request, Memory<byte> destination, CancellationToken cancellationToken = default);
 }
