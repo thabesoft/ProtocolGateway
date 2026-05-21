@@ -1,4 +1,4 @@
-﻿namespace ThabeSoft.ProtocolGateway;
+﻿namespace ThabeSoft.ProtocolGateway.Primitives;
 
 
 /// <summary>

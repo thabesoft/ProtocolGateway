@@ -1,4 +1,6 @@
-﻿namespace ThabeSoft.ProtocolGateway.Conversion;
+﻿using ThabeSoft.ProtocolGateway.Primitives;
+
+namespace ThabeSoft.ProtocolGateway.Conversion;
 
 
 [TestClass]

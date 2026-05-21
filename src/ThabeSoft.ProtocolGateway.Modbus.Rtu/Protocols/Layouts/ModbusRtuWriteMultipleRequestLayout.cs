@@ -1,5 +1,5 @@
-﻿using System.Diagnostics;
-using ThabeSoft.IndustrialHub.Modbus;
+﻿using ThabeSoft.IndustrialHub.Modbus;
+using ThabeSoft.ProtocolGateway.Primitives;
 
 namespace ThabeSoft.ProtocolGateway.Protocols.Layouts;
 
@@ -57,28 +57,12 @@ public readonly struct ModbusRtuWriteMultipleRequestLayout : IModbusRtuLayoutExt
     }
 
 
-
-
     /// <summary>
     /// 创建一个拥有指定数量寄存器的帧布局
     /// </summary>
     /// <param name="quantity">寄存器数量</param>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public static bool TryCreayeRegisters(byte quantity, out ModbusRtuWriteMultipleRequestLayout result)
+    public static ModbusRtuWriteMultipleRequestLayout CreateRegisters(ModbusWriteRegistersQuantity quantity)
     {
-        result = default;
-
-        if (quantity <= 0)
-        {
-            Debug.Fail("寄存器数量必须大于0");
-            return false;
-        }
-        if (quantity > 125)
-        {
-            Debug.Fail("寄存器数量不能超过125");
-            return false;
-        }
-
         // Data
         var data_byte_length = ModbusFrameLayout.GetRegistersToByteLength(quantity);
         const int data_start = 7;
@@ -93,36 +77,37 @@ public readonly struct ModbusRtuWriteMultipleRequestLayout : IModbusRtuLayoutExt
         var crc_end = data_end + 2;
         var crc_range = new Range(crc_start, crc_end);
 
-        result = new ModbusRtuWriteMultipleRequestLayout(
+        return new ModbusRtuWriteMultipleRequestLayout(
             dataRange: data_range,
             contentRange: content,
             crcRange: crc_range,
             dataByteLength: data_byte_length,
             fullByteLength: crc_end,
             dataMaxQuantity: quantity);
-
-        return true;
     }
+    /// <summary>
+    /// 创建一个拥有指定数量寄存器的帧布局
+    /// </summary>
+    /// <param name="quantity">寄存器数量</param>
+    public static bool TryCreayeRegisters(byte quantity, out ModbusRtuWriteMultipleRequestLayout result)
+    {
+        if (ModbusWriteRegistersQuantity.TryCreate(quantity, out var register_quantity))
+        {
+            result = CreateRegisters(register_quantity);
+            return true;
+        }
+
+        result = default;
+        return false;
+    }
+
+
     /// <summary>
     /// 创建一个拥有指定数量线圈的帧布局
     /// </summary>
     /// <param name="quantity">线圈数量</param>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public static bool TryCreateCoils(ushort quantity, out ModbusRtuWriteMultipleRequestLayout result)
+    public static ModbusRtuWriteMultipleRequestLayout CreateCoils(ModbusWriteCoilsQuantity quantity)
     {
-        result = default;
-
-        if (quantity <= 0)
-        {
-            Debug.Fail("线圈数量必须大于0"); 
-            return false;
-        }
-        if (quantity > 2000)
-        {
-            Debug.Fail("线圈数量不能超过2000"); 
-            return false;
-        }
-
         // Data
         var data_byte_length = ModbusFrameLayout.GetColisToByteLength(quantity);
         const int data_start = 7;
@@ -137,15 +122,27 @@ public readonly struct ModbusRtuWriteMultipleRequestLayout : IModbusRtuLayoutExt
         var crc_end = data_end + 2;
         var crc_range = new Range(crc_start, crc_end);
 
-        result = new ModbusRtuWriteMultipleRequestLayout(
+        return new ModbusRtuWriteMultipleRequestLayout(
             dataRange: data_range,
             contentRange: content,
             crcRange: crc_range,
             dataByteLength: data_byte_length,
             fullByteLength: crc_end,
             dataMaxQuantity: quantity);
+    }
+    /// <summary>
+    /// 创建一个拥有指定数量线圈的帧布局
+    /// </summary>
+    /// <param name="quantity">线圈数量</param>
+    public static bool TryCreateCoils(ushort quantity, out ModbusRtuWriteMultipleRequestLayout result)
+    {
+        if (ModbusWriteCoilsQuantity.TryCreate(quantity, out var coils_quantity))
+        {
+            result = CreateCoils(coils_quantity);
+            return true;
+        }
 
-        return true;
+        result = default;
+        return false;
     }
 }
-

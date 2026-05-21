@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using ThabeSoft.ProtocolGateway.Channels;
+using ThabeSoft.ProtocolGateway.Primitives;
 
 namespace ThabeSoft.ProtocolGateway;
 
@@ -21,7 +22,7 @@ public static class ChannelExtensions
             {
                 var destination = buffer.AsMemory(0, length);
                 var status = await channel.ReadAsync(request, destination, cancellationToken);
-                if (status != ResponseStatus.OK) return Result.Failure<T>(status);
+                if (status != ErrorType.Success) return Result.Failure<T>(status);
 
                 var value = MemoryMarshal.Cast<byte, T>(destination.Span)[0];
                 return Result.Success(value);
@@ -97,7 +98,7 @@ public static class ChannelExtensions
     // 写基本数据类型的扩展方法
     extension(IWriteChannel channel)
     {
-        public async ValueTask<ResponseStatus> WriteAsync<T>(IWriteRequest request, T value, CancellationToken cancellationToken = default)
+        public async ValueTask<ErrorType> WriteAsync<T>(IWriteRequest request, T value, CancellationToken cancellationToken = default)
             where T : unmanaged
         {
             var length = Unsafe.SizeOf<T>();
@@ -111,12 +112,12 @@ public static class ChannelExtensions
             }
             catch (OperationCanceledException)
             {
-                return ResponseStatus.Timeout;
+                return ErrorType.Timeout;
             }
             catch (Exception ex)
             {
                 Debug.Fail($"数据写入失败: {ex.Message}");
-                return ResponseStatus.InternalError;
+                return ErrorType.InternalError;
             }
             finally
             {
@@ -126,7 +127,7 @@ public static class ChannelExtensions
 
         /*------------------- 8bit -------------------*/
 
-        public ValueTask<ResponseStatus> WriteByteAsync(IWriteRequest request, byte value, CancellationToken cancellationToken = default)
+        public ValueTask<ErrorType> WriteByteAsync(IWriteRequest request, byte value, CancellationToken cancellationToken = default)
         {
             return channel.WriteAsync(request, value, cancellationToken);
         }
@@ -134,51 +135,51 @@ public static class ChannelExtensions
 
         /*------------------- 16bit -------------------*/
 
-        public ValueTask<ResponseStatus> WriteUInt16Async(IWriteRequest request, ushort value, CancellationToken cancellationToken = default)
+        public ValueTask<ErrorType> WriteUInt16Async(IWriteRequest request, ushort value, CancellationToken cancellationToken = default)
         {
             return channel.WriteAsync(request, value, cancellationToken);
         }
 
-        public ValueTask<ResponseStatus> WriteInt16Async(IWriteRequest request, short value, CancellationToken cancellationToken = default)
+        public ValueTask<ErrorType> WriteInt16Async(IWriteRequest request, short value, CancellationToken cancellationToken = default)
         {
             return channel.WriteAsync(request, value, cancellationToken);
         }
 
-        public ValueTask<ResponseStatus> WriteCharAsync(IWriteRequest request, char value, CancellationToken cancellationToken = default)
+        public ValueTask<ErrorType> WriteCharAsync(IWriteRequest request, char value, CancellationToken cancellationToken = default)
         {
             return channel.WriteAsync(request, value, cancellationToken);
         }
 
         /*------------------- 32bit -------------------*/
 
-        public ValueTask<ResponseStatus> WriteUInt32Async(IWriteRequest request, uint value, CancellationToken cancellationToken = default)
+        public ValueTask<ErrorType> WriteUInt32Async(IWriteRequest request, uint value, CancellationToken cancellationToken = default)
         {
             return channel.WriteAsync(request, value, cancellationToken);
         }
 
-        public ValueTask<ResponseStatus> WriteInt32Async(IWriteRequest request, int value, CancellationToken cancellationToken = default)
+        public ValueTask<ErrorType> WriteInt32Async(IWriteRequest request, int value, CancellationToken cancellationToken = default)
         {
             return channel.WriteAsync(request, value, cancellationToken);
         }
 
-        public ValueTask<ResponseStatus> WriteSingleAsync(IWriteRequest request, float value, CancellationToken cancellationToken = default)
+        public ValueTask<ErrorType> WriteSingleAsync(IWriteRequest request, float value, CancellationToken cancellationToken = default)
         {
             return channel.WriteAsync(request, value, cancellationToken);
         }
 
         /*------------------- 64bit -------------------*/
 
-        public ValueTask<ResponseStatus> WriteUInt64Async(IWriteRequest request, ulong value, CancellationToken cancellationToken = default)
+        public ValueTask<ErrorType> WriteUInt64Async(IWriteRequest request, ulong value, CancellationToken cancellationToken = default)
         {
             return channel.WriteAsync(request, value, cancellationToken);
         }
 
-        public ValueTask<ResponseStatus> WriteInt64Async(IWriteRequest request, long value, CancellationToken cancellationToken = default)
+        public ValueTask<ErrorType> WriteInt64Async(IWriteRequest request, long value, CancellationToken cancellationToken = default)
         {
             return channel.WriteAsync(request, value, cancellationToken);
         }
 
-        public ValueTask<ResponseStatus> WriteDoubleAsync(IWriteRequest request, double value, CancellationToken cancellationToken = default)
+        public ValueTask<ErrorType> WriteDoubleAsync(IWriteRequest request, double value, CancellationToken cancellationToken = default)
         {
             return channel.WriteAsync(request, value, cancellationToken);
         }

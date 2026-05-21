@@ -1,12 +1,14 @@
-﻿namespace ThabeSoft.ProtocolGateway.Channels;
+﻿using ThabeSoft.ProtocolGateway.Primitives;
+
+namespace ThabeSoft.ProtocolGateway.Channels;
 
 /// <summary>
 /// 写值通道
 /// </summary>
-public interface IWriteChannel
+public interface IWriteChannel : IChannel
 {
     /// <summary>
     /// 写入数据
     /// </summary>
-    ValueTask<ResponseStatus> WriteAsync(IWriteRequest request, ReadOnlyMemory<byte> source, CancellationToken cancellationToken = default);
+    ValueTask<ErrorType> WriteAsync(IWriteRequest request, ReadOnlyMemory<byte> source, CancellationToken cancellationToken = default);
 }

@@ -6,14 +6,17 @@ namespace ThabeSoft.ProtocolGateway;
 [TestClass]
 public class ProtocolGatewayTests
 {
+    public TestContext TestContext { get; set; }
+
     [TestMethod]
     public async Task FuckAsync()
     {
-        IChannel gateway = default!;
+        IProtocolGateway gateway = default!;
+        var chanel = gateway.GetChannel(default!);
 
-        var result = await gateway.ReadValueAsync<int>(default!, TestContext.CancellationToken);
-        if (result.IsSuccess) Console.WriteLine(result.Value);
+        if(chanel is IReadChannel readChannel)
+        {
+            await readChannel.ReadAsync(default!, default!, TestContext.CancellationToken);
+        }
     }
-
-    public TestContext TestContext { get; set; }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Buffers;
 using ThabeSoft.ProtocolGateway.Channels;
+using ThabeSoft.ProtocolGateway.Primitives;
 using ThabeSoft.ProtocolGateway.Protocols;
 using ThabeSoft.ProtocolGateway.Transports;
 
@@ -55,7 +56,7 @@ public class ModbusGateway(
     }
 
 
-    public async ValueTask<ResponseStatus> ReadValueAsync(IOperation request, Memory<byte> destination, CancellationToken cancellationToken = default)
+    public async ValueTask<ErrorType> ReadValueAsync(IOperation request, Memory<byte> destination, CancellationToken cancellationToken = default)
     {
         if (request is ModbusReadCoilRequest modbus)
         {
@@ -67,7 +68,7 @@ public class ModbusGateway(
 
     }
 
-    public ValueTask<ResponseStatus> WriteValueAsync(IOperation request, ReadOnlyMemory<byte> source, CancellationToken cancellationToken = default)
+    public ValueTask<ErrorType> WriteValueAsync(IOperation request, ReadOnlyMemory<byte> source, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }

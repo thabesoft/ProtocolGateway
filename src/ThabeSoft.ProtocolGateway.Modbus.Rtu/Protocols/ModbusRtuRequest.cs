@@ -1,4 +1,5 @@
-﻿using ThabeSoft.ProtocolGateway.Protocols.Layouts;
+﻿using ThabeSoft.ProtocolGateway.Primitives;
+using ThabeSoft.ProtocolGateway.Protocols.Layouts;
 using ThabeSoft.ProtocolGateway.Protocols.Serializer;
 
 namespace ThabeSoft.ProtocolGateway.Protocols;
@@ -12,8 +13,8 @@ public static class ModbusRtuRequest
 {
     public static IModbusReadRequestLayout ReadLayout => ModbusRtuReadRequestLayout.Instance;
     public static IModbusWriteSingleRequestLayout WriteSingleLayout => ModbusRtuWriteSingleRequestLayout.Instance;
-    public static IModbusWriteMultipleRequestLayout WriteMultipleCoilsLayout(ushort quantity) => ModbusRtuWriteMultipleRequestLayout.WriteMultipleCoils(quantity);
-    public static IModbusWriteMultipleRequestLayout WriteMultipleRegistersLayout(byte quantity) => ModbusRtuWriteMultipleRequestLayout.TryCreayeRegisters(quantity);
+    public static IModbusWriteMultipleRequestLayout WriteMultipleCoilsLayout(ModbusWriteCoilsQuantity quantity) => ModbusRtuWriteMultipleRequestLayout.CreateCoils(quantity);
+    public static IModbusWriteMultipleRequestLayout WriteMultipleRegistersLayout(ModbusWriteRegistersQuantity quantity) => ModbusRtuWriteMultipleRequestLayout.CreateRegisters(quantity);
 
 
     public static IModbusReadCoilsRequestSerializer ReadCoilsSerializer => ModbusRtuReadRequestSerializer.Instance;
@@ -43,7 +44,7 @@ public static class ModbusRtuRequest
     public static (IModbusWriteSingleRegisterRequestSerializer Serializer, IModbusWriteSingleRequestLayout Layout) WriteSingleRegister
         => (ModbusRtuWriteSingleRequestSerializer.Instance, ModbusRtuWriteSingleRequestLayout.Instance);
     public static (IModbusWriteMultipleCoilsRequestSerializer Serializer, IModbusWriteMultipleRequestLayout Layout) WriteMultipleCoils(ushort quantity)
-        => (ModbusRtuWriteMultipleRequestSerializer.Instance, ModbusRtuWriteMultipleRequestLayout.WriteMultipleCoils(quantity));
+        => (ModbusRtuWriteMultipleRequestSerializer.Instance, ModbusRtuWriteMultipleRequestLayout.CreateRegisters(quantity));
     public static (IModbusWriteMultipleRegistersRequestSerializer Serializer, IModbusWriteMultipleRequestLayout Layout) WriteMultipleRegisters(byte quantity)
-        => (ModbusRtuWriteMultipleRequestSerializer.Instance, ModbusRtuWriteMultipleRequestLayout.TryCreayeRegisters(quantity));
+        => (ModbusRtuWriteMultipleRequestSerializer.Instance, ModbusRtuWriteMultipleRequestLayout.CreateRegisters(quantity));
 }

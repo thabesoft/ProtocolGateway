@@ -3,7 +3,7 @@
 /// <summary>
 /// 订阅通道
 /// </summary>
-public interface ISubscribeChannel
+public interface ISubscribeChannel : IChannel
 {
     ISubscription Subscribe(ISubscribeSource source, Action<ReadOnlyMemory<byte>> callback);
     ISubscription Subscribe(ISubscribeSource source, Func<ReadOnlyMemory<byte>, ValueTask> callback);
