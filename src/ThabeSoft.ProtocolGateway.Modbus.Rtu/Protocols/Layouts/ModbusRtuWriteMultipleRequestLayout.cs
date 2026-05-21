@@ -1,4 +1,5 @@
-﻿using ThabeSoft.IndustrialHub.Modbus;
+﻿using System.Diagnostics;
+using ThabeSoft.IndustrialHub.Modbus;
 
 namespace ThabeSoft.ProtocolGateway.Protocols.Layouts;
 
@@ -6,21 +7,24 @@ namespace ThabeSoft.ProtocolGateway.Protocols.Layouts;
 /// <summary>
 /// Modbus Rtu 写多值请求布局
 /// </summary>
-internal readonly struct ModbusRtuWriteMultipleRequestLayout : IModbusReadRequestLayout, IModbusRtuLayoutExtension
+public readonly struct ModbusRtuWriteMultipleRequestLayout : IModbusRtuLayoutExtension,
+    IModbusWriteMultipleRequestLayout
 {
     public static readonly ModbusRtuWriteMultipleRequestLayout Empty;
+    static ModbusRtuWriteMultipleRequestLayout() => Empty = default;
+
 
 
     /// <summary>从站Id索引</summary>
-    public readonly int SlaveIdIndex { get; }
+    public readonly int SlaveIdIndex => 0;
     /// <summary>功能码索引</summary>
-    public readonly int FunctionCodeIndex { get; }
+    public readonly int FunctionCodeIndex => 1;
     /// <summary>地址范围[</summary>
-    public readonly Range AddressRange { get; }
+    public readonly Range AddressRange => new(2, 4);
     /// <summary>值数量范围</summary>
-    public readonly Range QuantityRange { get; }
+    public readonly Range QuantityRange => new(4, 6);
     /// <summary>数据长度索引</summary>
-    public readonly int DataLengthIndex { get; }
+    public readonly int DataLengthIndex => 6;
     /// <summary>数据范围</summary>
     public readonly Range DataRange { get; }
     /// <summary>内容范围</summary>
@@ -44,13 +48,6 @@ internal readonly struct ModbusRtuWriteMultipleRequestLayout : IModbusReadReques
         int dataMaxQuantity
         )
     {
-        SlaveIdIndex = 0;
-        FunctionCodeIndex = 1;
-        AddressRange = new(2, 4);
-        QuantityRange = new(4, 6);
-        DataLengthIndex = 6;
-
-
         DataRange = dataRange;
         PayloadRange = contentRange;
         CrcRange = crcRange;
@@ -67,15 +64,19 @@ internal readonly struct ModbusRtuWriteMultipleRequestLayout : IModbusReadReques
     /// </summary>
     /// <param name="quantity">寄存器数量</param>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public static ModbusRtuWriteMultipleRequestLayout WriteMultipleRegisters(byte quantity)
+    public static bool TryCreayeRegisters(byte quantity, out ModbusRtuWriteMultipleRequestLayout result)
     {
+        result = default;
+
         if (quantity <= 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(quantity), "数量必须大于0");
+            Debug.Fail("寄存器数量必须大于0");
+            return false;
         }
         if (quantity > 125)
         {
-            throw new ArgumentOutOfRangeException(nameof(quantity), "寄存器数量不能超过125");
+            Debug.Fail("寄存器数量不能超过125");
+            return false;
         }
 
         // Data
@@ -92,28 +93,34 @@ internal readonly struct ModbusRtuWriteMultipleRequestLayout : IModbusReadReques
         var crc_end = data_end + 2;
         var crc_range = new Range(crc_start, crc_end);
 
-        return new ModbusRtuWriteMultipleRequestLayout(
+        result = new ModbusRtuWriteMultipleRequestLayout(
             dataRange: data_range,
             contentRange: content,
             crcRange: crc_range,
             dataByteLength: data_byte_length,
             fullByteLength: crc_end,
             dataMaxQuantity: quantity);
+
+        return true;
     }
     /// <summary>
     /// 创建一个拥有指定数量线圈的帧布局
     /// </summary>
     /// <param name="quantity">线圈数量</param>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public static ModbusRtuWriteMultipleRequestLayout WriteMultipleCoils(ushort quantity)
+    public static bool TryCreateCoils(ushort quantity, out ModbusRtuWriteMultipleRequestLayout result)
     {
+        result = default;
+
         if (quantity <= 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(quantity), "数量必须大于0");
+            Debug.Fail("线圈数量必须大于0"); 
+            return false;
         }
         if (quantity > 2000)
         {
-            throw new ArgumentOutOfRangeException(nameof(quantity), "线圈数量不能超过2000");
+            Debug.Fail("线圈数量不能超过2000"); 
+            return false;
         }
 
         // Data
@@ -130,13 +137,15 @@ internal readonly struct ModbusRtuWriteMultipleRequestLayout : IModbusReadReques
         var crc_end = data_end + 2;
         var crc_range = new Range(crc_start, crc_end);
 
-        return new ModbusRtuWriteMultipleRequestLayout(
+        result = new ModbusRtuWriteMultipleRequestLayout(
             dataRange: data_range,
             contentRange: content,
             crcRange: crc_range,
             dataByteLength: data_byte_length,
             fullByteLength: crc_end,
             dataMaxQuantity: quantity);
+
+        return true;
     }
 }
 

@@ -2,6 +2,7 @@
 using ThabeSoft.IndustrialHub.Modbus;
 using ThabeSoft.ProtocolGateway.Conversion;
 using ThabeSoft.ProtocolGateway.Protocols.Layouts;
+using ThabeSoft.ProtocolGateway.Primitives;
 
 namespace ThabeSoft.ProtocolGateway.Protocols.Serializer;
 
@@ -9,11 +10,11 @@ namespace ThabeSoft.ProtocolGateway.Protocols.Serializer;
 /// <summary>
 /// Modbus Rtu 写单个值请求帧布局
 /// </summary>
-internal sealed class ModbusRtuWriteSingleRequestSerializer :
+public sealed class ModbusRtuWriteSingleRequestSerializer :
     IModbusWriteSingleCoilRequestSerializer,
     IModbusWriteSingleRegisterRequestSerializer
 {
-    internal static ModbusRtuWriteSingleRequestSerializer Instance { get; } = new(ModbusRtuWriteSingleRequestLayout.Default);
+    internal static ModbusRtuWriteSingleRequestSerializer Instance { get; } = new(ModbusRtuWriteSingleRequestLayout.Instance);
 
 
     private readonly ModbusRtuWriteSingleRequestLayout _layout;
@@ -24,18 +25,18 @@ internal sealed class ModbusRtuWriteSingleRequestSerializer :
     private bool TryPack(
         Span<byte> destination,
         byte slaveId,
-        FunctionCode function,
+        ModbusFunctionCode functionCode,
         ushort address,
         ushort value)
     {
         // 缓冲区长度不足
         if (destination.Length < _layout.TotalLength) return false;
-        if (!function.IsWriteSingle) return false;
+        if (!functionCode.IsWriteSingle) return false;
 
         // 从站
         destination[_layout.SlaveIdIndex] = slaveId;
         // 功能码
-        destination[_layout.FunctionCodeIndex] = function;
+        destination[_layout.FunctionCodeIndex] = functionCode;
         // 起始地址
         if (!address.TryToByte(destination[_layout.AddressRange], Endianness.BigEndian)) return false;
         // 值
@@ -47,7 +48,7 @@ internal sealed class ModbusRtuWriteSingleRequestSerializer :
     private bool TryUnpack(
         ReadOnlySpan<byte> source,
         out byte slaveId,
-        out FunctionCode functionCode,
+        out ModbusFunctionCode functionCode,
         out ushort address,
         out ushort value,
         out ushort crc)
@@ -64,7 +65,7 @@ internal sealed class ModbusRtuWriteSingleRequestSerializer :
         // 从站
         var received_slaveId = source[_layout.SlaveIdIndex];
         // 功能码
-        if (!FunctionCode.TryFromCode(source[_layout.FunctionCodeIndex], out var received_function_code)) return false;
+        if (!ModbusFunctionCode.TryFromCode(source[_layout.FunctionCodeIndex], out var received_function_code)) return false;
         if (!received_function_code.IsWriteSingle) return false;
         // 起始地址
         if (!source[_layout.AddressRange].TryToUInt16(out var received_address, Endianness.BigEndian)) return false;
@@ -93,7 +94,7 @@ internal sealed class ModbusRtuWriteSingleRequestSerializer :
         bool value)
     {
         var coil_value = ModbusFrameLayout.GetSingleCoilValue(value);
-        return TryPack(destination, slaveId, FunctionCode.WriteSingleCoil, address, coil_value);
+        return TryPack(destination, slaveId, ModbusFunctionCode.WriteSingleCoil, address, coil_value);
     }
     bool IModbusWriteSingleCoilRequestSerializer.TryUnpack(
         ReadOnlySpan<byte> source,
@@ -116,7 +117,7 @@ internal sealed class ModbusRtuWriteSingleRequestSerializer :
         ushort address,
         ushort value)
     {
-        return TryPack(destination, slaveId, FunctionCode.WriteSingleRegister, address, value);
+        return TryPack(destination, slaveId, ModbusFunctionCode.WriteSingleRegister, address, value);
     }
     bool IModbusWriteSingleRegisterRequestSerializer.TryUnpack(
         ReadOnlySpan<byte> source,

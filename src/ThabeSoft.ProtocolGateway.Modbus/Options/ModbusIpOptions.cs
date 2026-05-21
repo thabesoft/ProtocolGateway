@@ -1,38 +1,38 @@
 ﻿using System.Net;
 using ThabeSoft.ProtocolGateway.Transports;
 
-namespace IndustrialHub.Modbus.Options;
+namespace ThabeSoft.ProtocolGateway.Options;
 
-public interface IModbusIpOptions : ITransportOptions
-{
-    /// <summary>
-    /// 地址
-    /// </summary>
-    IPEndPoint IpAddress { get; }
-}
-
-
-/// <summary>
-/// Modbus 网线选项
-/// </summary>
-public sealed class ModbusIpOptions : ProtocolOptions
-{
-    /// <summary>
-    /// 地址
-    /// </summary>
-    public IPEndPoint IpAddress { get; }
+//public interface IModbusIpOptions : ITransportOptions
+//{
+//    /// <summary>
+//    /// 地址
+//    /// </summary>
+//    IPEndPoint IpAddress { get; }
+//}
 
 
-    private ModbusIpOptions(IPEndPoint ipAddress)
-    {
-        IpAddress = ipAddress;
-    }
+///// <summary>
+///// Modbus 网线选项
+///// </summary>
+//public sealed class ModbusIpOptions : ProtocolOptions
+//{
+//    /// <summary>
+//    /// 地址
+//    /// </summary>
+//    public IPEndPoint IpAddress { get; }
 
-    /// <summary>
-    /// 创建
-    /// </summary>
-    public static ModbusIpOptions Create(IPEndPoint ipAddress)
-    {
-        return new ModbusIpOptions(ipAddress);
-    }
-}
+
+//    private ModbusIpOptions(IPEndPoint ipAddress)
+//    {
+//        IpAddress = ipAddress;
+//    }
+
+//    /// <summary>
+//    /// 创建
+//    /// </summary>
+//    public static ModbusIpOptions Create(IPEndPoint ipAddress)
+//    {
+//        return new ModbusIpOptions(ipAddress);
+//    }
+//}

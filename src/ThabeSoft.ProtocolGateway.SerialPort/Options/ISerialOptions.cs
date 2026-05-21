@@ -44,7 +44,7 @@ public interface ISerialOptions : ITransportOptions
 /// <summary>
 /// Modbus 串口选项
 /// </summary>
-public sealed class SerialOptions : ProtocolOptions, ISerialOptions
+public sealed class SerialOptions : TransportOptions, ISerialOptions
 {
     /// <summary>
     /// 端口名
@@ -92,6 +92,34 @@ public sealed class SerialOptions : ProtocolOptions, ISerialOptions
         if (baudRate == BaudRate.Empty) throw new ArgumentException(nameof(baudRate), "波特率不可为空");
 
         BaudRate = baudRate;
+        return this;
+    }
+    public SerialOptions SetParity(Parity parity)
+    {
+        Parity = parity;
+        return this;
+    }
+    public SerialOptions SetDataBits(int dataBits)
+    {
+        if (dataBits < 5 || dataBits > 8)
+            throw new ArgumentOutOfRangeException(nameof(dataBits), "数据位必须在 5 到 8 之间");
+
+        DataBits = dataBits;
+        return this;
+    }
+    public SerialOptions SetStopBits(StopBits stopBits)
+    {
+        if (stopBits == StopBits.None) throw new ArgumentException(nameof(stopBits), "停止位不可为空");
+
+        StopBits = stopBits;
+        return this;
+    }
+
+    public SerialOptions SetDuplexMode(DuplexMode duplexMode)
+    {
+        if (duplexMode == DuplexMode.None) throw new ArgumentException(nameof(duplexMode), "双工模式不可为空");
+
+        DuplexMode = duplexMode;
         return this;
     }
 }

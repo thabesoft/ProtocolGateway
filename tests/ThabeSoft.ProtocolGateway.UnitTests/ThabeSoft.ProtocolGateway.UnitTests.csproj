@@ -12,6 +12,7 @@
 		<PackageReference Include="Moq" Version="4.20.72" />
 		<ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.Abstractions\ThabeSoft.ProtocolGateway.Abstractions.csproj" />
 		<ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.Common\ThabeSoft.ProtocolGateway.Utilities.csproj" />
+		<ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.Modbus.Rtu\ThabeSoft.ProtocolGateway.Modbus.Rtu.csproj" />
 		<ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.Modbus\ThabeSoft.ProtocolGateway.Modbus.csproj" />
 		<ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.SerialPort\ThabeSoft.ProtocolGateway.SerialPort.csproj" />
 		<PackageReference Update="Microsoft.Testing.Extensions.CodeCoverage" Version="18.6.2" />

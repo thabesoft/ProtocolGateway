@@ -22,12 +22,12 @@ public class Benchmark
     [Benchmark]
     public void ReadDiscreteInputs()
     {
-        ModbusRtuRequest.ReadDiscreteInputs.TryPack(buffer, 1, 100, 100);
+        ModbusRtuRequest.ReadDiscreteInputsSerializer.TryPack(buffer, 1, 100, 100);
     }
     [Benchmark]
     public void ReadInputRegisters()
     {
-        ModbusRtuRequest.ReadInputRegisters.TryPack(buffer, 1, 100, 100);
+        ModbusRtuRequest.ReadInputRegistersSerializer.TryPack(buffer, 1, 100, 100);
     }
     [Benchmark]
     public void ReadHoldingRegisters()
@@ -39,18 +39,18 @@ public class Benchmark
     [Benchmark]
     public void WriteSingleCoil()
     {
-        ModbusRtuRequest.WriteSingleCoil.TryPack(buffer, 1, 100, true);
+        ModbusRtuRequest.WriteSingleCoilSerializer.TryPack(buffer, 1, 100, true);
     }
     [Benchmark]
     public void WriteSingleRegister()
     {
-        ModbusRtuRequest.WriteSingleRegister.TryPack(buffer, 1, 100, 0xFF);
+        ModbusRtuRequest.WriteSingleRegisterSerializer.TryPack(buffer, 1, 100, 0xFF);
     }
     [Benchmark]
     public void WriteMultipleCoils()
     {
         Span<bool> values = [false, false, true];
-        ModbusRtuRequest.WriteMultipleCoils.TryPack(buffer, 1, 100, values);
+        ModbusRtuRequest.WriteMultipleCoilsSerializer.TryPack(buffer, 1, 100, values);
     }
     [Benchmark]
     public void WriteMultipleRegisters()

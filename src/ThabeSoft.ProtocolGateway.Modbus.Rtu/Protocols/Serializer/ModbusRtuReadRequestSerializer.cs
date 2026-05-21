@@ -1,6 +1,7 @@
-﻿using ThabeSoft.IndustrialHub.Modbus.Crc;
-using ThabeSoft.IndustrialHub.Modbus;
+﻿using System.Net;
+using ThabeSoft.IndustrialHub.Modbus.Crc;
 using ThabeSoft.ProtocolGateway.Conversion;
+using ThabeSoft.ProtocolGateway.Primitives;
 using ThabeSoft.ProtocolGateway.Protocols.Layouts;
 
 namespace ThabeSoft.ProtocolGateway.Protocols.Serializer;
@@ -9,13 +10,15 @@ namespace ThabeSoft.ProtocolGateway.Protocols.Serializer;
 /// <summary>
 /// Rtu读帧布局
 /// </summary>
-internal sealed class ModbusRtuReadRequestSerializer :
+public sealed class ModbusRtuReadRequestSerializer :
     IModbusReadCoilsRequestSerializer,
     IModbusReadDiscreteInputsRequestSerializer,
     IModbusReadHoldingRegistersRequestSerializer,
-    IModbusReadInputRegistersRequestSerializer
+    IModbusReadInputRegistersRequestSerializer,
+
+    IEncoder<ModbusReadCoilsRequest>, IDecoder<ModbusReadCoilsRequest>
 {
-    public static readonly ModbusRtuReadRequestSerializer Instance = new(ModbusRtuReadRequestLayout.Default);
+    public static readonly ModbusRtuReadRequestSerializer Instance = new(ModbusRtuReadRequestLayout.Instance);
 
 
 
@@ -28,10 +31,14 @@ internal sealed class ModbusRtuReadRequestSerializer :
     private bool TryPack(
         Span<byte> destination,
         byte slaveId,
-        FunctionCode function,
+        ModbusFunctionCode function,
         ushort address,
-        ushort quantity)
+        ushort quantity,
+        out int bytesWritten
+        )
     {
+        bytesWritten = 0;
+
         // 缓冲区长度不足
         if (destination.Length < _layout.TotalLength) return false;
         if (!function.IsRead) return false;
@@ -45,12 +52,15 @@ internal sealed class ModbusRtuReadRequestSerializer :
         if (!quantity.TryToByte(destination[_layout.QuantityRange], Endianness.BigEndian)) return false;
         // 验证
         var crc = CrcCalculator.Calculate(destination[_layout.PayloadRange]);
-        return crc.TryToByte(destination[_layout.CrcRange], Endianness.LittleEndian);
+        if (!crc.TryToByte(destination[_layout.CrcRange], Endianness.LittleEndian)) return false;
+
+        bytesWritten = _layout.TotalLength;
+        return true;
     }
     private bool TryUnpack(
         ReadOnlySpan<byte> source,
         out byte slaveId,
-        out FunctionCode functionCode,
+        out ModbusFunctionCode functionCode,
         out ushort address,
         out ushort quantity,
         out ushort crc
@@ -68,7 +78,7 @@ internal sealed class ModbusRtuReadRequestSerializer :
         // 从站
         var received_slaveId = source[_layout.SlaveIdIndex];
         // 功能码
-        if (!FunctionCode.TryFromCode(source[_layout.FunctionCodeIndex], out var received_function_code)) return false;
+        if (!ModbusFunctionCode.TryFromCode(source[_layout.FunctionCodeIndex], out var received_function_code)) return false;
         if (!received_function_code.IsRead) return false;
         // 起始地址
         if (!source[_layout.AddressRange].TryToUInt16(out var received_address, Endianness.BigEndian)) return false;
@@ -91,13 +101,33 @@ internal sealed class ModbusRtuReadRequestSerializer :
 
     /*------------------- 线圈 -------------------*/
 
+    bool IEncoder<ModbusReadCoilsRequest>.TryEncode(
+        in ModbusReadCoilsRequest source,
+        Span<byte> destination,
+        out int bytesWritten)
+    {
+        return TryPack(destination, source.SlaveId, source.FunctionCode, source.Address, source.Quantity, out bytesWritten);
+    }
+    bool IDecoder<ModbusReadCoilsRequest>.TryDecode(
+        ReadOnlySpan<byte> source,
+        out ModbusReadCoilsRequest destination)
+    {
+        destination = default;
+
+        if (!TryUnpack(source: source, out var slaveId, out var function_code, out var address, out var quantity, out _)) return false;
+        if (function_code != ModbusFunctionCode.ReadCoils) return false;
+
+        return ModbusReadCoilsRequest.TryCreateCoils(slaveId, address, quantity, out destination);
+    }
+
+
     bool IModbusReadCoilsRequestSerializer.TryPack(
         Span<byte> destination,
         byte slaveId,
         ushort address,
         ushort quantity)
     {
-        return TryPack(destination, slaveId, FunctionCode.ReadCoils, address, quantity);
+        return TryPack(destination, slaveId, ModbusFunctionCode.ReadCoils, address, quantity, out _);
     }
     bool IModbusReadCoilsRequestSerializer.TryUnpack(
         ReadOnlySpan<byte> source,
@@ -116,7 +146,7 @@ internal sealed class ModbusRtuReadRequestSerializer :
         ushort address,
         ushort quantity)
     {
-        return TryPack(destination, slaveId, FunctionCode.ReadDiscreteInputs, address, quantity);
+        return TryPack(destination, slaveId, ModbusFunctionCode.ReadDiscreteInputs, address, quantity, out _);
     }
     bool IModbusReadDiscreteInputsRequestSerializer.TryUnpack(
         ReadOnlySpan<byte> source,
@@ -135,7 +165,7 @@ internal sealed class ModbusRtuReadRequestSerializer :
         ushort address,
         ushort quantity)
     {
-        return TryPack(destination, slaveId, FunctionCode.ReadHoldingRegisters, address, quantity);
+        return TryPack(destination, slaveId, ModbusFunctionCode.ReadHoldingRegisters, address, quantity, out _);
     }
     bool IModbusReadHoldingRegistersRequestSerializer.TryUnpack(
         ReadOnlySpan<byte> source,
@@ -154,7 +184,7 @@ internal sealed class ModbusRtuReadRequestSerializer :
         ushort address,
         ushort quantity)
     {
-        return TryPack(destination, slaveId, FunctionCode.ReadInputRegisters, address, quantity);
+        return TryPack(destination, slaveId, ModbusFunctionCode.ReadInputRegisters, address, quantity, out _);
     }
     bool IModbusReadInputRegistersRequestSerializer.TryUnpack(
         ReadOnlySpan<byte> source,
@@ -164,4 +194,6 @@ internal sealed class ModbusRtuReadRequestSerializer :
     {
         return TryUnpack(source: source, out slaveId, out _, out address, out quantity, out _);
     }
+
+   
 }

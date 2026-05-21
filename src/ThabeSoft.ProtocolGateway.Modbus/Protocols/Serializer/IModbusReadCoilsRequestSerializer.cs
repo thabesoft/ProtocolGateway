@@ -1,4 +1,6 @@
-﻿namespace ThabeSoft.ProtocolGateway.Protocols.Serializer;
+﻿using ThabeSoft.ProtocolGateway.Protocols.Layouts;
+
+namespace ThabeSoft.ProtocolGateway.Protocols.Serializer;
 
 
 /// <summary>
@@ -14,8 +16,9 @@ public interface IModbusReadCoilsRequestSerializer
     /// <param name="address">地址</param>
     /// <param name="quantity">数量</param>
     /// <returns>是否打包成功</returns>
+    [Obsolete]
     bool TryPack(Span<byte> destination, byte slaveId, ushort address, ushort quantity);
-
+    
     /// <summary>
     /// 尝试从源数据解包读线圈请求帧
     /// </summary>

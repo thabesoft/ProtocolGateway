@@ -1,4 +1,4 @@
-﻿using ThabeSoft.IndustrialHub.Modbus;
+﻿using ThabeSoft.ProtocolGateway.Primitives;
 
 namespace ThabeSoft.IndustrialHub.Modbus.Exceptions;
 

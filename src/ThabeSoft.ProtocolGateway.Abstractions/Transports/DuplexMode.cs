@@ -7,6 +7,11 @@
 public enum DuplexMode
 {
     /// <summary>
+    /// 空
+    /// </summary>
+    None,
+
+    /// <summary>
     /// 全双工
     /// </summary>
     FullDuplex,

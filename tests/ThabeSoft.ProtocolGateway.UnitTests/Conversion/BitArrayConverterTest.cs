@@ -30,7 +30,7 @@ public class BitArrayConverterTest
     [TestMethod(DisplayName = "字节转位数组测试_小端序")]
     public void TryToBits_LittleEndian()
     {
-        byte source = 0b1010_1010;
+        const byte source = 0b1010_1010;
         bool[] destination = new bool[8];
 
         source.TryToBit(destination, Endianness.LittleEndian);
@@ -42,7 +42,7 @@ public class BitArrayConverterTest
     [TestMethod(DisplayName = "字节转位数组测试_大端序")]
     public void TryToBits_BigEndian()
     {
-        byte source = 0b1010_1010;
+        const byte source = 0b1010_1010;
         bool[] destination = new bool[8];
 
         source.TryToBit(destination, Endianness.BigEndian);
