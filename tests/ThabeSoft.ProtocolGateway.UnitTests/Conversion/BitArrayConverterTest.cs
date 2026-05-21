@@ -1,6 +1,4 @@
-﻿using ThabeSoft.ProtocolGateway.Protocols;
-
-namespace ThabeSoft.ProtocolGateway.Conversion;
+﻿namespace ThabeSoft.ProtocolGateway.Conversion;
 
 
 [TestClass]

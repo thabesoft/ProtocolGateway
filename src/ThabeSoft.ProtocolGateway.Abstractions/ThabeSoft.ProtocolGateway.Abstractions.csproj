@@ -1,18 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;netstandard2.1;net7.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<LangVersion>preview</LangVersion>
 		<RootNamespace>ThabeSoft.ProtocolGateway</RootNamespace>
 	</PropertyGroup>
 
-	<!-- std2.0 包 引入 ValueTask 和 Memory 相关的包-->
+	<!-- std2.0 引入 ValueTask 和 Memory-->
 	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
 		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.8" />
 		<PackageReference Include="System.Memory" Version="4.6.3" />
 		<PackageReference Include="IndexRange" Version="1.1.1" />
+	</ItemGroup>
+
+	<!-- net7.0 引入 Unsafe-->
+	<ItemGroup Condition="'$(TargetFramework)' != 'net7.0'">
+		<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
 	</ItemGroup>
 
 </Project>

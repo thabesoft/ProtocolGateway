@@ -1,9 +1,14 @@
 ﻿namespace ThabeSoft.ProtocolGateway.Protocols;
 
 /// <summary>
-/// 解码器
+/// 协议解码器
 /// </summary>
-public interface IDecoder<TData>
+public interface IDecoder<TProtocol>
 {
-    bool TryDecode(ReadOnlySpan<byte> source, out TData destination);
+    /// <summary>
+    /// 解码协议
+    /// </summary>
+    /// <param name="source">源数据</param>
+    /// <param name="protocol">解码后的协议数据</param>
+    bool TryDecode(ReadOnlySpan<byte> source, out TProtocol protocol);
 }

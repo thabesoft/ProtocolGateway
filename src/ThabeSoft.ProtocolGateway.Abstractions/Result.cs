@@ -1,40 +1,44 @@
 ﻿namespace ThabeSoft.ProtocolGateway;
 
+
 /// <summary>
 /// 结果
 /// </summary>
-public readonly struct Result<TValue> where TValue : struct
+public readonly struct Result<TValue> where TValue : unmanaged
 {
-    private readonly TValue _value;
-
-    public readonly bool IsSuccess { get; }
-    public readonly ResultErrorType ErrorType { get; }
-    public readonly string? Message { get; }
+    public static readonly Result<TValue> Empty = default;
 
 
-    public Result(TValue value)
+    public TValue Value { get; }
+    public ResponseStatus Status { get; }
+    public bool IsSuccess => Status == ResponseStatus.OK;
+
+
+    private Result(TValue value)
     {
-        _value = value;
-        IsSuccess = true;
-        ErrorType = ResultErrorType.None;
+        Value = value;
+        Status = ResponseStatus.OK;
     }
-    public Result(ResultErrorType error, string? message)
+    private Result(ResponseStatus status)
     {
-        IsSuccess = false;
-        ErrorType = error;
-        Message = message;
+        Status = status;
     }
 
 
-    public readonly bool TryGetValue(out TValue value)
-    {
-        if (IsSuccess)
-        {
-            value = _value;
-            return true;
-        }
+    public static Result<TValue> Success(TValue value) => new(value);
+    public static Result<TValue> Failure(ResponseStatus status) => new(status);
+    public static Result<TValue> Timeout() => new(ResponseStatus.Timeout);
+    public static Result<TValue> InternalError() => new(ResponseStatus.InternalError);
+}
 
-        value = default;
-        return false;
-    }
+public sealed class Result
+{
+    public static Result<TValue> Success<TValue>(TValue value) where TValue : unmanaged
+        => Result<TValue>.Success(value);
+    public static Result<TValue> Failure<TValue>(ResponseStatus status) where TValue : unmanaged
+        => Result<TValue>.Failure(status);
+    public static Result<TValue> Timeout<TValue>() where TValue : unmanaged
+        => Result<TValue>.Timeout();
+    public static Result<TValue> InternalError<TValue>() where TValue : unmanaged
+        => Result<TValue>.InternalError();
 }

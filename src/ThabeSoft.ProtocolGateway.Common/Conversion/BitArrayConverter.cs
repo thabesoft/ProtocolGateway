@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using ThabeSoft.ProtocolGateway.Protocols;
 
 namespace ThabeSoft.ProtocolGateway.Conversion;
 

@@ -1,9 +1,9 @@
 ﻿namespace ThabeSoft.ProtocolGateway.Protocols;
 
 /// <summary>
-/// 协议
+/// 协议布局
 /// </summary>
-public interface IProtocol
+public interface ILayout<TProtocol>
 {
-    string Name { get; }
+    int TotalLength { get; }
 }

@@ -1,9 +1,10 @@
 ﻿namespace ThabeSoft.ProtocolGateway.Protocols;
 
+
 /// <summary>
-/// 编码器
+/// 协议编码器
 /// </summary>
-public interface IEncoder<TData>
+public interface IEncoder<TProtocol>
 {
-    bool TryEncode(in TData source, Span<byte> destination, out int bytesWritten);
+    bool TryEncode(in TProtocol source, Span<byte> destination, out int bytesWritten);
 }
