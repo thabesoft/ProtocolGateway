@@ -37,12 +37,12 @@ public sealed class ModbusRtuWriteSingleRequestSerializer :
         // 功能码
         destination[_layout.FunctionCodeIndex] = functionCode;
         // 起始地址
-        if (!address.TryToByte(destination[_layout.AddressRange], ByteOrder.BigEndian)) return false;
+        if (!address.TryToByte(destination[_layout.AddressRange], ByteSwap.BigEndian)) return false;
         // 值
-        if (!value.TryToByte(destination[_layout.ValueRange], ByteOrder.BigEndian)) return false;
+        if (!value.TryToByte(destination[_layout.ValueRange], ByteSwap.BigEndian)) return false;
         // 验证
         var crc = CrcCalculator.Calculate(destination[_layout.PayloadRange]);
-        return crc.TryToByte(destination[_layout.CrcRange], ByteOrder.LittleEndian);
+        return crc.TryToByte(destination[_layout.CrcRange], ByteSwap.LittleEndian);
     }
     private bool TryUnpack(
         ReadOnlySpan<byte> source,
@@ -67,11 +67,11 @@ public sealed class ModbusRtuWriteSingleRequestSerializer :
         if (!ModbusFunctionCode.TryFromCode(source[_layout.FunctionCodeIndex], out var received_function_code)) return false;
         if (!received_function_code.IsWriteSingle) return false;
         // 起始地址
-        if (!source[_layout.AddressRange].TryToUInt16(out var received_address, ByteOrder.BigEndian)) return false;
+        if (!source[_layout.AddressRange].TryToUInt16(out var received_address, ByteSwap.BigEndian)) return false;
         // 值
-        if (!source[_layout.ValueRange].TryToUInt16(out var received_value, ByteOrder.BigEndian)) return false;
+        if (!source[_layout.ValueRange].TryToUInt16(out var received_value, ByteSwap.BigEndian)) return false;
         // Crc
-        if (!source[_layout.CrcRange].TryToUInt16(out var received_crc, ByteOrder.LittleEndian)) return false;
+        if (!source[_layout.CrcRange].TryToUInt16(out var received_crc, ByteSwap.LittleEndian)) return false;
         // 验证
         if (!CrcCalculator.Validate(source[_layout.PayloadRange], received_crc)) return false;
 

@@ -86,7 +86,6 @@ public readonly struct Result : IResult
     }
 }
 
-
 /// <summary>
 /// 结果
 /// </summary>

@@ -48,11 +48,11 @@ public sealed class ModbusRtuReadRequestSerializer :
         // 功能码
         destination[_layout.FunctionCodeIndex] = function;
         // 起始地址
-        if (!address.TryToByte(destination[_layout.AddressRange], ByteOrder.BigEndian)) return false;
-        if (!quantity.TryToByte(destination[_layout.QuantityRange], ByteOrder.BigEndian)) return false;
+        if (!address.TryToByte(destination[_layout.AddressRange], ByteSwap.BigEndian)) return false;
+        if (!quantity.TryToByte(destination[_layout.QuantityRange], ByteSwap.BigEndian)) return false;
         // 验证
         var crc = CrcCalculator.Calculate(destination[_layout.PayloadRange]);
-        if (!crc.TryToByte(destination[_layout.CrcRange], ByteOrder.LittleEndian)) return false;
+        if (!crc.TryToByte(destination[_layout.CrcRange], ByteSwap.LittleEndian)) return false;
 
         bytesWritten = _layout.TotalLength;
         return true;
@@ -78,11 +78,11 @@ public sealed class ModbusRtuReadRequestSerializer :
         // 功能码
         destination[_layout.FunctionCodeIndex] = function;
         // 起始地址
-        if (!address.TryToByte(destination[_layout.AddressRange], ByteOrder.BigEndian)) return false;
-        if (!quantity.TryToByte(destination[_layout.QuantityRange], ByteOrder.BigEndian)) return false;
+        if (!address.TryToByte(destination[_layout.AddressRange], ByteSwap.BigEndian)) return false;
+        if (!quantity.TryToByte(destination[_layout.QuantityRange], ByteSwap.BigEndian)) return false;
         // 验证
         var crc = CrcCalculator.Calculate(destination[_layout.PayloadRange]);
-        if (!crc.TryToByte(destination[_layout.CrcRange], ByteOrder.LittleEndian)) return false;
+        if (!crc.TryToByte(destination[_layout.CrcRange], ByteSwap.LittleEndian)) return false;
 
         bytesWritten = _layout.TotalLength;
         return true;
@@ -111,11 +111,11 @@ public sealed class ModbusRtuReadRequestSerializer :
         if (!ModbusFunctionCode.TryFromCode(source[_layout.FunctionCodeIndex], out var received_function_code)) return false;
         if (!received_function_code.IsRead) return false;
         // 起始地址
-        if (!source[_layout.AddressRange].TryToUInt16(out var received_address, ByteOrder.BigEndian)) return false;
+        if (!source[_layout.AddressRange].TryToUInt16(out var received_address, ByteSwap.BigEndian)) return false;
         // 数量
-        if (!source[_layout.QuantityRange].TryToUInt16(out var received_quantity, ByteOrder.BigEndian)) return false;
+        if (!source[_layout.QuantityRange].TryToUInt16(out var received_quantity, ByteSwap.BigEndian)) return false;
         // Crc
-        if (!source[_layout.CrcRange].TryToUInt16(out var received_crc, ByteOrder.LittleEndian)) return false;
+        if (!source[_layout.CrcRange].TryToUInt16(out var received_crc, ByteSwap.LittleEndian)) return false;
         // 验证
         if (!CrcCalculator.Validate(source[_layout.PayloadRange], received_crc)) return false;
 
