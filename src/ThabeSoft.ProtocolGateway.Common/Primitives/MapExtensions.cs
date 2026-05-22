@@ -1,8 +1,21 @@
-﻿namespace ThabeSoft.ProtocolGateway.Primitives.Linq;
+﻿namespace ThabeSoft.ProtocolGateway.Primitives;
 
 public static class MapExtensions
 {
-    extension<T>(IAsyncResultQuery<Result<T>> query)
+    extension<T>(Result<T> result)
+    {
+        public Result<U> Map<U>(Func<T, U> handler)
+        {
+            if (!result.IsSuccess)
+            {
+                return Result.Error<U>(result.ErrorType, result.Message);
+            }
+
+            return Result.Ok(handler(result.Value));
+        }
+    }
+
+    extension<T>(IAsyncResultPipe<Result<T>> query)
     {
         /// <summary>
         /// 将管道中的成功值通过转换函数映射为新的值。
@@ -18,10 +31,10 @@ public static class MapExtensions
         /// - 成功时：Result&lt;U&gt;.Ok(handler(value))
         /// - 失败时：Result&lt;U&gt;.Error(原错误类型, 原错误消息)
         /// </returns>
-        public IAsyncResultQuery<Result<U>> Map<U>(Func<T, U> handler)
+        public IAsyncResultPipe<Result<U>> Map<U>(Func<T, U> handler)
         {
             static async ValueTask<Result<U>> Handler(
-                (IAsyncResultQuery<Result<T>>, Func<T, U>) data,
+                (IAsyncResultPipe<Result<T>>, Func<T, U>) data,
                 CancellationToken ct)
             {
                 var (pipe, handler) = data;

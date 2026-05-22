@@ -1,9 +1,30 @@
-﻿namespace ThabeSoft.ProtocolGateway.Primitives.Linq;
+﻿namespace ThabeSoft.ProtocolGateway.Primitives;
 
 public static class TapExtensions
 {
-    extension<T>(IAsyncResultQuery<T> query)
-        where T : IResult
+    extension<T>(Result<T> result)
+    {
+        public Result<T> Tap(Action<T> handler)
+        {
+            if (result.IsSuccess) handler(result.Value);
+            return result;
+        }
+
+        public async ValueTask<Result<T>> Tap(Func<T, ValueTask> handler)
+        {
+            if (result.IsSuccess) await handler(result.Value);
+            return result;
+        }
+
+        public async ValueTask<Result<T>> Tap(Func<T, CancellationToken, ValueTask> handler, CancellationToken cancellationToken = default)
+        {
+            if (result.IsSuccess) await handler(result.Value, cancellationToken);
+            return result;
+        }
+    }
+
+
+    extension<T>(IAsyncResultPipe<Result<T>> query)
     {
         /// <summary>
         /// 成功时执行一个副作用操作，不改变结果值。
@@ -14,15 +35,15 @@ public static class TapExtensions
         /// 常用于日志记录、监控、缓存写入等副作用场景。
         /// </remarks>
         /// <param name="handler">成功时执行的回调，接收结果值</param>
-        public IAsyncResultQuery<T> Tap(Action<T> handler)
+        public IAsyncResultPipe<Result<T>> Tap(Action<Result<T>> handler)
         {
-            static async ValueTask<T> Handler(
-                (IAsyncResultQuery<T>, Action<T>) data,
+            static async ValueTask<Result<T>> Handler(
+                (IAsyncResultPipe<Result<T>>, Action<Result<T>>) data,
                 CancellationToken ct)
             {
-                var (pipe, handler) = data;
+                var (query, handler) = data;
 
-                var result = await pipe.ExecuteAsync(ct);
+                var result = await query.ExecuteAsync(ct);
                 if (result.IsSuccess) handler(result);
 
                 return result;
@@ -40,16 +61,16 @@ public static class TapExtensions
         /// 常用于日志记录、监控、缓存写入等副作用场景。
         /// </remarks>
         /// <param name="handler">成功时执行的回调，接收结果值</param>
-        public IAsyncResultQuery<T> Tap(Func<T, ValueTask> handler)
+        public IAsyncResultPipe<Result<T>> Tap(Func<T, ValueTask> handler)
         {
-            static async ValueTask<T> Handler(
-                (IAsyncResultQuery<T>, Func<T, ValueTask>) data,
+            static async ValueTask<Result<T>> Handler(
+                (IAsyncResultPipe<Result<T>>, Func<T, ValueTask>) data,
                 CancellationToken ct)
             {
                 var (pipe, handler) = data;
 
                 var result = await pipe.ExecuteAsync(ct);
-                if (result.IsSuccess) await handler(result);
+                if (result.IsSuccess) await handler(result.Value);
 
                 return result;
             }
@@ -66,16 +87,16 @@ public static class TapExtensions
         /// 常用于日志记录、监控、缓存写入等副作用场景。
         /// </remarks>
         /// <param name="handler">成功时执行的回调，接收结果值</param>
-        public IAsyncResultQuery<T> Tap(Func<T, CancellationToken, ValueTask> handler)
+        public IAsyncResultPipe<Result<T>> Tap(Func<T, CancellationToken, ValueTask> handler)
         {
-            static async ValueTask<T> Handler(
-                (IAsyncResultQuery<T>, Func<T, CancellationToken, ValueTask>) data,
+            static async ValueTask<Result<T>> Handler(
+                (IAsyncResultPipe<Result<T>>, Func<T, CancellationToken, ValueTask>) data,
                 CancellationToken ct)
             {
                 var (pipe, handler) = data;
 
                 var result = await pipe.ExecuteAsync(ct);
-                if (result.IsSuccess) await handler(result, ct);
+                if (result.IsSuccess) await handler(result.Value, ct);
 
                 return result;
             }

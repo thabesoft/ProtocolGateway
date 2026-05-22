@@ -1,6 +1,5 @@
 ﻿using System.Buffers;
 using ThabeSoft.ProtocolGateway.Primitives;
-using ThabeSoft.ProtocolGateway.Primitives.Linq;
 using ThabeSoft.ProtocolGateway.Protocols;
 using ThabeSoft.ProtocolGateway.Transports;
 

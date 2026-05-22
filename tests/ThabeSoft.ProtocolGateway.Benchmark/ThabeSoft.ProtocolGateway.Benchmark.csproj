@@ -12,4 +12,9 @@
 		<PackageReference Include="BenchmarkDotNet" Version="0.15.8" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.Abstractions\ThabeSoft.ProtocolGateway.Abstractions.csproj" />
+	  <ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.ResultPipeline\ThabeSoft.ProtocolGateway.ResultPipeline.csproj" />
+	</ItemGroup>
+
 </Project>

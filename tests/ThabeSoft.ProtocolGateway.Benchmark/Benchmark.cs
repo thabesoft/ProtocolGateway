@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
+using ThabeSoft.ProtocolGateway.Primitives;
 
 namespace ThabeSoft.ProtocolGateway.Benchmark;
 
@@ -13,16 +14,76 @@ public class Benchmark
 
 
     [Benchmark(Baseline = true)]
-    public void 传递()
+    public void Call()
     {
-        ResultPipe
+        var result = Result.Ok(10);
+        if (!result.IsSuccess) return;
+
+        var result1 = Result.Ok($"输入了: {result.Value}");
+        if (!result1.IsSuccess) return;
+
+        var result2 = Result.Ok(result1.Value.GetHashCode());
+        if (!result2.IsSuccess) return;
+
+        var result3 = result2.ToString();
     }
 
     [Benchmark]
-    public void 闭包()
+    public async Task CallAsync()
     {
-        int number = 256;
-        var result = Fuck(() => number * number);
+        var result = await GetIntResultAsync();
+        if (!result.IsSuccess) return;
+
+        var result1 = await GetStringResultAsync(result.Value);
+        if (!result1.IsSuccess) return;
+
+        var result2 = await GetHashCodeResultAsync(result1.Value);
+        if (!result2.IsSuccess) return;
+
+        var result3 = await GetHashCodeStringResultAsync(result2.Value);
+    }
+
+
+    [Benchmark]
+    public void Pipe()
+    {
+        var result = ResultPipeExtensions.Pipe(Result.Ok(10))
+            .Then(x => Result.Ok($"输入了: {x}"))
+            .Then(x => Result.Ok(x.GetHashCode()))
+            .Map(x => x.ToString())
+            .Execute();
+    }
+
+    [Benchmark]
+    public async Task PipeAsync()
+    {
+        var result = await ResultPipeExtensions.AsyncPipe(await GetIntResultAsync())
+            .Then(GetStringResultAsync)
+            .Then(GetHashCodeResultAsync)
+            .Then(GetHashCodeStringResultAsync)
+            .ExecuteAsync();
+    }
+
+
+    private async ValueTask<Result<int>> GetIntResultAsync()
+    {
+        await Task.Yield();
+        return 10;
+    }
+    private async ValueTask<Result<string>> GetStringResultAsync(int x)
+    {
+        await Task.Yield();
+        return $"输入了: {x}";
+    }
+    private async ValueTask<Result<int>> GetHashCodeResultAsync(string x)
+    {
+        await Task.Yield();
+        return x.GetHashCode();
+    }
+    private async ValueTask<Result<string>> GetHashCodeStringResultAsync(int x)
+    {
+        await Task.Yield();
+        return x.ToString();
     }
 
 
