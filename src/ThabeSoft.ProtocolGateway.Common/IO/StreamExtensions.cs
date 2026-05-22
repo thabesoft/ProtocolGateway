@@ -8,7 +8,7 @@ public static class StreamExtensions
 {
     extension(Stream stream)
     {
-#if NETSTANDARD2_1_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NET7_0_OR_GREATER
         public async ValueTask<int> ReadExactAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
         {
             if (buffer.Length == 0) return 0;
@@ -75,10 +75,7 @@ public static class StreamExtensions
                 throw new InvalidOperationException("无法获取底层数组");
             }
 
-            int length = buffer.Length;
-            int offset = segment.Offset;
-
-            await stream.WriteAsync(segment.Array, offset, length, cancellationToken);
+            await stream.WriteAsync(segment.Array, cancellationToken);
         }
 #endif
     }

@@ -19,7 +19,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.Abstractions\ThabeSoft.ProtocolGateway.Abstractions.csproj" />
-	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.Common\ThabeSoft.ProtocolGateway.Utilities.csproj" />
+	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.ResultPipeline\ThabeSoft.ProtocolGateway.ResultPipeline.csproj" />
 	</ItemGroup>
 
 </Project>

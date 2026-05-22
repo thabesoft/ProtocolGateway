@@ -70,9 +70,9 @@ public sealed class ModbusRtuWriteMultipleRequestSerializer :
         // 功能码
         destination[layout.FunctionCodeIndex] = functionCode;
         // 起始地址
-        if (!address.TryToByte(destination[layout.AddressRange], Endianness.BigEndian)) return false;
+        if (!address.TryToByte(destination[layout.AddressRange], ByteOrder.BigEndian)) return false;
         // 寄存器数量
-        if (!quantity.TryToByte(destination[layout.QuantityRange], Endianness.BigEndian)) return false;
+        if (!quantity.TryToByte(destination[layout.QuantityRange], ByteOrder.BigEndian)) return false;
         // 数据长度
         destination[layout.DataLengthIndex] = (byte)layout.DataByteLength;
 
@@ -100,16 +100,16 @@ public sealed class ModbusRtuWriteMultipleRequestSerializer :
         // 功能码
         if (!ModbusFunctionCode.TryFromCode(source[layout.FunctionCodeIndex], out var received_function_code)) return false;
         // 地址
-        if (!source[layout.AddressRange].TryToUInt16(out var received_address, Endianness.BigEndian)) return false;
+        if (!source[layout.AddressRange].TryToUInt16(out var received_address, ByteOrder.BigEndian)) return false;
         // 数量
-        if (!source[layout.QuantityRange].TryToUInt16(out var received_quantity, Endianness.BigEndian)) return false;
+        if (!source[layout.QuantityRange].TryToUInt16(out var received_quantity, ByteOrder.BigEndian)) return false;
 
         // 数据长度
         var data_length = source[layout.DataLengthIndex];
         if (data_length != layout.DataByteLength) return false;
 
         // 校验Crc
-        if (!source[layout.CrcRange].TryToUInt16(out var received_crc, Endianness.LittleEndian)) return false;
+        if (!source[layout.CrcRange].TryToUInt16(out var received_crc, ByteOrder.LittleEndian)) return false;
         if (!CrcCalculator.Validate(source[layout.PayloadRange], received_crc)) return false;
 
         slaveId = received_slaveId;
@@ -136,10 +136,10 @@ public sealed class ModbusRtuWriteMultipleRequestSerializer :
         if(TryPack(layout, destination, slaveId, ModbusFunctionCode.WriteMultipleRegisters, address, quantity))
         {
             // 数据
-            if (!values.TryToByte(destination[layout.DataRange], Endianness.BigEndian)) return false;
+            if (!values.TryToByte(destination[layout.DataRange], ByteOrder.BigEndian)) return false;
             // 验证
             var crc = CrcCalculator.Calculate(destination[layout.PayloadRange]);
-            return crc.TryToByte(destination[layout.CrcRange], Endianness.LittleEndian);
+            return crc.TryToByte(destination[layout.CrcRange], ByteOrder.LittleEndian);
         }
 
         return false;
@@ -161,7 +161,7 @@ public sealed class ModbusRtuWriteMultipleRequestSerializer :
             // 数量
             if (values.Length < received_quantity) return false;
             // 数据
-            if (!source[layout.DataRange].TryToUInt16(values, Endianness.BigEndian)) return false;
+            if (!source[layout.DataRange].TryToUInt16(values, ByteOrder.BigEndian)) return false;
 
             slaveId = received_slaveId;
             address = received_address;
@@ -186,10 +186,10 @@ public sealed class ModbusRtuWriteMultipleRequestSerializer :
         if (TryPack(layout, destination, slaveId, ModbusFunctionCode.WriteMultipleCoils, address, quantity))
         {
             // 数据
-            if (!values.TryToByte(destination[layout.DataRange], Endianness.LittleEndian)) return false;
+            if (!values.TryToByte(destination[layout.DataRange], ByteOrder.LittleEndian)) return false;
             // 验证
             var crc = CrcCalculator.Calculate(destination[layout.PayloadRange]);
-            return crc.TryToByte(destination[layout.CrcRange], Endianness.LittleEndian);
+            return crc.TryToByte(destination[layout.CrcRange], ByteOrder.LittleEndian);
         }
 
         return false;
@@ -211,7 +211,7 @@ public sealed class ModbusRtuWriteMultipleRequestSerializer :
             // 数量
             if (values.Length < received_quantity) return false;
             // 数据
-            if (!source[layout.DataRange].TryToBit(values, Endianness.LittleEndian)) return false;
+            if (!source[layout.DataRange].TryToBit(values, ByteOrder.LittleEndian)) return false;
 
             slaveId = received_slaveId;
             address = received_address;

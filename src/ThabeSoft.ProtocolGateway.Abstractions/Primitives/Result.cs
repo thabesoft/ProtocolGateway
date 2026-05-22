@@ -59,6 +59,22 @@ public readonly struct Result : IResult
         => Result<TValue>.Error(type, message);
 
 
+    /// <summary>
+    /// 将当前结果的错误传播到指定类型的 Result。
+    /// </summary>
+    /// <remarks>
+    /// 如果当前结果成功，此方法不应被调用。
+    /// 建议仅在 <c>if (!result.IsSuccess) return result.PropagateError&lt;T&gt;();</c> 场景使用。
+    /// </remarks>
+    public Result<U> PropagateError<U>()
+    {
+        if (IsSuccess)
+        {
+            throw new InvalidOperationException("Cannot propagate error from successful result");
+        }
+
+        return Result<U>.Error(ErrorType, Message);
+    }
     public override string ToString()
     {
         if (!string.IsNullOrWhiteSpace(Message))
@@ -66,7 +82,7 @@ public readonly struct Result : IResult
             return IsSuccess ? $"成功: {Message}" : $"失败[{ErrorType}]: {Message}";
         }
 
-        return IsSuccess ? $"成功" : $"失败[{ErrorType}]";
+        return IsSuccess ? "成功" : $"失败[{ErrorType}]";
     }
 }
 
@@ -135,6 +151,24 @@ public readonly struct Result<TValue> : IResult<TValue>
         return new(false, type, message, default!);
     }
 
+
+
+    /// <summary>
+    /// 将当前结果的错误传播到指定类型的 Result。
+    /// </summary>
+    /// <remarks>
+    /// 如果当前结果成功，此方法不应被调用。
+    /// 建议仅在 <c>if (!result.IsSuccess) return result.PropagateError&lt;T&gt;();</c> 场景使用。
+    /// </remarks>
+    public Result<U> PropagateError<U>()
+    {
+        if (IsSuccess)
+        {
+            throw new InvalidOperationException("Cannot propagate error from successful result");
+        }
+
+        return Result<U>.Error(ErrorType, Message);
+    }
 
     public override string ToString()
     {

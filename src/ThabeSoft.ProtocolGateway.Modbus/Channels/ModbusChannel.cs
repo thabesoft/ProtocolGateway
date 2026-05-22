@@ -13,47 +13,42 @@ public sealed class ModbusChannel(
         IDecoderFactory decoderFactory
     ) : IReadChannel, IWriteChannel
 {
-    private async ValueTask<Result<TResponse>> ReadValueAsync<TRequest, TResponse, TResponseValue>(TRequest request, Memory<TResponseValue> value, CancellationToken cancellationToken = default)
+    private async ValueTask<Result<TResponse>> ReadAsync<TRequest, TResponse, TResponseValue>(
+            TRequest request,
+            Memory<TResponseValue> value,
+            CancellationToken cancellationToken
+        )
     {
         var req_layout = layoutFactory.Create<TRequest>();
-        var resp_layout = layoutFactory.Create<TResponse>();
-
         var req_encoder = encoderFactory.Create<TRequest>();
+
+        var resp_layout = layoutFactory.Create<TResponse>();
         var resp_decoder = decoderFactory.CreateDataDecoder<TResponse, TResponseValue>();
 
-        var buffer = ArrayPool<byte>.Shared.Rent(req_layout.TotalLength + resp_layout.TotalLength);
+        // 申请缓冲区
+        var length = req_layout.TotalLength + resp_layout.TotalLength;
+        if (length < 0) return Result.Error<TResponse>(ErrorType.Internal, "Modbus 读取请求异常, 帧长度为0");
+        var buffer = ArrayPool<byte>.Shared.Rent(length);
+
         try
         {
             var sendr_buffer = buffer.AsMemory(0, req_layout.TotalLength);
             var receive_buffer = buffer.AsMemory(req_layout.TotalLength, resp_layout.TotalLength);
 
-
-
-
-            var shit = await req_encoder.Encode(request, sendr_buffer.Span).Query()
-                .Then(() => transport.WriteAsync(sendr_buffer, cancellationToken))
-                .Then(async (_, ct) => await transport.ReadExactAsync(receive_buffer, ct))
-                .Then(() => resp_decoder.Decode(receive_buffer.Span, value.Span))
-                .Map(x => x.ToString())
-                .Tap(x => Console.WriteLine(x))
-                .ExecuteAsync();
-
-
             // 编码请求
-            var result = req_encoder.Encode(request, sendr_buffer.Span);
-            if (!result) return result.ToResult(default(TResponse)!);
+            var req_encoder_result = req_encoder.Encode(request, sendr_buffer.Span);
+            if (!req_encoder_result) return req_encoder_result.PropagateError<TResponse>();
 
             // 写入数据
-            await transport.WriteAsync(sendr_buffer, cancellationToken);
+            var write_result = await transport.WriteAsync(sendr_buffer, cancellationToken);
+            if (!write_result) return write_result.PropagateError<TResponse>();
+
             // 接收数据
-            await transport.ReadExactAsync(receive_buffer, cancellationToken);
+            var read_result = await transport.ReadExactAsync(receive_buffer, cancellationToken);
+            if (!read_result) return read_result.PropagateError<TResponse>();
 
             // 解码响应
             return resp_decoder.Decode(receive_buffer.Span, value.Span);
-        }
-        catch(Exception ex) when(ex is ArrayTypeMismatchException or ArgumentOutOfRangeException)
-        {
-            return Result.Error<TResponse>(ErrorType.InvalidParameter, "参数错误");
         }
         finally
         {
@@ -62,16 +57,25 @@ public sealed class ModbusChannel(
     }
 
 
-    public async ValueTask<Result> ReadAsync(IReadRequest request, Memory<byte> destination, CancellationToken cancellationToken = default)
+    public async ValueTask<Result> ReadAsync(
+            IReadRequest request,
+            Memory<byte> destination,
+            CancellationToken cancellationToken = default
+        )
     {
         if (request is ModbusReadCoilRequest modbus)
         {
-            var result = await ReadValueAsync<ModbusReadCoilRequest, ModbusReadResponse, byte>(modbus, destination, cancellationToken);
-            result.Value.
+            return await ReadAsync<ModbusReadCoilRequest, ModbusReadResponse, byte>(modbus, destination, cancellationToken);
         }
+
+        return Result.Error(ErrorType.InvalidOperation, "Modbus 无法识别的读取操作");
     }
 
-    public ValueTask<Result> WriteAsync(IWriteRequest request, ReadOnlyMemory<byte> source, CancellationToken cancellationToken = default)
+    public ValueTask<Result> WriteAsync(
+            IWriteRequest request,
+            ReadOnlyMemory<byte> source,
+            CancellationToken cancellationToken = default
+        )
     {
         throw new NotImplementedException();
     }
@@ -80,13 +84,14 @@ public sealed class ModbusChannel(
 
 public class TestDe : IDecoder<ModbusReadResponse>
 {
-    public bool TryDecode(ReadOnlySpan<byte> source, out ModbusReadResponse destination)
+    public Result<ModbusReadResponse> Decode(ReadOnlySpan<byte> source)
     {
-        throw new NotImplementedException();
+        ModbusReadResponse resp = new();
+        return Result.Ok(resp);
     }
 }
 
-public readonly struct ModbusReadCoilRequest(byte slaveId, ushort address, ushort quantity) : IOperation<ModbusReadResponse>
+public readonly struct ModbusReadCoilRequest(byte slaveId, ushort address, ushort quantity) : IReadRequest
 {
     public byte SlaveId => slaveId;
     public ushort Address => address;

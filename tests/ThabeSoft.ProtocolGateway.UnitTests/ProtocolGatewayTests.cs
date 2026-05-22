@@ -1,4 +1,5 @@
 ﻿using ThabeSoft.ProtocolGateway.Channels;
+using ThabeSoft.ProtocolGateway.Primitives;
 
 namespace ThabeSoft.ProtocolGateway;
 
@@ -11,6 +12,14 @@ public class ProtocolGatewayTests
     [TestMethod]
     public async Task FuckAsync()
     {
+        Word world = Word.FromUInt(10);
+        if(world.ToInt16() > 10)
+        {
+
+        }
+
+
+
         IProtocolGateway gateway = default!;
         var chanel = gateway.GetChannel(default!);
 

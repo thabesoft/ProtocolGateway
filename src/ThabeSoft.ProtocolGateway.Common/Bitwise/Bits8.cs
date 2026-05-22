@@ -63,6 +63,6 @@ public readonly struct Bits8 : IBits<Bits8>
     }
 
     public override int GetHashCode() => _value.GetHashCode();
-    public override bool Equals(object obj) => obj is Bits8 other && _value.Equals(other._value);
+    public override bool Equals(object? obj) => obj is Bits8 other && _value.Equals(other._value);
     public override string ToString() => $"0b{Convert.ToString(_value, 2).PadLeft(MaxLength, '0')}";
 }

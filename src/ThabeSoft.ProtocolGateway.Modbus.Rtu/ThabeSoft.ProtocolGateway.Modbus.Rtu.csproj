@@ -9,6 +9,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\ThabeSoft.ProtocolGateway.Common\ThabeSoft.ProtocolGateway.Utilities.csproj" />
 		<ProjectReference Include="..\ThabeSoft.ProtocolGateway.Modbus\ThabeSoft.ProtocolGateway.Modbus.csproj" />
 	</ItemGroup>
 

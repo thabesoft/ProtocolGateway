@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace ThabeSoft.IndustrialHub.Modbus;
+namespace ThabeSoft.ProtocolGateway;
 
 
 /// <summary>

@@ -20,7 +20,7 @@ public static class BitArrayConverter
     /// <param name="destination">目标位组</param>
     /// <param name="endianness">端序</param>
     /// <returns>是否转换成功</returns>
-    public static bool TryToBit(this ReadOnlySpan<byte> source, Span<bool> destination, Endianness endianness = Endianness.BigEndian)
+    public static bool TryToBit(this ReadOnlySpan<byte> source, Span<bool> destination, ByteOrder endianness = ByteOrder.BigEndian)
     {
         int total_length = Math.Min(destination.Length, source.Length * BitsPerByte);
 
@@ -45,14 +45,14 @@ public static class BitArrayConverter
     /// <param name="destination">目标位组</param>
     /// <param name="endianness">端序</param>
     /// <returns>是否转换成功</returns>
-    public static bool TryToBit(this byte source, Span<bool> destination, Endianness endianness = Endianness.BigEndian)
+    public static bool TryToBit(this byte source, Span<bool> destination, ByteOrder endianness = ByteOrder.BigEndian)
     {
         //if (destination.Length < BitsPerByte) return false;
-        if (endianness is not (Endianness.LittleEndian or Endianness.BigEndian)) return false;
+        if (endianness is not (ByteOrder.LittleEndian or ByteOrder.BigEndian)) return false;
 
         for (int i = 0; i < destination.Length; i++)
         {
-            if (endianness == Endianness.BigEndian)
+            if (endianness == ByteOrder.BigEndian)
             {
                 // 大端序：destination[0] = bit7
                 int bit_index = BitsPerByte - 1 - i;
@@ -79,7 +79,7 @@ public static class BitArrayConverter
     /// <param name="destination">字节组</param>
     /// <param name="endianness">端序</param>
     /// <returns>是否转换成功</returns>
-    public static bool TryToByte(this ReadOnlySpan<bool> source, Span<byte> destination, Endianness endianness = Endianness.BigEndian)
+    public static bool TryToByte(this ReadOnlySpan<bool> source, Span<byte> destination, ByteOrder endianness = ByteOrder.BigEndian)
     {
         var bits_count = source.Length;
         var byte_count = (bits_count + 7) / BitsPerByte;
@@ -103,7 +103,7 @@ public static class BitArrayConverter
     /// <param name="destination">目标字节</param>
     /// <param name="endianness">端序</param>
     /// <returns>是否转换成功</returns>
-    public static bool TryToByte(this ReadOnlySpan<bool> source, out byte destination, Endianness endianness = Endianness.BigEndian)
+    public static bool TryToByte(this ReadOnlySpan<bool> source, out byte destination, ByteOrder endianness = ByteOrder.BigEndian)
     {
         var bit_count = source.Length;
 
@@ -120,7 +120,7 @@ public static class BitArrayConverter
         {
             if (!source[i]) continue;
 
-            var bitIndex = endianness == Endianness.LittleEndian ? i : bit_count - 1 - i;
+            var bitIndex = endianness == ByteOrder.LittleEndian ? i : bit_count - 1 - i;
             byte_value |= (byte)(1 << bitIndex);
         }
 
@@ -134,7 +134,7 @@ public static class BitArrayConverter
     /// <param name="destination">目标字节组</param>
     /// <param name="endianness">端序</param>
     /// <returns>是否转换成功</returns>
-    public static bool TryToByte(this ReadOnlySpan<ushort> source, Span<byte> destination, Endianness endianness = Endianness.LittleEndian)
+    public static bool TryToByte(this ReadOnlySpan<ushort> source, Span<byte> destination, ByteOrder endianness = ByteOrder.LittleEndian)
     {
         var source_count = source.Length;
         var byte_count = source_count * 2;
@@ -142,7 +142,7 @@ public static class BitArrayConverter
         for (int source_index = 0; source_index < source_count; source_index++)
         {
             var byte_start = source_index * 2;
-            var byte_length = 2;
+            const int byte_length = 2;
             var byte_range = destination.Slice(byte_start, byte_length);
 
             if (!TryToByte(source[source_index], byte_range, endianness)) return false;
@@ -157,11 +157,18 @@ public static class BitArrayConverter
     /// <param name="destination">目标字节组</param>
     /// <param name="endianness">端序</param>
     /// <returns>是否转换成功</returns>
-    public static bool TryToByte(this ushort source, Span<byte> destination, Endianness endianness = Endianness.LittleEndian)
+    public static Result TryToByte(this ushort source, Span<byte> destination, ByteOrder endianness = ByteOrder.BigEndian)
     {
-        if (destination.Length < 2) return false;
+        if (destination.Length < 2)
+        {
+            return Result.Error
+            (
+                ErrorType.InvalidParameter,
+                $"ushort转字节失败, 缓冲区不足(需要2字节,实际{destination.Length}字节)"
+            );
+        }
 
-        if (endianness == Endianness.BigEndian)
+        if (endianness == ByteOrder.BigEndian)
         {
             // 大端序
             destination[0] = (byte)(source >> 8);   // 高字节
@@ -170,7 +177,7 @@ public static class BitArrayConverter
             return true;
         }
 
-        if (endianness == Endianness.LittleEndian)
+        if (endianness == ByteOrder.LittleEndian)
         {
             // 小端序
             destination[0] = (byte)source;          // 低字节
@@ -178,8 +185,9 @@ public static class BitArrayConverter
             return true;
         }
 
-        return false;
+        return Result.Error(ErrorType.InvalidParameter, $"ushort 转字节失败, 不支持的字节序: {endianness}");
     }
+
 
     #endregion
 
@@ -192,14 +200,14 @@ public static class BitArrayConverter
     /// <param name="destination">目标16位无符号整数组</param>
     /// <param name="endianness">端序</param>
     /// <returns>是否转换成功</returns>
-    public static bool TryToUInt16(this ReadOnlySpan<byte> source, Span<ushort> destination, Endianness endianness = Endianness.BigEndian)
+    public static bool TryToUInt16(this ReadOnlySpan<byte> source, Span<ushort> destination, ByteOrder endianness = ByteOrder.BigEndian)
     {
         int total_length = Math.Min(destination.Length, source.Length / 2);
 
         for (int i = 0; i < total_length; i++)
         {
             int begin = i * 2;
-            int length = 2;
+            const int length = 2;
             var span = source.Slice(begin, length);
 
             if (!TryToUInt16(span, out var value, endianness)) return false;
@@ -215,22 +223,23 @@ public static class BitArrayConverter
     /// <param name="destination">目标16位无符号整数</param>
     /// <param name="endianness">端序</param>
     /// <returns>是否转换成功</returns>
-    public static bool TryToUInt16(this ReadOnlySpan<byte> source, out ushort destination, Endianness endianness = Endianness.BigEndian)
+    public static bool TryToUInt16(this ReadOnlySpan<byte> source, out ushort destination, ByteOrder endianness = ByteOrder.BigEndian)
     {
+
         destination = 0;
         if (source.Length != 2)
         {
             return false;
         }
 
-        if (endianness == Endianness.BigEndian)
+        if (endianness == ByteOrder.BigEndian)
         {
             // 大端序：高字节在前，低字节在后
             destination = (ushort)((source[0] << 8) | source[1]);
             return true;
         }
 
-        if (endianness == Endianness.LittleEndian)
+        if (endianness == ByteOrder.LittleEndian)
         {
             // 小端序：低字节在前，高字节在后
             destination = (ushort)(source[0] | (source[1] << 8));

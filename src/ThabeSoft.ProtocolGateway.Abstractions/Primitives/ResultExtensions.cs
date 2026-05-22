@@ -6,28 +6,35 @@
 /// </summary>
 public static class ResultExtensions
 {
-    /// <summary>
-    /// Map
-    /// </summary>
+    extension<T>(Result<T>)
+    {
+    }
+
+
     extension<T>(Result<T> result)
     {
+        public Result<U> OrElse<U>(Func<T, Result<U>> action)
+        {
+            if (!result.IsSuccess)
+            {
+                return result.PropagateError<U>();
+            }
+
+            return action(result.Value);
+        }
+
+
         public Result<U> Map<U>(Func<T, U> handler)
         {
             if (!result.IsSuccess)
             {
-                return Result.Error<U>(result.ErrorType, result.Message);
+                return result.PropagateError<U>();
             }
 
             return Result.Ok(handler(result.Value));
         }
-    }
 
 
-    /// <summary>
-    /// Tap
-    /// </summary>
-    extension<T>(Result<T> result)
-    {
         public Result<T> Tap(Action<T> handler)
         {
             if (result.IsSuccess) handler(result.Value);

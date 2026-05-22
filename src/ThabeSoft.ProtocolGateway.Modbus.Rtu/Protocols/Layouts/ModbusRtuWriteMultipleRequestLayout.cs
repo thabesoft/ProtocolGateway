@@ -1,5 +1,4 @@
-﻿using ThabeSoft.IndustrialHub.Modbus;
-using ThabeSoft.ProtocolGateway.Primitives;
+﻿using ThabeSoft.ProtocolGateway.Primitives;
 
 namespace ThabeSoft.ProtocolGateway.Protocols.Layouts;
 

@@ -1,4 +1,4 @@
-﻿namespace ThabeSoft.IndustrialHub.Modbus;
+﻿namespace ThabeSoft.ProtocolGateway;
 
 
 /// <summary>
