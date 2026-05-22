@@ -7,30 +7,31 @@ public enum ErrorType
 {
     /// <summary>空</summary>
     None = 0,
-
     /// <summary>未指定的错误</summary>
     Unspecified,
+    /// <summary>内部错误</summary>
+    Internal,
 
-    /// <summary>内务错误</summary>
-    InternalError,
 
-    /// <summary>错误操作</summary>
-    InvalidRequest,
+
+    /// <summary>无效操作</summary>
+    InvalidOperation,
+    /// <summary>操作超时</summary>
+    OperationTimeout,
+    /// <summary>操作被取消</summary>
+    OperationCancelled,
+
+
+
+    /// <summary>连接丢失</summary>
+    ConnectionLost,
+    /// <summary>连接被拒绝</summary>
+    ConnectionRefused,
+
+
 
 
     /// <summary>协议错误</summary>
     ProtocolErrored,
-
-    /// <summary>传输错误</summary>
-    TransportErrored,
-
-    /// <summary>通道错误</summary>
-    ChannelError,
-
-
-    Timeout,
-
-    Cancelled,
-
     InvalidParameter,
 }

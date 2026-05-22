@@ -4,7 +4,17 @@
 /// <summary>
 /// 结果
 /// </summary>
-public readonly struct Result<TValue> where TValue : unmanaged
+/// <typeparam name="TValue">包含值的类型</typeparam>
+public interface IResult<out TValue> : IResult
+{
+    /// <summary> 值 </summary>
+    TValue Value { get; }
+}
+
+/// <summary>
+/// 结果
+/// </summary>
+public readonly struct Result<TValue> : IResult<TValue>
 {
     /// <summary> 是否成功 </summary>
     public bool IsSuccess { get; }
@@ -59,10 +69,10 @@ public readonly struct Result<TValue> where TValue : unmanaged
     {
         if (type == ErrorType.None || type == ErrorType.Unspecified)
         {
-            return new(false, ErrorType.Unspecified, message, default);
+            return new(false, ErrorType.Unspecified, message, default!);
         }
 
-        return new(false, type, message, default);
+        return new(false, type, message, default!);
     }
 
 

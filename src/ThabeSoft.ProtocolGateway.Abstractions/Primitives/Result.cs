@@ -4,7 +4,20 @@
 /// <summary>
 /// 结果
 /// </summary>
-public readonly struct Result
+public interface IResult
+{
+    /// <summary> 是否成功 </summary>
+    public bool IsSuccess { get; }
+    /// <summary> 错误类型 </summary>
+    ErrorType ErrorType { get; }
+    /// <summary> 消息 </summary>
+    string? Message { get; }
+}
+
+/// <summary>
+/// 结果
+/// </summary>
+public readonly struct Result : IResult
 {
     public static readonly Result Success = new(true, ErrorType.None, null);
 
@@ -54,9 +67,9 @@ public readonly struct Result
     }
 
 
-    public static Result<TValue> Ok<TValue>(TValue value, string? message = null) where TValue : unmanaged
+    public static Result<TValue> Ok<TValue>(TValue value, string? message = null)
         => Result<TValue>.Ok(value, message);
-    public static Result<TValue> Error<TValue>(ErrorType type, string? message = null) where TValue : unmanaged
+    public static Result<TValue> Error<TValue>(ErrorType type, string? message = null)
         => Result<TValue>.Error(type, message);
 
 

@@ -1,22 +1,20 @@
 ﻿using System.Buffers;
-using ThabeSoft.ProtocolGateway.Channels;
 using ThabeSoft.ProtocolGateway.Primitives;
+using ThabeSoft.ProtocolGateway.Primitives.Linq;
 using ThabeSoft.ProtocolGateway.Protocols;
 using ThabeSoft.ProtocolGateway.Transports;
 
-namespace ThabeSoft.ProtocolGateway;
+namespace ThabeSoft.ProtocolGateway.Channels;
 
 
-public class ModbusGateway(
+public sealed class ModbusChannel(
         ITransport transport,
         IEncoderFactory encoderFactory,
         ILayoutFactory layoutFactory,
         IDecoderFactory decoderFactory
-    ) : IChannel
+    ) : IReadChannel, IWriteChannel
 {
     private async ValueTask<Result<TResponse>> ReadValueAsync<TRequest, TResponse, TResponseValue>(TRequest request, Memory<TResponseValue> value, CancellationToken cancellationToken = default)
-        where TResponse : notnull
-        where TResponseValue : unmanaged
     {
         var req_layout = layoutFactory.Create<TRequest>();
         var resp_layout = layoutFactory.Create<TResponse>();
@@ -30,24 +28,33 @@ public class ModbusGateway(
             var sendr_buffer = buffer.AsMemory(0, req_layout.TotalLength);
             var receive_buffer = buffer.AsMemory(req_layout.TotalLength, resp_layout.TotalLength);
 
-            // 编码失败
-            if(!req_encoder.TryEncode(request, sendr_buffer.Span, out var bytesWritten))
-            {
-                return Result.InternalError<TResponse>();
-            }
+
+
+
+            var shit = await req_encoder.Encode(request, sendr_buffer.Span).Query()
+                .Then(() => transport.WriteAsync(sendr_buffer, cancellationToken))
+                .Then(async (_, ct) => await transport.ReadExactAsync(receive_buffer, ct))
+                .Then(() => resp_decoder.Decode(receive_buffer.Span, value.Span))
+                .Map(x => x.ToString())
+                .Tap(x => Console.WriteLine(x))
+                .ExecuteAsync();
+
+
+            // 编码请求
+            var result = req_encoder.Encode(request, sendr_buffer.Span);
+            if (!result) return result.ToResult(default(TResponse)!);
 
             // 写入数据
             await transport.WriteAsync(sendr_buffer, cancellationToken);
             // 接收数据
             await transport.ReadExactAsync(receive_buffer, cancellationToken);
 
-            // 解码失败
-            if (!resp_decoder.TryDecode(receive_buffer.Span, out var response, value.Span))
-            {
-                return Result.InternalError<TResponse>();
-            }
-
-            return Result.Success(response);
+            // 解码响应
+            return resp_decoder.Decode(receive_buffer.Span, value.Span);
+        }
+        catch(Exception ex) when(ex is ArrayTypeMismatchException or ArgumentOutOfRangeException)
+        {
+            return Result.Error<TResponse>(ErrorType.InvalidParameter, "参数错误");
         }
         finally
         {
@@ -56,19 +63,16 @@ public class ModbusGateway(
     }
 
 
-    public async ValueTask<ErrorType> ReadValueAsync(IOperation request, Memory<byte> destination, CancellationToken cancellationToken = default)
+    public async ValueTask<Result> ReadAsync(IReadRequest request, Memory<byte> destination, CancellationToken cancellationToken = default)
     {
         if (request is ModbusReadCoilRequest modbus)
         {
             var result = await ReadValueAsync<ModbusReadCoilRequest, ModbusReadResponse, byte>(modbus, destination, cancellationToken);
             result.Value.
         }
-
-
-
     }
 
-    public ValueTask<ErrorType> WriteValueAsync(IOperation request, ReadOnlyMemory<byte> source, CancellationToken cancellationToken = default)
+    public ValueTask<Result> WriteAsync(IWriteRequest request, ReadOnlyMemory<byte> source, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }

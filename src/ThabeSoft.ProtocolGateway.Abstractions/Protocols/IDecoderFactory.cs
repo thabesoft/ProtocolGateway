@@ -6,5 +6,5 @@
 public interface IDecoderFactory
 {
     IDecoder<TProtocol> Create<TProtocol>();
-    IDataDecoder<TProtocol, TData> CreateDataDecoder<TProtocol, TData>() where TData : unmanaged;
+    IDataDecoder<TProtocol, TData> CreateDataDecoder<TProtocol, TData>();
 }

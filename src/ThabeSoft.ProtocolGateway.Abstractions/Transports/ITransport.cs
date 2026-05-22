@@ -1,4 +1,6 @@
-﻿namespace ThabeSoft.ProtocolGateway.Transports;
+﻿using ThabeSoft.ProtocolGateway.Primitives;
+
+namespace ThabeSoft.ProtocolGateway.Transports;
 
 
 /// <summary>
@@ -15,19 +17,19 @@ public interface ITransport : IAsyncDisposable
     /// <summary>
     /// 连接
     /// </summary>
-    ValueTask ConnectAsync(ITransportOptions options, CancellationToken cancellationToken = default);
+    ValueTask<Result> ConnectAsync(ITransportOptions options, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 断开
     /// </summary>
-    ValueTask DisconnectAsync(CancellationToken cancellationToken = default);
+    ValueTask<Result> DisconnectAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 读取所有
     /// </summary>
-    ValueTask<int> ReadExactAsync(Memory<byte> buffer, CancellationToken cancellationToken = default);
+    ValueTask<Result<int>> ReadExactAsync(Memory<byte> buffer, CancellationToken cancellationToken = default);
     /// <summary>
     /// 写入所有
     /// </summary>
-    ValueTask WriteAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default);
+    ValueTask<Result> WriteAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default);
 }

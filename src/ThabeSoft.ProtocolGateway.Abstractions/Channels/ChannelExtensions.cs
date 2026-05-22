@@ -22,17 +22,17 @@ public static class ChannelExtensions
             {
                 var destination = buffer.AsMemory(0, length);
                 var result = await channel.ReadAsync(request, destination, cancellationToken);
-                if (!result) return Result.Error<T>(ErrorType.ChannelError);
+                if (!result) return Result.Error<T>(ErrorType.ConnectionRefused);
 
                 return MemoryMarshal.Cast<byte, T>(destination.Span)[0];
             }
             catch (OperationCanceledException)
             {
-                return ErrorType.Cancelled;
+                return ErrorType.OperationCancelled;
             }
             catch (Exception ex)
             {
-                return Result.Error<T>(ErrorType.InternalError, $"数据读取失败: {ex.Message}");
+                return Result.Error<T>(ErrorType.Internal, $"数据读取失败: {ex.Message}");
             }
             finally
             {
@@ -110,11 +110,11 @@ public static class ChannelExtensions
             }
             catch (OperationCanceledException)
             {
-                return ErrorType.Timeout;
+                return ErrorType.OperationTimeout;
             }
             catch (Exception ex)
             {
-                return Result.Error(ErrorType.InternalError, $"数据写入失败: {ex.Message}");
+                return Result.Error(ErrorType.Internal, $"数据写入失败: {ex.Message}");
             }
             finally
             {

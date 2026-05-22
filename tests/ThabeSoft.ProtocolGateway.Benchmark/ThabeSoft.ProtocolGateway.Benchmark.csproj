@@ -12,8 +12,4 @@
 		<PackageReference Include="BenchmarkDotNet" Version="0.15.8" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.Modbus.Rtu\ThabeSoft.ProtocolGateway.Modbus.Rtu.csproj" />
-	</ItemGroup>
-
 </Project>
