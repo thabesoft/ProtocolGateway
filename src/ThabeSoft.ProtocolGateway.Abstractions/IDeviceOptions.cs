@@ -1,6 +1,5 @@
 ﻿using System.Linq.Expressions;
 using ThabeSoft.ProtocolGateway.Primitives;
-using static ThabeSoft.ProtocolGateway.Test;
 
 namespace ThabeSoft.ProtocolGateway;
 
