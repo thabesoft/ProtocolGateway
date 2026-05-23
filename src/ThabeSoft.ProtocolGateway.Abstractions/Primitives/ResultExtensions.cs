@@ -39,6 +39,16 @@ public static class ResultExtensions
 
     extension(Result result)
     {
+        public Result<U> ThenReturn<U>(U value)
+        {
+            if (!result.IsSuccess)
+            {
+                return result.PropagateError<U>();
+            }
+
+            return Result.Ok(value);
+        }
+
         public Result<U> OrElse<U>(Func<Result<U>> action)
         {
             if (!result.IsSuccess)

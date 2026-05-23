@@ -6,9 +6,9 @@ namespace ThabeSoft.ProtocolGateway.Modbus.Protocols.Headers;
 /// <summary>
 /// 写多值请求头
 /// </summary>
-public readonly struct WriteMultipleHeader : IRequestHeader
+public readonly record struct WriteMultipleRequestHeader : IRequestHeader
 {
-    public static readonly ReadRequesHeader Empty = default;
+    public static readonly WriteMultipleRequestHeader Empty = default;
 
     public readonly byte SlaveId { get; }
     public readonly FunctionCode FunctionCode { get; }
@@ -17,22 +17,22 @@ public readonly struct WriteMultipleHeader : IRequestHeader
 
 
     [Obsolete("禁止调用构造, 请使用工厂方法")]
-    public WriteMultipleHeader() { }
-    private WriteMultipleHeader(byte slaveId, FunctionCode functionCode, ushort address)
+    public WriteMultipleRequestHeader() { }
+    private WriteMultipleRequestHeader(byte slaveId, FunctionCode functionCode, ushort address)
     {
         SlaveId = slaveId;
         FunctionCode = functionCode;
         Address = address;
     }
 
-    public static Result<WriteMultipleHeader> Coils(byte slaveId, ushort address)
+    public static Result<WriteMultipleRequestHeader> Coils(byte slaveId, ushort address)
     {
-        return new WriteMultipleHeader(slaveId, FunctionCode.WriteMultipleCoils, address);
+        return new WriteMultipleRequestHeader(slaveId, FunctionCode.WriteMultipleCoils, address);
     }
 
-    public static Result<WriteMultipleHeader> Registers(byte slaveId, ushort address)
+    public static Result<WriteMultipleRequestHeader> Registers(byte slaveId, ushort address)
     {
-        return new WriteMultipleHeader(slaveId, FunctionCode.WriteMultipleRegisters, address);
+        return new WriteMultipleRequestHeader(slaveId, FunctionCode.WriteMultipleRegisters, address);
     }
 
     public override string ToString()

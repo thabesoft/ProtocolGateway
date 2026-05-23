@@ -73,7 +73,7 @@ public static class ByteExtensions
         {
             if (index < 0 || maxBit > 8 || index >= maxBit)
             {
-                return Result.InvalidParameter<bool>($"位索引必须在 0~{BitsPerByte - 1} 之间，实际 {index}");
+                return Result.InvalidParameter<bool>($"字节位索引必须在 0~{BitsPerByte - 1} 之间，实际 {index}");
             }
 
             int bit_index = endianness == Endianness.LittleEndian ? index : maxBit - 1 - index;
@@ -115,7 +115,10 @@ public static class ByteExtensions
         public Result<ushort> ToWord(Endianness endianness = Endianness.BigEndian)
         {
             if (source.Length < 2)
-                return Result.Error<ushort>(ErrorType.InvalidParameter, "字至少需要2字节");
+            {
+                return Result.Error<ushort>(ErrorType.InvalidParameter,
+                    $"Byte[] 转 Word 失败，至少需要 2 字节，实际 {source.Length} 字节");
+            }
 
             if (endianness == Endianness.BigEndian)
             {
@@ -131,7 +134,10 @@ public static class ByteExtensions
         public Result<uint> ToDWord(Endianness endianness = Endianness.BigEndian)
         {
             if (source.Length < 4)
-                return Result.Error<uint>(ErrorType.InvalidParameter, "双字至少需要4字节");
+            {
+                return Result.Error<uint>(ErrorType.InvalidParameter, 
+                    $"Byte[] 转 DWord 失败，至少需要 4 字节，实际 {source.Length} 字节");
+            }
 
             if (endianness == Endianness.BigEndian)
             {
@@ -147,7 +153,10 @@ public static class ByteExtensions
         public Result<ulong> ToQWord(Endianness endianness = Endianness.BigEndian)
         {
             if (source.Length < 8)
-                return Result.Error<ulong>(ErrorType.InvalidParameter, "四字至少需要8字节");
+            {
+                return Result.Error<ulong>(ErrorType.InvalidParameter, 
+                    $"Byte[] 转 QWord 失败，至少需要 8 字节，实际 {source.Length} 字节");
+            }
 
             if (endianness == Endianness.BigEndian)
             {
@@ -242,7 +251,7 @@ public static class ByteExtensions
             if (destination.Length < source_byte_count)
             {
                 return Result.Error(ErrorType.InvalidParameter,
-                    $"目标缓冲区不足，需要 {source_byte_count} 字节，实际 {destination.Length} 字节 (源数据: {source_count} 个 ushort)");
+                    $"Word[] 转 Byte[] 失败, Byte[] 缓冲区不足，至少需要 {source_byte_count} 字节，实际 {destination.Length} 字节");
             }
 
             // 暂存数据
@@ -275,7 +284,10 @@ public static class ByteExtensions
         public Result ToBytes(Span<byte> destination, Endianness endianness = Endianness.BigEndian)
         {
             if (destination.Length < 2)
-                return Result.Error(ErrorType.InvalidParameter, "目标缓冲区至少需要2字节");
+            {
+                return Result.Error(ErrorType.InvalidParameter,
+                    $"Word 转 Byte[] 失败, Byte[] 缓冲区不足，至少需要 2 字节, 实际 {destination.Length} 字节");
+            }
 
             if (endianness == Endianness.BigEndian)
             {
@@ -305,7 +317,10 @@ public static class ByteExtensions
         public Result ToBytes(Span<byte> destination, Endianness endianness = Endianness.BigEndian)
         {
             if (destination.Length < 4)
-                return Result.Error(ErrorType.InvalidParameter, "目标缓冲区至少需要4字节");
+            {
+                return Result.Error(ErrorType.InvalidParameter,
+                    $"DWord 转 Byte[] 失败, Byte[] 缓冲区不足，至少需要 4 字节, 实际 {destination.Length} 字节");
+            }
 
             if (endianness == Endianness.BigEndian)
             {
@@ -338,7 +353,8 @@ public static class ByteExtensions
         public Result ToBytes(Span<byte> destination, Endianness endianness = Endianness.BigEndian)
         {
             if (destination.Length < 8)
-                return Result.Error(ErrorType.InvalidParameter, "目标缓冲区至少需要8字节");
+                return Result.Error(ErrorType.InvalidParameter,
+                    $"QWord 转 Byte[] 失败, Byte[] 缓冲区不足，至少需要 8 字节, 实际 {destination.Length} 字节");
 
             if (endianness == Endianness.BigEndian)
             {

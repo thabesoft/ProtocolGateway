@@ -2,6 +2,7 @@
 using ThabeSoft.ProtocolGateway.Modbus.Protocols.Headers;
 using ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
 using ThabeSoft.ProtocolGateway.Primitives;
+using ThabeSoft.ProtocolGateway.Protocols;
 
 namespace ThabeSoft.ProtocolGateway.Modbus.Protocols;
 
@@ -11,17 +12,20 @@ namespace ThabeSoft.ProtocolGateway.Modbus.Protocols;
 /// </summary>
 public static class RtuRequestEncoder
 {
-    public static Result<int> Read(Span<byte> destination, in ReadRequesHeader header)
+    public static Result<int> Read(Span<byte> destination, in ReadRequestHeader header)
+    {
+        var layout = RtuReadRequestLayout.Instance;
+        return Read(destination, header, layout).ThenReturn(layout.TotalLength);
+    }
+    public static Result Read(Span<byte> destination, in ReadRequestHeader header, in RtuReadRequestLayout layout)
     {
         // 缺少请求头
-        if (header == ReadRequesHeader.Empty)
-            return Result.MissingRequestHeader<int>();
-
-        var layout = RtuReadRequestLayout.Instance;
+        if (header == ReadRequestHeader.Empty)
+            return MissingRequestHeader(nameof(Read));
 
         // 缓冲区不足
         if (destination.Length < layout.TotalLength)
-            return ProtocolExtensions.BufferInsufficient<int>(layout.TotalLength, destination.Length);
+            return BufferTooSmall(layout.TotalLength, destination.Length);
 
         Span<byte> buffer = stackalloc byte[layout.TotalLength];
 
@@ -41,14 +45,22 @@ public static class RtuRequestEncoder
         if (!crc_result) return crc_result.PropagateError<int>();
 
         buffer.CopyTo(destination);
-        return layout.TotalLength;
+        return true;
     }
-    public static Result<int> WriteSingle(Span<byte> destination, in WriteSingleHeader header)
+
+
+    public static Result<int> WriteSingle(Span<byte> destination, in WriteSingleRequestHeader header)
     {
-        if (header == WriteSingleHeader.Empty)
+        var layout = RtuWriteSingleRequestLayout.Instance;
+        return WriteSingle(destination, header, layout).ThenReturn(layout.TotalLength);
+    }
+    public static Result WriteSingle(Span<byte> destination, in WriteSingleRequestHeader header, in RtuWriteSingleRequestLayout layout)
+    {
+        // 缺少请求头
+        if (header == WriteSingleRequestHeader.Empty)
             return Result.MissingRequestHeader<int>();
 
-        var layout = RtuWriteSingleRequestLayout.Instance;
+        // 缓冲区不足
         if (destination.Length < layout.TotalLength)
             return Result.BufferInsufficient<int>(layout.TotalLength, destination.Length);
 
@@ -70,25 +82,36 @@ public static class RtuRequestEncoder
         if (!crc_result) return crc_result.PropagateError<int>();
 
         buffer.CopyTo(destination);
-        return layout.TotalLength;
+        return true;
     }
-    public static Result WriteMultipleCoils(Span<byte> destination, in WriteMultipleHeader header, ReadOnlySpan<bool> values)
-    {
-        // 数量
-        var value_length_result = WriteCoilsQuantity.Create(values.Length);
-        if (!value_length_result) return value_length_result;
-        ushort quantity = value_length_result.Value;
 
-        // 帧布局
-        var layout = RtuWriteMultipleRequestLayout.CreateCoils(value_length_result.Value);
+
+    public static Result<int> WriteMultipleCoils(Span<byte> destination, ReadOnlySpan<bool> values, in WriteMultipleRequestHeader header)
+    {
+        var layout_result = WriteCoilsQuantity.Create(values.Length)
+            .Then(RtuWriteMultipleRequestLayout.CreateCoils);
+        if (!layout_result) return layout_result.PropagateError<int>();
+
+        return WriteMultipleCoils(destination, values, header, layout_result.Value).ThenReturn(layout_result.Value.TotalLength);
+    }
+    public static Result WriteMultipleCoils(Span<byte> destination, ReadOnlySpan<bool> values, in WriteMultipleRequestHeader header, in RtuWriteMultipleRequestLayout layout)
+    {
+        // 协议布局无效
+        if (layout == RtuWriteMultipleRequestLayout.Empty)
+            return MissingRequestLayout(nameof(WriteMultipleCoils), nameof(RtuWriteMultipleRequestLayout));
+
+        // 缺少请求头
+        if (header == WriteMultipleRequestHeader.Empty)
+            return MissingRequestHeader(nameof(WriteMultipleCoils));
 
         // 缓冲区长度不足
         if (destination.Length < layout.TotalLength)
-            return Result.BufferInsufficient(layout.TotalLength, destination.Length);
+            return BufferTooSmall(layout.TotalLength, destination.Length);
 
         // 参数数量超过预期
-        if (quantity > layout.DataQuantity)
-            return Result.InvalidParameter($"读取数量 {quantity} 超过协议允许的最大值 {layout.DataQuantity}");
+        var data_quantity = (ushort)values.Length;
+        if (data_quantity > layout.DataQuantity)
+            return Result.InvalidParameter($"读取数量 {data_quantity} 超过协议允许的最大值 {layout.DataQuantity}");
 
 
         // 数据帧暂存
@@ -102,7 +125,7 @@ public static class RtuRequestEncoder
         var address_result = header.Address.ToBytes(buffer[layout.AddressRange], Endianness.BigEndian);
         if (!address_result) return address_result;
         // 数量
-        var quantity_result = quantity.ToBytes(buffer[layout.QuantityRange], Endianness.BigEndian);
+        var quantity_result = data_quantity.ToBytes(buffer[layout.QuantityRange], Endianness.BigEndian);
         if (!quantity_result) return quantity_result;
         // 数据长度
         buffer[layout.DataLengthIndex] = (byte)layout.DataByteLength;
@@ -118,22 +141,36 @@ public static class RtuRequestEncoder
         buffer.CopyTo(destination);
         return true;
     }
-    public static Result WriteMultipleRegisters(Span<byte> destination, in WriteMultipleHeader header, ReadOnlySpan<ushort> values)
+
+
+    public static Result<int> WriteMultipleRegisters(Span<byte> destination, ReadOnlySpan<ushort> values, in WriteMultipleRequestHeader header)
     {
-        // 数量
-        var value_length_result = WriteRegistersQuantity.Create(values.Length);
-        if (!value_length_result) return value_length_result;
-        ushort quantity = value_length_result.Value;
+        var layout_result = WriteRegistersQuantity.Create(values.Length)
+            .Then(RtuWriteMultipleRequestLayout.CreateRegisters);
+        if (!layout_result) return layout_result.PropagateError<int>();
 
-        // 帧布局
-        var layout = RtuWriteMultipleRequestLayout.CreateRegisters(value_length_result.Value);
+        return WriteMultipleRegisters(destination, values, header, layout_result.Value).ThenReturn(layout_result.Value.TotalLength);
+    }
+    public static Result WriteMultipleRegisters(Span<byte> destination, ReadOnlySpan<ushort> values, in WriteMultipleRequestHeader header, in RtuWriteMultipleRequestLayout layout)
+    {
+        // 数据数量
+        var data_quantity = (ushort)values.Length;
 
-        // 缓冲区长度不足
+        // 协议布局无效
+        if (layout == RtuWriteMultipleRequestLayout.Empty)
+            return MissingRequestLayout(nameof(WriteMultipleRegisters), nameof(RtuWriteMultipleRequestLayout));
+
+        // 缺少请求头
+        if (header == WriteMultipleRequestHeader.Empty)
+            return MissingRequestHeader(nameof(WriteMultipleRegisters));
+
+        // 构建缓冲区长度不足
         if (destination.Length < layout.TotalLength)
-            return Result.BufferInsufficient(layout.TotalLength, destination.Length);
+            return BufferTooSmall(layout.TotalLength, destination.Length);
+
         // 参数数量超过预期
-        if (quantity > layout.DataQuantity)
-            return Result.InvalidParameter($"读取数量 {quantity} 超过协议允许的最大值 {layout.DataQuantity}");
+        if (data_quantity > layout.DataQuantity)
+            return Result.InvalidParameter($"写寄存器数量 {data_quantity} 超出最大值 {layout.DataQuantity}");
 
 
         // 数据帧暂存
@@ -147,7 +184,7 @@ public static class RtuRequestEncoder
         var address_result = header.Address.ToBytes(buffer[layout.AddressRange], Endianness.BigEndian);
         if (!address_result) return address_result;
         // 数量
-        var quantity_result = quantity.ToBytes(buffer[layout.QuantityRange], Endianness.BigEndian);
+        var quantity_result = data_quantity.ToBytes(buffer[layout.QuantityRange], Endianness.BigEndian);
         if (!quantity_result) return quantity_result;
         // 数据长度
         buffer[layout.DataLengthIndex] = (byte)layout.DataByteLength;
@@ -163,4 +200,13 @@ public static class RtuRequestEncoder
         buffer.CopyTo(destination);
         return true;
     }
+
+
+
+    private static Result MissingRequestHeader(string actionName)=> Result.InvalidParameter(
+        $"[{actionName}] 请求头不可为空");
+    public static Result MissingRequestLayout(string actionName, string layoutName) => Result.InvalidParameter(
+       $"[{actionName}] 缺少布局信息: {layoutName}");
+    private static Result BufferTooSmall(int required, int actual) => Result.InvalidParameter(
+        $"编码所需建缓冲区不足，需要 {required} 字节，实际 {actual} 字节");
 }

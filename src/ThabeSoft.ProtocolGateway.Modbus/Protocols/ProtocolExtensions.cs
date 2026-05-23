@@ -55,55 +55,53 @@ public static class ProtocolExtensions
         /// 缺少请求头
         /// </summary>
         public static Result MissingRequestHeader()
-        {
-            return Result.Error(ErrorType.InvalidParameter, "请求头不可为空");
-        }
-
+            => Result.Error(ErrorType.InvalidParameter, "请求头不可为空");
         /// <summary>
         /// 缺少请求头
         /// </summary>
         public static Result<T> MissingRequestHeader<T>()
-        {
-            return Result.Error<T>(ErrorType.InvalidParameter, "请求头不可为空");
-        }
+            => Result.Error<T>(ErrorType.InvalidParameter, "请求头不可为空");
+
+
+        /// <summary>
+        /// 缺少请求布局
+        /// </summary>
+        public static Result MissingRequestLayout()
+            => Result.Error(ErrorType.InvalidParameter, "请求布局不可为空");
+        /// <summary>
+        /// 缺少请求布局
+        /// </summary>
+        public static Result<T> MissingRequestLayout<T>()
+            => Result.Error<T>(ErrorType.InvalidParameter, "请求布局不可为空");
+
 
 
         /// <summary>
         /// 缓冲区不足错误
         /// </summary>
         public static Result BufferInsufficient(int required, int actual)
-        {
-            return Result.Error(ErrorType.InvalidParameter,
+            => Result.Error(ErrorType.InvalidParameter,
                 $"缓冲区不足，需要 {required} 字节，实际 {actual} 字节");
-        }
-
         /// <summary>
         /// 缓冲区不足错误
         /// </summary>
-        public static Result<T> BufferInsufficient<T>(int required, int actual)
-        {
-            return Result<T>.Error(ErrorType.InvalidParameter,
+        public static Result<T> BufferInsufficient<T>(int required, int actual) 
+            => Result<T>.Error(ErrorType.InvalidParameter,
                 $"缓冲区不足，需要 {required} 字节，实际 {actual} 字节");
-        }
 
 
 
         /// <summary>
         /// 数据长度不足错误
         /// </summary>
-        public static Result DataTooShort(int required, int actual)
-        {
-            return Result.Error(ErrorType.InvalidData,
+        public static Result DataTooShort(int required, int actual) 
+            => Result.Error(ErrorType.InvalidData,
                 $"数据长度不足，需要 {required} 字节，实际 {actual} 字节");
-        }
-
         /// <summary>
         /// 数据长度不足错误
         /// </summary>
-        public static Result<T> DataTooShort<T>(int required, int actual)
-        {
-            return Result<T>.Error(ErrorType.InvalidData,
+        public static Result<T> DataTooShort<T>(int required, int actual) 
+            => Result<T>.Error(ErrorType.InvalidData,
                 $"数据长度不足，需要 {required} 字节，实际 {actual} 字节");
-        }
     }
 }

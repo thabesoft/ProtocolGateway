@@ -9,9 +9,7 @@ namespace ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
 public readonly record struct RtuWriteMultipleRequestLayout : ICrcRangeable,
     IWriteMultipleRequestLayout
 {
-    public static readonly RtuWriteMultipleRequestLayout Empty;
-    static RtuWriteMultipleRequestLayout() => Empty = default;
-
+    public static readonly RtuWriteMultipleRequestLayout Empty = default;
 
 
     /// <summary>从站Id索引</summary>

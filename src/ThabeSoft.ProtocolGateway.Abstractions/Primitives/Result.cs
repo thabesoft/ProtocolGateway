@@ -16,6 +16,10 @@ public readonly struct Result : IResult
     public ErrorType ErrorType { get; }
     /// <summary> 消息 </summary>
     public string? Message { get; }
+#if DEBUG
+    /// <summary> 堆栈信息 </summary>
+    public string? StackTrace { get; }
+#endif
 
 
     private Result(bool isSuccess, ErrorType errorType, string? message)
@@ -23,8 +27,23 @@ public readonly struct Result : IResult
         IsSuccess = isSuccess;
         ErrorType = errorType;
         Message = message;
-    }
 
+#if DEBUG
+        if (!isSuccess) StackTrace = GetFilteredStackTrace();
+#endif
+
+        static string GetFilteredStackTrace()
+        {
+            var frames = new StackTrace(true).GetFrames();
+            if (frames == null) return "";
+
+            var filtered = frames
+                .Where(f => f.GetMethod()?.DeclaringType?.Namespace?.StartsWith("System") == false && f.GetMethod()?.DeclaringType?.Namespace?.StartsWith("Microsoft") == false)
+                .Select(f => $"{f.GetMethod()?.DeclaringType?.Name}.{f.GetMethod()?.Name}");
+
+            return string.Join(" -> ", filtered);
+        }
+    }
 
     /// <summary>
     /// 将是否成功转为bool
@@ -48,10 +67,10 @@ public readonly struct Result : IResult
     {
         if (type == ErrorType.None || type == ErrorType.Unspecified)
         {
-            return new Result(false, ErrorType.Unspecified, message);
+            return new(false, ErrorType.Unspecified, message);
         }
 
-        return new Result(false, type, message);
+        return new(false, type, message);
     }
 
 
@@ -79,12 +98,17 @@ public readonly struct Result : IResult
     }
     public override string ToString()
     {
-        if (!string.IsNullOrWhiteSpace(Message))
+        if (IsSuccess)
         {
-            return IsSuccess ? $"成功: {Message}" : $"失败[{ErrorType}]: {Message}";
+            if (Message is not null) return $"{Message}";
+            return $"Ok";
         }
 
-        return IsSuccess ? "成功" : $"失败[{ErrorType}]";
+#if DEBUG
+        return $"[{ErrorType}] {Message}{Environment.NewLine}{StackTrace}";
+#else
+        return $"[{ErrorType}] {Message}";
+#endif
     }
 }
 
@@ -101,6 +125,10 @@ public readonly struct Result<TValue> : IResult<TValue>
     public string? Message { get; }
     /// <summary> 值 </summary>
     public TValue Value { get; }
+#if DEBUG
+    /// <summary> 堆栈信息 </summary>
+    public string? StackTrace { get; }
+#endif
 
 
     private Result(bool isSuccess, ErrorType errorType, string? message, TValue value)
@@ -109,6 +137,22 @@ public readonly struct Result<TValue> : IResult<TValue>
         ErrorType = errorType;
         Message = message;
         Value = value;
+
+#if DEBUG
+        if (!isSuccess) StackTrace = GetFilteredStackTrace();
+#endif
+
+        static string GetFilteredStackTrace()
+        {
+            var frames = new StackTrace(true).GetFrames();
+            if (frames == null) return "";
+
+            var filtered = frames
+                .Where(f => f.GetMethod()?.DeclaringType?.Namespace?.StartsWith("System") == false && f.GetMethod()?.DeclaringType?.Namespace?.StartsWith("Microsoft") == false)
+                .Select(f => $"{f.GetMethod()?.DeclaringType?.Name}.{f.GetMethod()?.Name}");
+
+            return string.Join(" -> ", filtered);
+        }
     }
 
 
@@ -144,10 +188,6 @@ public readonly struct Result<TValue> : IResult<TValue>
     }
     public static Result<TValue> Error(ErrorType type, string? message = null)
     {
-#if DEBUG
-        Debug.Assert(type != ErrorType.None, message);
-#endif
-
         if (type == ErrorType.None || type == ErrorType.Unspecified)
         {
             return new(false, ErrorType.Unspecified, message, default!);
@@ -177,11 +217,16 @@ public readonly struct Result<TValue> : IResult<TValue>
 
     public override string ToString()
     {
-        if (!string.IsNullOrWhiteSpace(Message))
+        if (IsSuccess)
         {
-            return IsSuccess ? $"{Message}={Value}" : $"失败[{ErrorType}]: {Message}";
+            if (Message is not null) return $"{Message}={Value}";
+            return $"Ok={Value}";
         }
 
-        return IsSuccess ? $"成功={Value}" : $"失败[{ErrorType}]";
+#if DEBUG
+        return $"[{ErrorType}] {Message}{Environment.NewLine}{StackTrace}";
+#else
+        return $"[{ErrorType}] {Message}";
+#endif
     }
 }
