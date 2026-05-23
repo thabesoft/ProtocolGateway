@@ -12,13 +12,6 @@ public interface IResult
     ErrorType ErrorType { get; }
     /// <summary> 消息 </summary>
     string? Message { get; }
-
-#if DEBUG
-    /// <summary>
-    /// 栈信息
-    /// </summary>
-    string? StackTrace { get; }
-#endif
 }
 
 /// <summary>

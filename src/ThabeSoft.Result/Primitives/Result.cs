@@ -16,10 +16,6 @@ public readonly struct Result : IResult
     public ErrorType ErrorType { get; }
     /// <summary> 消息 </summary>
     public string? Message { get; }
-#if DEBUG
-    /// <summary> 堆栈信息 </summary>
-    public string? StackTrace { get; }
-#endif
 
 
     private Result(bool isSuccess, ErrorType errorType, string? message)
@@ -29,20 +25,8 @@ public readonly struct Result : IResult
         Message = message;
 
 #if DEBUG
-        if (!isSuccess) StackTrace = GetFilteredStackTrace();
+        if (!isSuccess) ResultException.ThrowIfDebugger(errorType, message);
 #endif
-
-        static string GetFilteredStackTrace()
-        {
-            var frames = new StackTrace(true).GetFrames();
-            if (frames == null) return "";
-
-            var filtered = frames
-                .Where(f => f.GetMethod()?.DeclaringType?.Namespace?.StartsWith("System") == false && f.GetMethod()?.DeclaringType?.Namespace?.StartsWith("Microsoft") == false)
-                .Select(f => $"{f.GetMethod()?.DeclaringType?.Name}.{f.GetMethod()?.Name}");
-
-            return string.Join(" -> ", filtered);
-        }
     }
 
     /// <summary>
@@ -89,11 +73,7 @@ public readonly struct Result : IResult
     /// </remarks>
     public Result<U> PropagateError<U>()
     {
-        if (IsSuccess)
-        {
-            throw new InvalidOperationException("Cannot propagate error from successful result");
-        }
-
+        if (IsSuccess) throw new ResultException("Cannot propagate error from successful result");
         return Result<U>.Error(ErrorType, Message);
     }
     public override string ToString()
@@ -104,11 +84,7 @@ public readonly struct Result : IResult
             return $"Ok";
         }
 
-#if DEBUG
-        return $"[{ErrorType}] {Message}{Environment.NewLine}{StackTrace}";
-#else
         return $"[{ErrorType}] {Message}";
-#endif
     }
 }
 
@@ -125,10 +101,6 @@ public readonly struct Result<TValue> : IResult<TValue>
     public string? Message { get; }
     /// <summary> 值 </summary>
     public TValue Value { get; }
-#if DEBUG
-    /// <summary> 堆栈信息 </summary>
-    public string? StackTrace { get; }
-#endif
 
 
     private Result(bool isSuccess, ErrorType errorType, string? message, TValue value)
@@ -139,20 +111,8 @@ public readonly struct Result<TValue> : IResult<TValue>
         Value = value;
 
 #if DEBUG
-        if (!isSuccess) StackTrace = GetFilteredStackTrace();
+        if (!isSuccess) ResultException.ThrowIfDebugger(errorType, message);
 #endif
-
-        static string GetFilteredStackTrace()
-        {
-            var frames = new StackTrace(true).GetFrames();
-            if (frames == null) return "";
-
-            var filtered = frames
-                .Where(f => f.GetMethod()?.DeclaringType?.Namespace?.StartsWith("System") == false && f.GetMethod()?.DeclaringType?.Namespace?.StartsWith("Microsoft") == false)
-                .Select(f => $"{f.GetMethod()?.DeclaringType?.Name}.{f.GetMethod()?.Name}");
-
-            return string.Join(" -> ", filtered);
-        }
     }
 
 
@@ -207,11 +167,7 @@ public readonly struct Result<TValue> : IResult<TValue>
     /// </remarks>
     public Result<U> PropagateError<U>()
     {
-        if (IsSuccess)
-        {
-            throw new InvalidOperationException("Cannot propagate error from successful result");
-        }
-
+        if (IsSuccess) throw new ResultException(ErrorType.Internal, "Cannot propagate error from successful result");
         return Result<U>.Error(ErrorType, Message);
     }
 
@@ -223,10 +179,6 @@ public readonly struct Result<TValue> : IResult<TValue>
             return $"Ok={Value}";
         }
 
-#if DEBUG
-        return $"[{ErrorType}] {Message}{Environment.NewLine}{StackTrace}";
-#else
         return $"[{ErrorType}] {Message}";
-#endif
     }
 }

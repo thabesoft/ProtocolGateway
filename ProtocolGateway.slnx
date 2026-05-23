@@ -10,6 +10,9 @@
   <Folder Name="/Modules/Transports/">
     <Project Path="src/ThabeSoft.ProtocolGateway.SerialPort/ThabeSoft.ProtocolGateway.SerialPort.csproj" />
   </Folder>
+  <Folder Name="/Primitives/">
+    <Project Path="src/ThabeSoft.Result/ThabeSoft.Primitives.Result.csproj" />
+  </Folder>
   <Folder Name="/Tests/">
     <Project Path="tests/ThabeSoft.ProtocolGateway.Benchmark/ThabeSoft.ProtocolGateway.Benchmark.csproj" />
     <Project Path="tests/ThabeSoft.ProtocolGateway.UnitTests/ThabeSoft.ProtocolGateway.UnitTests.csproj" />
