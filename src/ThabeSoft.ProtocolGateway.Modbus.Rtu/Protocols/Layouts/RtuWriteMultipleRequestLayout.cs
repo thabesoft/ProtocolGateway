@@ -1,17 +1,10 @@
-﻿using ThabeSoft.ProtocolGateway.Modbus.Primitives;
-
-namespace ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
-
+﻿namespace ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
 
 /// <summary>
-/// Modbus Rtu 写多值请求布局
+/// Rtu 写多个值
 /// </summary>
-public readonly record struct RtuWriteMultipleRequestLayout : ICrcRangeable,
-    IWriteMultipleRequestLayout
+internal readonly record struct RtuWriteMultipleRequestLayout : ICrcRangeable, IWriteMultipleRequestLayout
 {
-    public static readonly RtuWriteMultipleRequestLayout Empty = default;
-
-
     /// <summary>从站Id索引</summary>
     public readonly int SlaveIdIndex => 0;
     /// <summary>功能码索引</summary>
@@ -36,7 +29,7 @@ public readonly record struct RtuWriteMultipleRequestLayout : ICrcRangeable,
     public readonly int TotalLength { get; }
 
 
-    private RtuWriteMultipleRequestLayout(
+    internal RtuWriteMultipleRequestLayout(
         Range dataRange,
         Range contentRange,
         Range crcRange,
@@ -52,66 +45,6 @@ public readonly record struct RtuWriteMultipleRequestLayout : ICrcRangeable,
         TotalLength = fullByteLength;
         DataQuantity = dataMaxQuantity;
     }
-
-
-    /// <summary>
-    /// 创建一个拥有指定数量寄存器的帧布局
-    /// </summary>
-    /// <param name="quantity">寄存器数量</param>
-    public static RtuWriteMultipleRequestLayout CreateRegisters(WriteRegistersQuantity quantity)
-    {
-        // Data
-        var data_byte_length = ProtocolExtensions.GetRegistersToByteLength(quantity);
-        const int data_start = 7;
-        int data_end = data_start + data_byte_length;
-        var data_range = new Range(data_start, data_end);
-
-        // Content
-        var content = new Range(0, data_end);
-
-        // Crc
-        var crc_start = data_end;
-        var crc_end = data_end + 2;
-        var crc_range = new Range(crc_start, crc_end);
-
-        return new RtuWriteMultipleRequestLayout(
-            dataRange: data_range,
-            contentRange: content,
-            crcRange: crc_range,
-            dataByteLength: data_byte_length,
-            fullByteLength: crc_end,
-            dataMaxQuantity: quantity);
-    }
-
-    /// <summary>
-    /// 创建一个拥有指定数量线圈的帧布局
-    /// </summary>
-    /// <param name="quantity">线圈数量</param>
-    public static RtuWriteMultipleRequestLayout CreateCoils(WriteCoilsQuantity quantity)
-    {
-        // Data
-        var data_byte_length = ProtocolExtensions.GetColisToByteLength(quantity);
-        const int data_start = 7;
-        int data_end = data_start + data_byte_length;
-        var data_range = new Range(data_start, data_end);
-
-        // Content
-        var content = new Range(0, data_end);
-
-        // Crc
-        var crc_start = data_end;
-        var crc_end = data_end + 2;
-        var crc_range = new Range(crc_start, crc_end);
-
-        return new RtuWriteMultipleRequestLayout(
-            dataRange: data_range,
-            contentRange: content,
-            crcRange: crc_range,
-            dataByteLength: data_byte_length,
-            fullByteLength: crc_end,
-            dataMaxQuantity: quantity);
-    }
-
 
     public override string ToString()
     {

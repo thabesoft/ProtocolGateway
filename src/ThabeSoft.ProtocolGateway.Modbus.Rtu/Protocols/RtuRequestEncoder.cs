@@ -89,16 +89,16 @@ public static class RtuRequestEncoder
     public static Result<int> WriteMultipleCoils(Span<byte> destination, ReadOnlySpan<bool> values, in WriteMultipleRequestHeader header)
     {
         var layout_result = WriteCoilsQuantity.Create(values.Length)
-            .Then(RtuWriteMultipleRequestLayout.CreateCoils);
+            .Then(RtuWriteMultipleCoilsRequestLayout.Create);
         if (!layout_result) return layout_result.PropagateError<int>();
 
         return WriteMultipleCoils(destination, values, header, layout_result.Value).ThenReturn(layout_result.Value.TotalLength);
     }
-    public static Result WriteMultipleCoils(Span<byte> destination, ReadOnlySpan<bool> values, in WriteMultipleRequestHeader header, in RtuWriteMultipleRequestLayout layout)
+    public static Result WriteMultipleCoils(Span<byte> destination, ReadOnlySpan<bool> values, in WriteMultipleRequestHeader header, in RtuWriteMultipleCoilsRequestLayout layout)
     {
         // 协议布局无效
-        if (layout == RtuWriteMultipleRequestLayout.Empty)
-            return MissingRequestLayout(nameof(WriteMultipleCoils), nameof(RtuWriteMultipleRequestLayout));
+        if (layout == RtuWriteMultipleCoilsRequestLayout.Empty)
+            return MissingRequestLayout(nameof(WriteMultipleCoils), nameof(RtuWriteMultipleCoilsRequestLayout));
 
         // 缺少请求头
         if (header == WriteMultipleRequestHeader.Empty)
@@ -146,19 +146,19 @@ public static class RtuRequestEncoder
     public static Result<int> WriteMultipleRegisters(Span<byte> destination, ReadOnlySpan<ushort> values, in WriteMultipleRequestHeader header)
     {
         var layout_result = WriteRegistersQuantity.Create(values.Length)
-            .Then(RtuWriteMultipleRequestLayout.CreateRegisters);
+            .Then(RtuWriteMultipleRegisterRequestLayout.Create);
         if (!layout_result) return layout_result.PropagateError<int>();
 
         return WriteMultipleRegisters(destination, values, header, layout_result.Value).ThenReturn(layout_result.Value.TotalLength);
     }
-    public static Result WriteMultipleRegisters(Span<byte> destination, ReadOnlySpan<ushort> values, in WriteMultipleRequestHeader header, in RtuWriteMultipleRequestLayout layout)
+    public static Result WriteMultipleRegisters(Span<byte> destination, ReadOnlySpan<ushort> values, in WriteMultipleRequestHeader header, in RtuWriteMultipleRegisterRequestLayout layout)
     {
         // 数据数量
         var data_quantity = (ushort)values.Length;
 
         // 协议布局无效
-        if (layout == RtuWriteMultipleRequestLayout.Empty)
-            return MissingRequestLayout(nameof(WriteMultipleRegisters), nameof(RtuWriteMultipleRequestLayout));
+        if (layout == RtuWriteMultipleRegisterRequestLayout.Empty)
+            return MissingRequestLayout(nameof(WriteMultipleRegisters), nameof(RtuWriteMultipleRegisterRequestLayout));
 
         // 缺少请求头
         if (header == WriteMultipleRequestHeader.Empty)

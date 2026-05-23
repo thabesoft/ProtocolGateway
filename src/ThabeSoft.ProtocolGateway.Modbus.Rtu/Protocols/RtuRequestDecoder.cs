@@ -159,16 +159,16 @@ public static class RtuRequestDecoder
     {
         // 根据数量创建布局
         var layout_result = WriteCoilsQuantity.Create(destination.Length)
-            .Then(RtuWriteMultipleRequestLayout.CreateCoils);
+            .Then(RtuWriteMultipleCoilsRequestLayout.Create);
         if (!layout_result) return layout_result.PropagateError<RtuWriteMultipleRequestHeader>();
 
         return WriteMultipleCoils(source, destination, layout_result.Value);
     }
-    public static Result<RtuWriteMultipleRequestHeader> WriteMultipleCoils(ReadOnlySpan<byte> source, Span<bool> destination, in RtuWriteMultipleRequestLayout layout)
+    public static Result<RtuWriteMultipleRequestHeader> WriteMultipleCoils(ReadOnlySpan<byte> source, Span<bool> destination, in RtuWriteMultipleCoilsRequestLayout layout)
     {
         // 缺少请求头
-        if (layout == RtuWriteMultipleRequestLayout.Empty)
-            return MissingRequestLayout<RtuWriteMultipleRequestHeader>(nameof(WriteMultipleCoils), nameof(RtuWriteMultipleRequestLayout));
+        if (layout == RtuWriteMultipleCoilsRequestLayout.Empty)
+            return MissingRequestLayout<RtuWriteMultipleRequestHeader>(nameof(WriteMultipleCoils), nameof(RtuWriteMultipleCoilsRequestLayout));
 
         // 校验包长度
         if (source.Length < layout.TotalLength)
@@ -216,16 +216,16 @@ public static class RtuRequestDecoder
     {
         // 根据数量创建布局
         var layout_result = WriteRegistersQuantity.Create(destination.Length)
-            .Then(RtuWriteMultipleRequestLayout.CreateRegisters);
+            .Then(RtuWriteMultipleRegisterRequestLayout.Create);
         if (!layout_result) return layout_result.PropagateError<RtuWriteMultipleRequestHeader>();
 
         return WriteMultipleRegisters(source, destination, layout_result.Value);
     }
-    public static Result<RtuWriteMultipleRequestHeader> WriteMultipleRegisters(ReadOnlySpan<byte> source, Span<ushort> destination, in RtuWriteMultipleRequestLayout layout)
+    public static Result<RtuWriteMultipleRequestHeader> WriteMultipleRegisters(ReadOnlySpan<byte> source, Span<ushort> destination, in RtuWriteMultipleRegisterRequestLayout layout)
     {
         // 缺少请求头
-        if (layout == RtuWriteMultipleRequestLayout.Empty)
-            return MissingRequestLayout<RtuWriteMultipleRequestHeader>(nameof(WriteMultipleRegisters), nameof(RtuWriteMultipleRequestLayout));
+        if (layout == RtuWriteMultipleRegisterRequestLayout.Empty)
+            return MissingRequestLayout<RtuWriteMultipleRequestHeader>(nameof(WriteMultipleRegisters), nameof(RtuWriteMultipleRegisterRequestLayout));
 
         // 校验包长度
         if (source.Length < layout.TotalLength)

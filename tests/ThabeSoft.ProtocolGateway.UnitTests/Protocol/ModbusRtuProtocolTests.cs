@@ -21,7 +21,7 @@ public sealed class ModbusRtuProtocolTests
     {
         // 获取帧布局
         var layout_result = WriteRegistersQuantity.Create(quantity)
-            .Then(RtuWriteMultipleRequestLayout.CreateRegisters);
+            .Then(RtuWriteMultipleRegisterRequestLayout.Create);
         Assert.IsTrue(layout_result, layout_result.Message);
 
         Span<byte> pack_buffer = stackalloc byte[layout_result.Value.TotalLength];
@@ -67,7 +67,7 @@ public sealed class ModbusRtuProtocolTests
     {
         // 获取帧布局
         var layout_result = WriteCoilsQuantity.Create(quantity)
-            .Then(RtuWriteMultipleRequestLayout.CreateCoils);
+            .Then(RtuWriteMultipleCoilsRequestLayout.Create);
         Assert.IsTrue(layout_result, layout_result.Message);
 
         Span<byte> pack_buffer = stackalloc byte[layout_result.Value.TotalLength];
