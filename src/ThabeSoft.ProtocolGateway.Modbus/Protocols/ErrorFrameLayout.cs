@@ -1,10 +1,10 @@
-﻿namespace ThabeSoft.ProtocolGateway.Protocols;
+﻿namespace ThabeSoft.ProtocolGateway.Modbus.Protocols;
 
 
 /// <summary>
 /// 错误帧布局
 /// </summary>
-public readonly struct ModbusErrorFrameLayout
+public readonly struct ErrorFrameLayout
 {
     public static readonly int SlaveIdIndex;
 

@@ -1,5 +1,5 @@
-﻿using ThabeSoft.ProtocolGateway.Protocols;
-using ThabeSoft.ProtocolGateway.Protocols.Layouts;
+﻿using ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
+using ThabeSoft.ProtocolGateway.Protocols;
 using ThabeSoft.ProtocolGateway.Protocols.Serializer;
 
 namespace ThabeSoft.ProtocolGateway.Protocol;
@@ -20,7 +20,7 @@ public sealed class ModbusRtuProtocolTests
         IModbusWriteMultipleRegistersRequestSerializer serializer = ModbusRtuRequest.WriteMultipleRegistersSerializer;
 
 
-        ModbusRtuWriteMultipleRequestLayout.TryCreayeRegisters(quantity, out var layout);
+        RtuWriteMultipleRequestLayout.TryCreayeRegisters(quantity, out var layout);
 
         ModbusRtuWriteMultipleRequestSerializer.TryPackRegisters(layout, null, slaveId, address, []);
 

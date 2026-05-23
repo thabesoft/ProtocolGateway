@@ -1,10 +1,10 @@
-﻿namespace ThabeSoft.ProtocolGateway.Protocols.Layouts;
+﻿namespace ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
 
 
 /// <summary>
 /// Rtu 写多个值请求帧布局
 /// </summary>
-public interface IModbusWriteMultipleRequestLayout : IModbusRequestLayout
+public interface IWriteMultipleRequestLayout : IRequestLayout
 {
     /// <summary>值数量范围[4..6)</summary>
     Range QuantityRange { get; }
@@ -15,5 +15,5 @@ public interface IModbusWriteMultipleRequestLayout : IModbusRequestLayout
     /// <summary>数据总字节数</summary>
     int DataByteLength { get; }
     /// <summary>数据最大数量</summary>
-    int DataMaxQuantity { get; }
+    int DataQuantity { get; }
 }

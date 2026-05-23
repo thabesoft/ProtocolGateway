@@ -1,10 +1,8 @@
-﻿using System.Net;
-using ThabeSoft.IndustrialHub.Modbus.Crc;
-using ThabeSoft.ProtocolGateway.Conversion;
+﻿using ThabeSoft.ProtocolGateway.Conversion;
 using ThabeSoft.ProtocolGateway.Modbus.Crc;
 using ThabeSoft.ProtocolGateway.Modbus.Primitives;
+using ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
 using ThabeSoft.ProtocolGateway.Primitives;
-using ThabeSoft.ProtocolGateway.Protocols.Layouts;
 
 namespace ThabeSoft.ProtocolGateway.Protocols.Serializer;
 
@@ -18,12 +16,12 @@ public sealed class ModbusRtuReadRequestSerializer :
     IModbusReadHoldingRegistersRequestSerializer,
     IModbusReadInputRegistersRequestSerializer
 {
-    public static readonly ModbusRtuReadRequestSerializer Instance = new(ModbusRtuReadRequestLayout.Instance);
+    public static readonly ModbusRtuReadRequestSerializer Instance = new(RtuReadRequestLayout.Instance);
 
 
 
-    private readonly ModbusRtuReadRequestLayout _layout;
-    private ModbusRtuReadRequestSerializer(in ModbusRtuReadRequestLayout layout) => _layout = layout;
+    private readonly RtuReadRequestLayout _layout;
+    private ModbusRtuReadRequestSerializer(in RtuReadRequestLayout layout) => _layout = layout;
 
 
     /*------------------- 共用 -------------------*/
@@ -31,7 +29,7 @@ public sealed class ModbusRtuReadRequestSerializer :
     private bool TryPack(
         Span<byte> destination,
         byte slaveId,
-        ModbusFunctionCode function,
+        FunctionCode function,
         ushort address,
         ushort quantity,
         out int bytesWritten
@@ -60,7 +58,7 @@ public sealed class ModbusRtuReadRequestSerializer :
     private bool TryUnpack(
         ReadOnlySpan<byte> source,
         out byte slaveId,
-        out ModbusFunctionCode functionCode,
+        out FunctionCode functionCode,
         out ushort address,
         out ushort quantity,
         out ushort crc
@@ -78,7 +76,7 @@ public sealed class ModbusRtuReadRequestSerializer :
         // 从站
         var received_slaveId = source[_layout.SlaveIdIndex];
         // 功能码
-        if (!ModbusFunctionCode.TryFromCode(source[_layout.FunctionCodeIndex], out var received_function_code)) return false;
+        if (!FunctionCode.TryFromCode(source[_layout.FunctionCodeIndex], out var received_function_code)) return false;
         if (!received_function_code.IsRead) return false;
         // 起始地址
         if (!source[_layout.AddressRange].TryToUInt16(out var received_address, Endianness.BigEndian)) return false;
@@ -107,7 +105,7 @@ public sealed class ModbusRtuReadRequestSerializer :
         ushort address,
         ushort quantity)
     {
-        return TryPack(destination, slaveId, ModbusFunctionCode.ReadCoils, address, quantity, out _);
+        return TryPack(destination, slaveId, FunctionCode.ReadCoils, address, quantity, out _);
     }
     bool IModbusReadCoilsRequestSerializer.TryUnpack(
         ReadOnlySpan<byte> source,
@@ -126,7 +124,7 @@ public sealed class ModbusRtuReadRequestSerializer :
         ushort address,
         ushort quantity)
     {
-        return TryPack(destination, slaveId, ModbusFunctionCode.ReadDiscreteInputs, address, quantity, out _);
+        return TryPack(destination, slaveId, FunctionCode.ReadDiscreteInputs, address, quantity, out _);
     }
     bool IModbusReadDiscreteInputsRequestSerializer.TryUnpack(
         ReadOnlySpan<byte> source,
@@ -145,7 +143,7 @@ public sealed class ModbusRtuReadRequestSerializer :
         ushort address,
         ushort quantity)
     {
-        return TryPack(destination, slaveId, ModbusFunctionCode.ReadHoldingRegisters, address, quantity, out _);
+        return TryPack(destination, slaveId, FunctionCode.ReadHoldingRegisters, address, quantity, out _);
     }
     bool IModbusReadHoldingRegistersRequestSerializer.TryUnpack(
         ReadOnlySpan<byte> source,
@@ -164,7 +162,7 @@ public sealed class ModbusRtuReadRequestSerializer :
         ushort address,
         ushort quantity)
     {
-        return TryPack(destination, slaveId, ModbusFunctionCode.ReadInputRegisters, address, quantity, out _);
+        return TryPack(destination, slaveId, FunctionCode.ReadInputRegisters, address, quantity, out _);
     }
     bool IModbusReadInputRegistersRequestSerializer.TryUnpack(
         ReadOnlySpan<byte> source,

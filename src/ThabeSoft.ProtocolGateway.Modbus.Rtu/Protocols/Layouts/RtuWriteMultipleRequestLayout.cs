@@ -1,16 +1,17 @@
-﻿using ThabeSoft.ProtocolGateway.Primitives;
+﻿using ThabeSoft.ProtocolGateway.Modbus.Primitives;
+using ThabeSoft.ProtocolGateway.Primitives;
 
-namespace ThabeSoft.ProtocolGateway.Protocols.Layouts;
+namespace ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
 
 
 /// <summary>
 /// Modbus Rtu 写多值请求布局
 /// </summary>
-public readonly struct ModbusRtuWriteMultipleRequestLayout : IModbusRtuLayoutExtension,
-    IModbusWriteMultipleRequestLayout
+public readonly struct RtuWriteMultipleRequestLayout : ICrcRangeable,
+    IWriteMultipleRequestLayout
 {
-    public static readonly ModbusRtuWriteMultipleRequestLayout Empty;
-    static ModbusRtuWriteMultipleRequestLayout() => Empty = default;
+    public static readonly RtuWriteMultipleRequestLayout Empty;
+    static RtuWriteMultipleRequestLayout() => Empty = default;
 
 
 
@@ -32,13 +33,13 @@ public readonly struct ModbusRtuWriteMultipleRequestLayout : IModbusRtuLayoutExt
     public readonly Range CrcRange { get; }
     /// <summary>数据总字节数</summary>
     public readonly int DataByteLength { get; }
-    /// <summary>数据最大数量</summary>
-    public readonly int DataMaxQuantity { get; }
+    /// <summary>数据数量</summary>
+    public readonly int DataQuantity { get; }
     /// <summary>帧总长度</summary>
     public readonly int TotalLength { get; }
 
 
-    private ModbusRtuWriteMultipleRequestLayout(
+    private RtuWriteMultipleRequestLayout(
         Range dataRange,
         Range contentRange,
         Range crcRange,
@@ -52,7 +53,7 @@ public readonly struct ModbusRtuWriteMultipleRequestLayout : IModbusRtuLayoutExt
         CrcRange = crcRange;
         DataByteLength = dataByteLength;
         TotalLength = fullByteLength;
-        DataMaxQuantity = dataMaxQuantity;
+        DataQuantity = dataMaxQuantity;
     }
 
 
@@ -60,7 +61,7 @@ public readonly struct ModbusRtuWriteMultipleRequestLayout : IModbusRtuLayoutExt
     /// 创建一个拥有指定数量寄存器的帧布局
     /// </summary>
     /// <param name="quantity">寄存器数量</param>
-    public static ModbusRtuWriteMultipleRequestLayout CreateRegisters(ModbusWriteRegistersQuantity quantity)
+    public static RtuWriteMultipleRequestLayout CreateRegisters(WriteRegistersQuantity quantity)
     {
         // Data
         var data_byte_length = ModbusFrameLayout.GetRegistersToByteLength(quantity);
@@ -76,7 +77,7 @@ public readonly struct ModbusRtuWriteMultipleRequestLayout : IModbusRtuLayoutExt
         var crc_end = data_end + 2;
         var crc_range = new Range(crc_start, crc_end);
 
-        return new ModbusRtuWriteMultipleRequestLayout(
+        return new RtuWriteMultipleRequestLayout(
             dataRange: data_range,
             contentRange: content,
             crcRange: crc_range,
@@ -84,25 +85,14 @@ public readonly struct ModbusRtuWriteMultipleRequestLayout : IModbusRtuLayoutExt
             fullByteLength: crc_end,
             dataMaxQuantity: quantity);
     }
+
     /// <summary>
     /// 创建一个拥有指定数量寄存器的帧布局
     /// </summary>
     /// <param name="quantity">寄存器数量</param>
-    [Obsolete("使用Result模式")]
-    public static bool TryCreayeRegisters(byte quantity, out ModbusRtuWriteMultipleRequestLayout result)
+    public static Result<RtuWriteMultipleRequestLayout> CreateRegisters(int quantity)
     {
-        if (ModbusWriteRegistersQuantity.TryCreate(quantity, out var register_quantity))
-        {
-            result = CreateRegisters(register_quantity);
-            return true;
-        }
-
-        result = default;
-        return false;
-    }
-    public static Result<ModbusRtuWriteMultipleRequestLayout> CreateRegisters(byte quantity)
-    {
-        return ModbusWriteRegistersQuantity.Create(quantity)
+        return WriteRegistersQuantity.Create(quantity)
             .Then(CreateRegisters);
     }
 
@@ -111,7 +101,7 @@ public readonly struct ModbusRtuWriteMultipleRequestLayout : IModbusRtuLayoutExt
     /// 创建一个拥有指定数量线圈的帧布局
     /// </summary>
     /// <param name="quantity">线圈数量</param>
-    public static ModbusRtuWriteMultipleRequestLayout CreateCoils(ModbusWriteCoilsQuantity quantity)
+    public static RtuWriteMultipleRequestLayout CreateCoils(WriteCoilsQuantity quantity)
     {
         // Data
         var data_byte_length = ModbusFrameLayout.GetColisToByteLength(quantity);
@@ -127,7 +117,7 @@ public readonly struct ModbusRtuWriteMultipleRequestLayout : IModbusRtuLayoutExt
         var crc_end = data_end + 2;
         var crc_range = new Range(crc_start, crc_end);
 
-        return new ModbusRtuWriteMultipleRequestLayout(
+        return new RtuWriteMultipleRequestLayout(
             dataRange: data_range,
             contentRange: content,
             crcRange: crc_range,
@@ -135,26 +125,14 @@ public readonly struct ModbusRtuWriteMultipleRequestLayout : IModbusRtuLayoutExt
             fullByteLength: crc_end,
             dataMaxQuantity: quantity);
     }
+
     /// <summary>
     /// 创建一个拥有指定数量线圈的帧布局
     /// </summary>
     /// <param name="quantity">线圈数量</param>
-    [Obsolete("使用Result模式")]
-    public static bool TryCreateCoils(ushort quantity, out ModbusRtuWriteMultipleRequestLayout result)
+    public static Result<RtuWriteMultipleRequestLayout> CreateCoils(int quantity)
     {
-        if (ModbusWriteCoilsQuantity.TryCreate(quantity, out var coils_quantity))
-        {
-            result = CreateCoils(coils_quantity);
-            return true;
-        }
-
-        result = default;
-        return false;
-    }
-
-    public static Result<ModbusRtuWriteMultipleRequestLayout> CreateCoils(byte quantity)
-    {
-        return ModbusWriteCoilsQuantity.Create(quantity)
+        return WriteCoilsQuantity.Create(quantity)
             .Then(CreateCoils);
     }
 }

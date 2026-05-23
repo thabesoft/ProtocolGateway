@@ -6,12 +6,18 @@
 /// </summary>
 public static class ResultExtensions
 {
-    extension(Result)
+    extension<T>(T) where T : IResult
     {
         [Obsolete]
         public static Result Error(string? message = null)
         {
             return Result.Error(ErrorType.Unspecified, message);
+        }
+        [Obsolete]
+        public static Result<U> If<U>(bool co, Func<U> selector)
+        {
+            if (co) return selector();
+            return Result.Error<U>(ErrorType.Unspecified, "比较失败");
         }
     }
 

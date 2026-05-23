@@ -1,10 +1,108 @@
-﻿namespace ThabeSoft.ProtocolGateway.Primitives;
+﻿using System.Diagnostics;
+
+namespace ThabeSoft.ProtocolGateway.Primitives;
 
 /// <summary>
 /// 字节扩展
 /// </summary>
 public static class ByteExtensions
 {
+    private const int BitsPerByte = 8;
+
+    /// <summary>
+    /// 位组
+    /// </summary>
+    extension(ReadOnlySpan<bool> source)
+    {
+        /// <summary>
+        /// 尝试从位组转换为8位字节组
+        /// </summary>
+        /// <param name="destination">字节组</param>
+        /// <param name="endianness">端序</param>
+        /// <returns>是否转换成功</returns>
+        public Result ToBytes(Span<byte> destination, Endianness endianness = Endianness.BigEndian)
+        {
+            var bits_count = source.Length;
+            var byte_count = (bits_count + 7) / BitsPerByte;
+
+            Span<byte> buffer = stackalloc byte[byte_count];
+
+            for (int byte_index = 0; byte_index < byte_count; byte_index++)
+            {
+                var bits_start = byte_index * BitsPerByte;
+                var bits_length = Math.Min(bits_count - bits_start, BitsPerByte);
+                var bits_range = source.Slice(bits_start, bits_length);
+
+                var result = bits_range.ToByte();
+                if (!result) return result;
+
+                buffer[byte_index] = result.Value;
+            }
+
+            buffer.CopyTo(destination);
+            return true;
+        }
+
+        /// <summary>
+        /// 从位组转换为字节
+        /// </summary>
+        /// <param name="endianness">端序</param>
+        /// <returns>是否转换成功</returns>
+        public Result<byte> ToByte(Endianness endianness = Endianness.BigEndian)
+        {
+            var bit_count = Math.Min(8, source.Length);
+            byte byte_value = 0;
+
+            for (int i = 0; i < bit_count; i++)
+            {
+                if (!source[i]) continue;
+
+                var bitIndex = endianness == Endianness.LittleEndian ? i : bit_count - 1 - i;
+                byte_value |= (byte)(1 << bitIndex);
+            }
+
+            return byte_value;
+        }
+    }
+
+    /// <summary>
+    /// 字节
+    /// </summary>
+    extension(byte source)
+    {
+        /// <summary>
+        /// 将字节转为位组
+        /// </summary>
+        /// <param name="destination">目标位组</param>
+        /// <param name="endianness">端序</param>
+        /// <returns>实际写入的位数</returns>
+        public Result<int> ToBits(Span<bool> destination, Endianness endianness = Endianness.BigEndian)
+        {
+            int length = Math.Min(8, destination.Length);
+            Span<bool> buffer = stackalloc bool[length];
+
+            for (int i = 0; i < destination.Length; i++)
+            {
+                if (endianness == Endianness.BigEndian)
+                {
+                    // 大端序：destination[0] = bit7
+                    int bit_index = BitsPerByte - 1 - i;
+                    buffer[i] = (source & (1 << bit_index)) != 0;
+                }
+                else
+                {
+                    // 小端序：destination[0] = bit0
+                    buffer[i] = (source & (1 << i)) != 0;
+                }
+            }
+
+            buffer.CopyTo(destination);
+            return length;
+        }
+    }
+    /// <summary>
+    /// 字节组
+    /// </summary>
     extension(ReadOnlySpan<byte> source)
     {
         /// <summary>
@@ -61,92 +159,207 @@ public static class ByteExtensions
                        ((ulong)source[3] << 24) | ((ulong)source[2] << 16) |
                        ((ulong)source[1] << 8) | source[0];
         }
+
+
+        /// <summary>
+        /// 将字节组转为位组
+        /// </summary>
+        /// <param name="destination">目标位组</param>
+        /// <param name="endianness">端序</param>
+        /// <returns>是否转换成功</returns>
+        public Result ToBits(Span<bool> destination, Endianness endianness = Endianness.BigEndian)
+        {
+            int total_length = Math.Min(destination.Length, source.Length * BitsPerByte);
+            Span<bool> buffer = stackalloc bool[total_length];
+
+            for (int i = 0; i < source.Length; i++)
+            {
+                int start_bit = i * BitsPerByte;
+                if (start_bit >= total_length) break;
+
+                // 当前范围
+                int bits_in_this_byte = Math.Min(BitsPerByte, total_length - start_bit);
+                var cur_span = buffer.Slice(start_bit, bits_in_this_byte);
+
+                var result = source[i].ToBits(cur_span);
+                if (!result) return result;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// 将字节序转为16位无符号整数序
+        /// </summary>
+        /// <param name="destination">目标16位无符号整数组</param>
+        /// <param name="endianness">端序</param>
+        public Result ToWords(Span<ushort> destination, Endianness endianness = Endianness.BigEndian)
+        {
+            int total_length = Math.Min(destination.Length, source.Length / 2);
+
+            Span<ushort> buffer = stackalloc ushort[total_length];
+
+            for (int i = 0; i < total_length; i++)
+            {
+                int begin = i * 2;
+                const int length = 2;
+                var span = source.Slice(begin, length);
+
+                var result = span.ToWord(endianness);
+                if(!result) return result;
+
+                buffer[i] = result.Value;
+            }
+
+            buffer.CopyTo(destination);
+            return true;
+        }
     }
 
 
     /// <summary>
-    /// 将 ushort 转换为字节数组（大端序）
+    /// 字组
     /// </summary>
-    /// <param name="source">源数据</param>
-    /// <param name="destination">目标字节数组（至少2字节）</param>
-    public static Result ToBytes(this ushort source, Span<byte> destination, Endianness endianness = Endianness.BigEndian)
+    extension(ReadOnlySpan<ushort> source)
     {
-        if (destination.Length < 2)
-            return Result.Error(ErrorType.InvalidParameter, "目标缓冲区至少需要2字节");
-
-        if (endianness == Endianness.BigEndian)
+        /// <summary>
+        /// 将 ushort 数组转换为字节数组
+        /// </summary>
+        /// <param name="destination">目标字节缓冲区</param>
+        /// <param name="endianness">字节序，默认大端</param>
+        public Result ToByte(Span<byte> destination, Endianness endianness = Endianness.BigEndian)
         {
-            destination[0] = (byte)(source >> 8);
-            destination[1] = (byte)source;
-        }
-        else
-        {
-            destination[0] = (byte)source;
-            destination[1] = (byte)(source >> 8);
-        }
+            // 元数据数量
+            var source_count = source.Length;
+            // 元数据字节数量
+            var source_byte_count = source_count * 2;
 
-        return Result.Success;
+
+            if (destination.Length < source_byte_count)
+            {
+                return Result.Error(ErrorType.InvalidParameter,
+                    $"目标缓冲区不足，需要 {source_byte_count} 字节，实际 {destination.Length} 字节 (源数据: {source_count} 个 ushort)");
+            }
+
+            // 暂存数据
+            Span<byte> buffer = stackalloc byte[source_byte_count];
+
+            for (int source_index = 0; source_index < source_count; source_index++)
+            {
+                var byte_start = source_index * 2;
+                const int byte_length = 2;
+                var byte_range = buffer.Slice(byte_start, byte_length);
+
+                var result = source[source_index].ToBytes(byte_range, endianness);
+                if (!result) return result;
+            }
+
+            // 全部拷贝至目标
+            buffer.CopyTo(destination);
+            return true;
+        }
     }
     /// <summary>
-    /// 将 uint 转换为字节数组（大端序）
+    /// 字
     /// </summary>
-    /// <param name="source">源数据</param>
-    /// <param name="destination">目标字节数组（至少4字节）</param>
-    public static Result ToBytes(this uint source, Span<byte> destination, Endianness endianness = Endianness.BigEndian)
+    extension(ushort source)
     {
-        if (destination.Length < 4)
-            return Result.Error(ErrorType.InvalidParameter, "目标缓冲区至少需要4字节");
-
-        if(endianness == Endianness.BigEndian)
+        /// <summary>
+        /// 将 ushort 转换为字节数组
+        /// </summary>
+        /// <param name="destination">目标字节数组（至少2字节）</param>
+        public Result ToBytes(Span<byte> destination, Endianness endianness = Endianness.BigEndian)
         {
-            destination[0] = (byte)(source >> 24);
-            destination[1] = (byte)(source >> 16);
-            destination[2] = (byte)(source >> 8);
-            destination[3] = (byte)source;
-        }
-        else
-        {
-            destination[0] = (byte)source;
-            destination[1] = (byte)(source >> 8);
-            destination[2] = (byte)(source >> 16);
-            destination[3] = (byte)(source >> 24);
-        }
+            if (destination.Length < 2)
+                return Result.Error(ErrorType.InvalidParameter, "目标缓冲区至少需要2字节");
 
-        return Result.Success;
+            if (endianness == Endianness.BigEndian)
+            {
+                destination[0] = (byte)(source >> 8);
+                destination[1] = (byte)source;
+            }
+            else
+            {
+                destination[0] = (byte)source;
+                destination[1] = (byte)(source >> 8);
+            }
+
+            return Result.Success;
+        }
     }
+
+
     /// <summary>
-    /// 将 ulong 转换为字节数组（大端序）
+    /// 双字
     /// </summary>
-    /// <param name="source">源数据</param>
-    /// <param name="destination">目标字节数组（至少8字节）</param>
-    public static Result ToBytes(this ulong source, Span<byte> destination, Endianness endianness = Endianness.BigEndian)
+    extension(uint source)
     {
-        if (destination.Length < 8)
-            return Result.Error(ErrorType.InvalidParameter, "目标缓冲区至少需要8字节");
-
-        if (endianness == Endianness.BigEndian)
+        /// <summary>
+        /// 将 uint 转换为字节数组（大端序）
+        /// </summary>
+        /// <param name="destination">目标字节数组（至少4字节）</param>
+        public Result ToBytes(Span<byte> destination, Endianness endianness = Endianness.BigEndian)
         {
-            destination[0] = (byte)(source >> 56);
-            destination[1] = (byte)(source >> 48);
-            destination[2] = (byte)(source >> 40);
-            destination[3] = (byte)(source >> 32);
-            destination[4] = (byte)(source >> 24);
-            destination[5] = (byte)(source >> 16);
-            destination[6] = (byte)(source >> 8);
-            destination[7] = (byte)source;
-        }
-        else
-        {
-            destination[0] = (byte)source;
-            destination[1] = (byte)(source >> 8);
-            destination[2] = (byte)(source >> 16);
-            destination[3] = (byte)(source >> 24);
-            destination[4] = (byte)(source >> 32);
-            destination[5] = (byte)(source >> 40);
-            destination[6] = (byte)(source >> 48);
-            destination[7] = (byte)(source >> 56);
-        }
+            if (destination.Length < 4)
+                return Result.Error(ErrorType.InvalidParameter, "目标缓冲区至少需要4字节");
 
-        return Result.Success;
+            if (endianness == Endianness.BigEndian)
+            {
+                destination[0] = (byte)(source >> 24);
+                destination[1] = (byte)(source >> 16);
+                destination[2] = (byte)(source >> 8);
+                destination[3] = (byte)source;
+            }
+            else
+            {
+                destination[0] = (byte)source;
+                destination[1] = (byte)(source >> 8);
+                destination[2] = (byte)(source >> 16);
+                destination[3] = (byte)(source >> 24);
+            }
+
+            return Result.Success;
+        }
+    }
+
+    /// <summary>
+    /// 四字
+    /// </summary>
+    extension(ulong source)
+    {
+        /// <summary>
+        /// 将 ulong 转换为字节数组（大端序）
+        /// </summary>
+        /// <param name="destination">目标字节数组（至少8字节）</param>
+        public Result ToBytes(Span<byte> destination, Endianness endianness = Endianness.BigEndian)
+        {
+            if (destination.Length < 8)
+                return Result.Error(ErrorType.InvalidParameter, "目标缓冲区至少需要8字节");
+
+            if (endianness == Endianness.BigEndian)
+            {
+                destination[0] = (byte)(source >> 56);
+                destination[1] = (byte)(source >> 48);
+                destination[2] = (byte)(source >> 40);
+                destination[3] = (byte)(source >> 32);
+                destination[4] = (byte)(source >> 24);
+                destination[5] = (byte)(source >> 16);
+                destination[6] = (byte)(source >> 8);
+                destination[7] = (byte)source;
+            }
+            else
+            {
+                destination[0] = (byte)source;
+                destination[1] = (byte)(source >> 8);
+                destination[2] = (byte)(source >> 16);
+                destination[3] = (byte)(source >> 24);
+                destination[4] = (byte)(source >> 32);
+                destination[5] = (byte)(source >> 40);
+                destination[6] = (byte)(source >> 48);
+                destination[7] = (byte)(source >> 56);
+            }
+
+            return Result.Success;
+        }
     }
 }

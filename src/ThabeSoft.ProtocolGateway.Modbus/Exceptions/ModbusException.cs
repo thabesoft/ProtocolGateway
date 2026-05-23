@@ -5,7 +5,8 @@ namespace ThabeSoft.IndustrialHub.Modbus.Exceptions;
 
 /// <summary>
 /// Modbus异常
-/// </summary>
+/// </summary
+[Obsolete]
 public sealed class ModbusException: Exception
 {
     public byte SlaveId { get; set; }

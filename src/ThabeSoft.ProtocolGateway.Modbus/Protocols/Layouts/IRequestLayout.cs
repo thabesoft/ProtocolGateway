@@ -1,10 +1,10 @@
-﻿namespace ThabeSoft.ProtocolGateway.Protocols.Layouts;
+﻿namespace ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
 
 
 /// <summary>
 /// Modbus 请求帧布局
 /// </summary>
-public interface IModbusRequestLayout
+public interface IRequestLayout
 {
     /// <summary>从站Id索引</summary>
     int SlaveIdIndex { get; }

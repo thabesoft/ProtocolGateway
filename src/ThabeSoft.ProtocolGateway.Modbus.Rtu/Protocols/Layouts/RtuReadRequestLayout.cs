@@ -1,12 +1,12 @@
-﻿namespace ThabeSoft.ProtocolGateway.Protocols.Layouts;
+﻿namespace ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
 
 
 /// <summary>
 /// Modbus Rtu 读请求布局
 /// </summary>
-public readonly struct ModbusRtuReadRequestLayout : IModbusReadRequestLayout, IModbusRtuLayoutExtension
+public readonly struct RtuReadRequestLayout : IReadRequestLayout, ICrcRangeable
 {
-    public static ModbusRtuReadRequestLayout Instance => default;
+    public static RtuReadRequestLayout Instance => default;
 
 
     /// <summary>从站Id索引</summary>

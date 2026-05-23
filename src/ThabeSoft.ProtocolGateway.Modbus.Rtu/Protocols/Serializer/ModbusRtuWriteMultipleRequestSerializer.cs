@@ -1,8 +1,8 @@
 ﻿using ThabeSoft.ProtocolGateway.Conversion;
-using ThabeSoft.ProtocolGateway.Protocols.Layouts;
 using ThabeSoft.ProtocolGateway.Primitives;
 using ThabeSoft.ProtocolGateway.Modbus.Primitives;
 using ThabeSoft.ProtocolGateway.Modbus.Crc;
+using ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
 
 namespace ThabeSoft.ProtocolGateway.Protocols.Serializer;
 
@@ -22,14 +22,14 @@ public sealed class ModbusRtuWriteMultipleRequestSerializer :
     bool IModbusWriteMultipleRegistersRequestSerializer.TryPack(Span<byte> destination, byte slaveId, ushort address, ReadOnlySpan<ushort> values)
     {
         var quantity = (byte)values.Length;
-        var layout = ModbusRtuWriteMultipleRequestLayout.TryCreayeRegisters(quantity, out var result)
+        var layout = RtuWriteMultipleRequestLayout.TryCreayeRegisters(quantity, out var result)
 
         return TryPackRegisters(layout, destination, slaveId, address, values);
     }
     bool IModbusWriteMultipleRegistersRequestSerializer.TryUnpack(ReadOnlySpan<byte> source, out byte slaveId, out ushort address, Span<ushort> values)
     {
         var quantity = (byte)values.Length;
-        var layout = ModbusRtuWriteMultipleRequestLayout.TryCreayeRegisters(quantity);
+        var layout = RtuWriteMultipleRequestLayout.TryCreayeRegisters(quantity);
 
         return TryUnpackRegisters(layout, source, out slaveId, out address, values);
     }
@@ -37,14 +37,14 @@ public sealed class ModbusRtuWriteMultipleRequestSerializer :
     bool IModbusWriteMultipleCoilsRequestSerializer.TryPack(Span<byte> destination, byte slaveId, ushort address, ReadOnlySpan<bool> values)
     {
         var quantity = (ushort)values.Length;
-        var layout = ModbusRtuWriteMultipleRequestLayout.WriteMultipleCoils(quantity);
+        var layout = RtuWriteMultipleRequestLayout.WriteMultipleCoils(quantity);
 
         return TryPackCoils(layout, destination, slaveId, address, values);
     }
     bool IModbusWriteMultipleCoilsRequestSerializer.TryUnpack(ReadOnlySpan<byte> source, out byte slaveId, out ushort address, Span<bool> values)
     {
         var quantity = (ushort)values.Length;
-        var layout = ModbusRtuWriteMultipleRequestLayout.WriteMultipleCoils(quantity);
+        var layout = RtuWriteMultipleRequestLayout.WriteMultipleCoils(quantity);
 
         return TryUnpackCoils(layout, source, out slaveId, out address, values);
     }
@@ -53,10 +53,10 @@ public sealed class ModbusRtuWriteMultipleRequestSerializer :
     /*------------------- 共用 -------------------*/
 
     private static bool TryPack(
-        in ModbusRtuWriteMultipleRequestLayout layout,
+        in RtuWriteMultipleRequestLayout layout,
         Span<byte> destination,
         in byte slaveId,
-        in ModbusFunctionCode functionCode,
+        in FunctionCode functionCode,
         in ushort address,
         in ushort quantity
         )
@@ -64,7 +64,7 @@ public sealed class ModbusRtuWriteMultipleRequestSerializer :
         // 缓冲区长度不足
         if (destination.Length < layout.TotalLength) return false;
         // 参数数量超过预期
-        if (quantity > layout.DataMaxQuantity) return false;
+        if (quantity > layout.DataQuantity) return false;
 
         // 从站
         destination[layout.SlaveIdIndex] = slaveId;
@@ -80,10 +80,10 @@ public sealed class ModbusRtuWriteMultipleRequestSerializer :
         return true;
     }
     private static bool TryUnpack(
-        in ModbusRtuWriteMultipleRequestLayout layout,
+        in RtuWriteMultipleRequestLayout layout,
         ReadOnlySpan<byte> source,
         out byte slaveId,
-        out ModbusFunctionCode functionCode,
+        out FunctionCode functionCode,
         out ushort address,
         out ushort quantity
         )
@@ -99,7 +99,7 @@ public sealed class ModbusRtuWriteMultipleRequestSerializer :
         // 从站Id
         var received_slaveId = source[layout.SlaveIdIndex];
         // 功能码
-        if (!ModbusFunctionCode.TryFromCode(source[layout.FunctionCodeIndex], out var received_function_code)) return false;
+        if (!FunctionCode.TryFromCode(source[layout.FunctionCodeIndex], out var received_function_code)) return false;
         // 地址
         if (!source[layout.AddressRange].TryToUInt16(out var received_address, Endianness.BigEndian)) return false;
         // 数量
@@ -125,7 +125,7 @@ public sealed class ModbusRtuWriteMultipleRequestSerializer :
     /*------------------- 写多个寄存器 -------------------*/
 
     public static bool TryPackRegisters(
-        in ModbusRtuWriteMultipleRequestLayout layout,
+        in RtuWriteMultipleRequestLayout layout,
         in Span<byte> destination,
         in byte slaveId,
         in ushort address,
@@ -134,7 +134,7 @@ public sealed class ModbusRtuWriteMultipleRequestSerializer :
     {
         var quantity = (ushort)values.Length;
 
-        if(TryPack(layout, destination, slaveId, ModbusFunctionCode.WriteMultipleRegisters, address, quantity))
+        if(TryPack(layout, destination, slaveId, FunctionCode.WriteMultipleRegisters, address, quantity))
         {
             // 数据
             if (!values.TryToByte(destination[layout.DataRange], Endianness.BigEndian)) return false;
@@ -146,7 +146,7 @@ public sealed class ModbusRtuWriteMultipleRequestSerializer :
         return false;
     }
     public static bool TryUnpackRegisters(
-        in ModbusRtuWriteMultipleRequestLayout layout,
+        in RtuWriteMultipleRequestLayout layout,
         ReadOnlySpan<byte> source,
         out byte slaveId,
         out ushort address,
@@ -158,7 +158,7 @@ public sealed class ModbusRtuWriteMultipleRequestSerializer :
         if (TryUnpack(layout, source, out var received_slaveId, out var function_code, out var received_address, out var received_quantity))
         {
             // 功能码
-            if (function_code != ModbusFunctionCode.WriteMultipleRegisters) return false;
+            if (function_code != FunctionCode.WriteMultipleRegisters) return false;
             // 数量
             if (values.Length < received_quantity) return false;
             // 数据
@@ -175,7 +175,7 @@ public sealed class ModbusRtuWriteMultipleRequestSerializer :
     /*------------------- 写多个线圈 -------------------*/
 
     public static bool TryPackCoils(
-        in ModbusRtuWriteMultipleRequestLayout layout,
+        in RtuWriteMultipleRequestLayout layout,
         Span<byte> destination,
         byte slaveId,
         ushort address,
@@ -184,7 +184,7 @@ public sealed class ModbusRtuWriteMultipleRequestSerializer :
     {
         var quantity = (ushort)values.Length;
 
-        if (TryPack(layout, destination, slaveId, ModbusFunctionCode.WriteMultipleCoils, address, quantity))
+        if (TryPack(layout, destination, slaveId, FunctionCode.WriteMultipleCoils, address, quantity))
         {
             // 数据
             if (!values.TryToByte(destination[layout.DataRange], Endianness.LittleEndian)) return false;
@@ -196,7 +196,7 @@ public sealed class ModbusRtuWriteMultipleRequestSerializer :
         return false;
     }
     public static bool TryUnpackCoils(
-        in ModbusRtuWriteMultipleRequestLayout layout,
+        in RtuWriteMultipleRequestLayout layout,
         ReadOnlySpan<byte> source,
         out byte slaveId,
         out ushort address,
@@ -208,7 +208,7 @@ public sealed class ModbusRtuWriteMultipleRequestSerializer :
         if(TryUnpack(layout, source, out var received_slaveId, out var functionCode, out var received_address, out var received_quantity))
         {
             // 功能码
-            if (functionCode != ModbusFunctionCode.WriteMultipleCoils) return false;
+            if (functionCode != FunctionCode.WriteMultipleCoils) return false;
             // 数量
             if (values.Length < received_quantity) return false;
             // 数据
