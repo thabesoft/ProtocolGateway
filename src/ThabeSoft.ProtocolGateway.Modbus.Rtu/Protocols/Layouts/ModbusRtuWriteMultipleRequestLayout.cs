@@ -88,6 +88,7 @@ public readonly struct ModbusRtuWriteMultipleRequestLayout : IModbusRtuLayoutExt
     /// 创建一个拥有指定数量寄存器的帧布局
     /// </summary>
     /// <param name="quantity">寄存器数量</param>
+    [Obsolete("使用Result模式")]
     public static bool TryCreayeRegisters(byte quantity, out ModbusRtuWriteMultipleRequestLayout result)
     {
         if (ModbusWriteRegistersQuantity.TryCreate(quantity, out var register_quantity))
@@ -98,6 +99,11 @@ public readonly struct ModbusRtuWriteMultipleRequestLayout : IModbusRtuLayoutExt
 
         result = default;
         return false;
+    }
+    public static Result<ModbusRtuWriteMultipleRequestLayout> CreateRegisters(byte quantity)
+    {
+        return ModbusWriteRegistersQuantity.Create(quantity)
+            .Then(CreateRegisters);
     }
 
 
@@ -133,6 +139,7 @@ public readonly struct ModbusRtuWriteMultipleRequestLayout : IModbusRtuLayoutExt
     /// 创建一个拥有指定数量线圈的帧布局
     /// </summary>
     /// <param name="quantity">线圈数量</param>
+    [Obsolete("使用Result模式")]
     public static bool TryCreateCoils(ushort quantity, out ModbusRtuWriteMultipleRequestLayout result)
     {
         if (ModbusWriteCoilsQuantity.TryCreate(quantity, out var coils_quantity))
@@ -143,5 +150,11 @@ public readonly struct ModbusRtuWriteMultipleRequestLayout : IModbusRtuLayoutExt
 
         result = default;
         return false;
+    }
+
+    public static Result<ModbusRtuWriteMultipleRequestLayout> CreateCoils(byte quantity)
+    {
+        return ModbusWriteCoilsQuantity.Create(quantity)
+            .Then(CreateCoils);
     }
 }

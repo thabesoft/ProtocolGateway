@@ -91,8 +91,6 @@ public interface IModbusResponseUnpacker
     bool TryUnpackReadDiscreteInputsResponse(ReadOnlySpan<byte> source, out byte slaveId, out ushort address, out byte dataLengths);
     bool TryUnpackReadHoldingRegistersResponse(ReadOnlySpan<byte> source, out byte slaveId, out ushort address, out byte dataLengths);
     bool TryUnpackReadInputRegistersResponse(ReadOnlySpan<byte> source, out byte slaveId, out ushort address, out byte dataLengths);
-
-
     bool TryUnpackWriteSingleResponse(ReadOnlySpan<byte> source, out byte slaveId, out ushort address, bool coils);
 }
 

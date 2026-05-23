@@ -7,6 +7,7 @@ namespace ThabeSoft.ProtocolGateway.Conversion;
 /// <summary>
 /// 位组转换器
 /// </summary>
+[Obsolete("请使用 ByteExtensions")]
 public static class BitArrayConverter
 {
     private const int BitsPerByte = 8;
@@ -20,7 +21,8 @@ public static class BitArrayConverter
     /// <param name="destination">目标位组</param>
     /// <param name="endianness">端序</param>
     /// <returns>是否转换成功</returns>
-    public static bool TryToBit(this ReadOnlySpan<byte> source, Span<bool> destination, ByteSwap endianness = ByteSwap.BigEndian)
+    [Obsolete("请使用 ByteExtensions")]
+    public static bool TryToBit(this ReadOnlySpan<byte> source, Span<bool> destination, Endianness endianness = Endianness.BigEndian)
     {
         int total_length = Math.Min(destination.Length, source.Length * BitsPerByte);
 
@@ -45,14 +47,15 @@ public static class BitArrayConverter
     /// <param name="destination">目标位组</param>
     /// <param name="endianness">端序</param>
     /// <returns>是否转换成功</returns>
-    public static bool TryToBit(this byte source, Span<bool> destination, ByteSwap endianness = ByteSwap.BigEndian)
+    [Obsolete("请使用 ByteExtensions")]
+    public static bool TryToBit(this byte source, Span<bool> destination, Endianness endianness = Endianness.BigEndian)
     {
         //if (destination.Length < BitsPerByte) return false;
-        if (endianness is not (ByteSwap.LittleEndian or ByteSwap.BigEndian)) return false;
+        if (endianness is not (Endianness.LittleEndian or Endianness.BigEndian)) return false;
 
         for (int i = 0; i < destination.Length; i++)
         {
-            if (endianness == ByteSwap.BigEndian)
+            if (endianness == Endianness.BigEndian)
             {
                 // 大端序：destination[0] = bit7
                 int bit_index = BitsPerByte - 1 - i;
@@ -79,7 +82,8 @@ public static class BitArrayConverter
     /// <param name="destination">字节组</param>
     /// <param name="endianness">端序</param>
     /// <returns>是否转换成功</returns>
-    public static bool TryToByte(this ReadOnlySpan<bool> source, Span<byte> destination, ByteSwap endianness = ByteSwap.BigEndian)
+    [Obsolete("请使用 ByteExtensions")]
+    public static bool TryToByte(this ReadOnlySpan<bool> source, Span<byte> destination, Endianness endianness = Endianness.BigEndian)
     {
         var bits_count = source.Length;
         var byte_count = (bits_count + 7) / BitsPerByte;
@@ -103,7 +107,8 @@ public static class BitArrayConverter
     /// <param name="destination">目标字节</param>
     /// <param name="endianness">端序</param>
     /// <returns>是否转换成功</returns>
-    public static bool TryToByte(this ReadOnlySpan<bool> source, out byte destination, ByteSwap endianness = ByteSwap.BigEndian)
+    [Obsolete("请使用 ByteExtensions")]
+    public static bool TryToByte(this ReadOnlySpan<bool> source, out byte destination, Endianness endianness = Endianness.BigEndian)
     {
         var bit_count = source.Length;
 
@@ -120,7 +125,7 @@ public static class BitArrayConverter
         {
             if (!source[i]) continue;
 
-            var bitIndex = endianness == ByteSwap.LittleEndian ? i : bit_count - 1 - i;
+            var bitIndex = endianness == Endianness.LittleEndian ? i : bit_count - 1 - i;
             byte_value |= (byte)(1 << bitIndex);
         }
 
@@ -134,7 +139,8 @@ public static class BitArrayConverter
     /// <param name="destination">目标字节组</param>
     /// <param name="endianness">端序</param>
     /// <returns>是否转换成功</returns>
-    public static bool TryToByte(this ReadOnlySpan<ushort> source, Span<byte> destination, ByteSwap endianness = ByteSwap.LittleEndian)
+    [Obsolete("请使用 ByteExtensions")]
+    public static bool TryToByte(this ReadOnlySpan<ushort> source, Span<byte> destination, Endianness endianness = Endianness.LittleEndian)
     {
         var source_count = source.Length;
         var byte_count = source_count * 2;
@@ -157,7 +163,8 @@ public static class BitArrayConverter
     /// <param name="destination">目标字节组</param>
     /// <param name="endianness">端序</param>
     /// <returns>是否转换成功</returns>
-    public static Result TryToByte(this ushort source, Span<byte> destination, ByteSwap endianness = ByteSwap.BigEndian)
+    [Obsolete("请使用 ByteExtensions")]
+    public static Result TryToByte(this ushort source, Span<byte> destination, Endianness endianness = Endianness.BigEndian)
     {
         if (destination.Length < 2)
         {
@@ -168,7 +175,7 @@ public static class BitArrayConverter
             );
         }
 
-        if (endianness == ByteSwap.BigEndian)
+        if (endianness == Endianness.BigEndian)
         {
             // 大端序
             destination[0] = (byte)(source >> 8);   // 高字节
@@ -177,7 +184,7 @@ public static class BitArrayConverter
             return true;
         }
 
-        if (endianness == ByteSwap.LittleEndian)
+        if (endianness == Endianness.LittleEndian)
         {
             // 小端序
             destination[0] = (byte)source;          // 低字节
@@ -200,7 +207,8 @@ public static class BitArrayConverter
     /// <param name="destination">目标16位无符号整数组</param>
     /// <param name="endianness">端序</param>
     /// <returns>是否转换成功</returns>
-    public static bool TryToUInt16(this ReadOnlySpan<byte> source, Span<ushort> destination, ByteSwap endianness = ByteSwap.BigEndian)
+    [Obsolete("请使用 ByteExtensions")]
+    public static bool TryToUInt16(this ReadOnlySpan<byte> source, Span<ushort> destination, Endianness endianness = Endianness.BigEndian)
     {
         int total_length = Math.Min(destination.Length, source.Length / 2);
 
@@ -223,7 +231,8 @@ public static class BitArrayConverter
     /// <param name="destination">目标16位无符号整数</param>
     /// <param name="endianness">端序</param>
     /// <returns>是否转换成功</returns>
-    public static bool TryToUInt16(this ReadOnlySpan<byte> source, out ushort destination, ByteSwap endianness = ByteSwap.BigEndian)
+    [Obsolete("请使用 ByteExtensions")]
+    public static bool TryToUInt16(this ReadOnlySpan<byte> source, out ushort destination, Endianness endianness = Endianness.BigEndian)
     {
 
         destination = 0;
@@ -232,14 +241,14 @@ public static class BitArrayConverter
             return false;
         }
 
-        if (endianness == ByteSwap.BigEndian)
+        if (endianness == Endianness.BigEndian)
         {
             // 大端序：高字节在前，低字节在后
             destination = (ushort)((source[0] << 8) | source[1]);
             return true;
         }
 
-        if (endianness == ByteSwap.LittleEndian)
+        if (endianness == Endianness.LittleEndian)
         {
             // 小端序：低字节在前，高字节在后
             destination = (ushort)(source[0] | (source[1] << 8));

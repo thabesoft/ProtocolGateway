@@ -1,7 +1,8 @@
-﻿using ThabeSoft.IndustrialHub.Modbus.Crc;
-using ThabeSoft.ProtocolGateway.Conversion;
+﻿using ThabeSoft.ProtocolGateway.Conversion;
 using ThabeSoft.ProtocolGateway.Protocols.Layouts;
 using ThabeSoft.ProtocolGateway.Primitives;
+using ThabeSoft.ProtocolGateway.Modbus.Primitives;
+using ThabeSoft.ProtocolGateway.Modbus.Crc;
 
 namespace ThabeSoft.ProtocolGateway.Protocols.Serializer;
 
@@ -21,7 +22,7 @@ public sealed class ModbusRtuWriteMultipleRequestSerializer :
     bool IModbusWriteMultipleRegistersRequestSerializer.TryPack(Span<byte> destination, byte slaveId, ushort address, ReadOnlySpan<ushort> values)
     {
         var quantity = (byte)values.Length;
-        var layout = ModbusRtuWriteMultipleRequestLayout.TryCreayeRegisters(quantity);
+        var layout = ModbusRtuWriteMultipleRequestLayout.TryCreayeRegisters(quantity, out var result)
 
         return TryPackRegisters(layout, destination, slaveId, address, values);
     }
@@ -70,9 +71,9 @@ public sealed class ModbusRtuWriteMultipleRequestSerializer :
         // 功能码
         destination[layout.FunctionCodeIndex] = functionCode;
         // 起始地址
-        if (!address.TryToByte(destination[layout.AddressRange], ByteSwap.BigEndian)) return false;
+        if (!address.TryToByte(destination[layout.AddressRange], Endianness.BigEndian)) return false;
         // 寄存器数量
-        if (!quantity.TryToByte(destination[layout.QuantityRange], ByteSwap.BigEndian)) return false;
+        if (!quantity.TryToByte(destination[layout.QuantityRange], Endianness.BigEndian)) return false;
         // 数据长度
         destination[layout.DataLengthIndex] = (byte)layout.DataByteLength;
 
@@ -100,16 +101,16 @@ public sealed class ModbusRtuWriteMultipleRequestSerializer :
         // 功能码
         if (!ModbusFunctionCode.TryFromCode(source[layout.FunctionCodeIndex], out var received_function_code)) return false;
         // 地址
-        if (!source[layout.AddressRange].TryToUInt16(out var received_address, ByteSwap.BigEndian)) return false;
+        if (!source[layout.AddressRange].TryToUInt16(out var received_address, Endianness.BigEndian)) return false;
         // 数量
-        if (!source[layout.QuantityRange].TryToUInt16(out var received_quantity, ByteSwap.BigEndian)) return false;
+        if (!source[layout.QuantityRange].TryToUInt16(out var received_quantity, Endianness.BigEndian)) return false;
 
         // 数据长度
         var data_length = source[layout.DataLengthIndex];
         if (data_length != layout.DataByteLength) return false;
 
         // 校验Crc
-        if (!source[layout.CrcRange].TryToUInt16(out var received_crc, ByteSwap.LittleEndian)) return false;
+        if (!source[layout.CrcRange].TryToUInt16(out var received_crc, Endianness.LittleEndian)) return false;
         if (!CrcCalculator.Validate(source[layout.PayloadRange], received_crc)) return false;
 
         slaveId = received_slaveId;
@@ -136,10 +137,10 @@ public sealed class ModbusRtuWriteMultipleRequestSerializer :
         if(TryPack(layout, destination, slaveId, ModbusFunctionCode.WriteMultipleRegisters, address, quantity))
         {
             // 数据
-            if (!values.TryToByte(destination[layout.DataRange], ByteSwap.BigEndian)) return false;
+            if (!values.TryToByte(destination[layout.DataRange], Endianness.BigEndian)) return false;
             // 验证
             var crc = CrcCalculator.Calculate(destination[layout.PayloadRange]);
-            return crc.TryToByte(destination[layout.CrcRange], ByteSwap.LittleEndian);
+            return crc.TryToByte(destination[layout.CrcRange], Endianness.LittleEndian);
         }
 
         return false;
@@ -161,7 +162,7 @@ public sealed class ModbusRtuWriteMultipleRequestSerializer :
             // 数量
             if (values.Length < received_quantity) return false;
             // 数据
-            if (!source[layout.DataRange].TryToUInt16(values, ByteSwap.BigEndian)) return false;
+            if (!source[layout.DataRange].TryToUInt16(values, Endianness.BigEndian)) return false;
 
             slaveId = received_slaveId;
             address = received_address;
@@ -186,10 +187,10 @@ public sealed class ModbusRtuWriteMultipleRequestSerializer :
         if (TryPack(layout, destination, slaveId, ModbusFunctionCode.WriteMultipleCoils, address, quantity))
         {
             // 数据
-            if (!values.TryToByte(destination[layout.DataRange], ByteSwap.LittleEndian)) return false;
+            if (!values.TryToByte(destination[layout.DataRange], Endianness.LittleEndian)) return false;
             // 验证
             var crc = CrcCalculator.Calculate(destination[layout.PayloadRange]);
-            return crc.TryToByte(destination[layout.CrcRange], ByteSwap.LittleEndian);
+            return crc.TryToByte(destination[layout.CrcRange], Endianness.LittleEndian);
         }
 
         return false;
@@ -211,7 +212,7 @@ public sealed class ModbusRtuWriteMultipleRequestSerializer :
             // 数量
             if (values.Length < received_quantity) return false;
             // 数据
-            if (!source[layout.DataRange].TryToBit(values, ByteSwap.LittleEndian)) return false;
+            if (!source[layout.DataRange].TryToBit(values, Endianness.LittleEndian)) return false;
 
             slaveId = received_slaveId;
             address = received_address;

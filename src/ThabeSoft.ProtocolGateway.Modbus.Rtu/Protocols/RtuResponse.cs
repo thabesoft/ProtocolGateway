@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using ThabeSoft.IndustrialHub.Modbus.Crc;
 using ThabeSoft.IndustrialHub.Modbus.Exceptions;
+using ThabeSoft.ProtocolGateway.Modbus.Crc;
 
 namespace ThabeSoft.ProtocolGateway.Protocols;
 

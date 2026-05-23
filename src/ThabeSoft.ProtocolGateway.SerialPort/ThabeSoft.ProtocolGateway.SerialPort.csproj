@@ -9,14 +9,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="11.0.0-preview.2.26159.112" />
-		<PackageReference Include="System.IO.Pipelines" Version="10.0.8" />
 		<PackageReference Include="System.IO.Ports" Version="10.0.4" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.Abstractions\ThabeSoft.ProtocolGateway.Abstractions.csproj" />
-	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.Common\ThabeSoft.ProtocolGateway.csproj" />
 	</ItemGroup>
 
 </Project>

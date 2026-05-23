@@ -1,9 +1,8 @@
-﻿namespace ThabeSoft.ProtocolGateway.IO;
+﻿#pragma warning disable IDE0130 // 命名空间与文件夹结构不匹配
+namespace System.IO;
+#pragma warning restore IDE0130 // 命名空间与文件夹结构不匹配
 
 
-/// <summary>
-/// Stream扩展
-/// </summary>
 public static class StreamExtensions
 {
     extension(Stream stream)

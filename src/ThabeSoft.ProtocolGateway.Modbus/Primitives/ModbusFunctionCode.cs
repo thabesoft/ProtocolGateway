@@ -1,4 +1,6 @@
-﻿namespace ThabeSoft.ProtocolGateway.Primitives;
+﻿using ThabeSoft.ProtocolGateway.Primitives;
+
+namespace ThabeSoft.ProtocolGateway.Modbus.Primitives;
 
 
 /// <summary>
@@ -87,7 +89,7 @@ public readonly struct ModbusFunctionCode : IEquatable<ModbusFunctionCode>
     /// <summary>
     /// 从功能码值创建
     /// </summary>
-    public static ModbusFunctionCode FromCode(byte code)
+    public static Result<ModbusFunctionCode> FromCode(byte code)
     {
         return code switch
         {
@@ -99,7 +101,7 @@ public readonly struct ModbusFunctionCode : IEquatable<ModbusFunctionCode>
             WriteSingleRegisterValue => WriteSingleRegister,
             WriteMultipleCoilsValue => WriteMultipleCoils,
             WriteMultipleRegistersValue => WriteMultipleRegisters,
-            _ => throw new ArgumentException($"不支持的功能码: {code}")
+            _ => Result.Error<ModbusFunctionCode>(ErrorType.InvalidOperation, "无法识别的功能码")
         };
     }
 
@@ -126,7 +128,6 @@ public readonly struct ModbusFunctionCode : IEquatable<ModbusFunctionCode>
 
 
     public static implicit operator byte(ModbusFunctionCode code) => code._value;
-    public static explicit operator ModbusFunctionCode(byte code) => FromCode(code);
 
 
     public override string ToString() => $"[0x{_value:X2}]";
@@ -152,31 +153,30 @@ public readonly struct ErrorFunctionCode : IEquatable<ErrorFunctionCode>
     {
         return new ErrorFunctionCode(code);
     }
-    public static ErrorFunctionCode FromCode(byte code)
+    public static Result<ErrorFunctionCode> FromCode(byte code)
     {
         if ((code & 0x80) == 0)
         {
-            throw new ArgumentException($"不是有效的异常功能码: 0x{code:X2}（缺少 0x80 标志位）", nameof(code));
+            return Result.Error<ErrorFunctionCode>(ErrorType.InvalidOperation, $"不是有效的异常功能码: 0x{code:X2}（缺少 0x80 标志位）");
         }
+        var result = ModbusFunctionCode.FromCode((byte)(code & 0x7F));
+        if (!result) return result.PropagateError<ErrorFunctionCode>();
 
-        var function_code = ModbusFunctionCode.FromCode((byte)(code & 0x7F));
-        return new ErrorFunctionCode(function_code);
+        return new ErrorFunctionCode(result.Value);
     }
     public static bool TryFromCode(byte code, out ErrorFunctionCode errorFunctionCode)
     {
         errorFunctionCode = default;
-
         if ((code & 0x80) == 0) return false;
 
-        var function_code = ModbusFunctionCode.FromCode((byte)(code & 0x7F));
-        errorFunctionCode = new ErrorFunctionCode(function_code);
+        if (!ModbusFunctionCode.TryFromCode((byte)(code & 0x7F), out var function_code)) return false;
 
+        errorFunctionCode = new ErrorFunctionCode(function_code);
         return true;
     }
 
 
     public static implicit operator byte(ErrorFunctionCode code) => (byte)(code | 0x80);
-    public static implicit operator ErrorFunctionCode(byte code) => FromCode(code);
 
 
     public override bool Equals(object obj) => obj is ErrorFunctionCode other && Equals(other);

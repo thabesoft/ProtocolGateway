@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.IO.Ports;
-using ThabeSoft.ProtocolGateway.IO;
 using ThabeSoft.ProtocolGateway.Options;
 using ThabeSoft.ProtocolGateway.Primitives;
 
@@ -61,7 +60,7 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
         {
             _options = serialOptions;
 
-            return CreateSerialPort(serialOptions).Bind(x =>
+            return CreateSerialPort(serialOptions).Tap(x =>
             {
                 port = x;
                 port.Open();

@@ -23,7 +23,6 @@ public static class ByteExtensions
 
             return (ushort)(source[1] << 8 | source[0]);
         }
-
         /// <summary>
         /// 将字节组转换为 双字 (32 bit)
         /// </summary>
@@ -40,7 +39,6 @@ public static class ByteExtensions
 
             return (uint)((source[3] << 24) | (source[2] << 16) | (source[1] << 8) | source[0]);
         }
-
         /// <summary>
         /// 将字节组转换为 四字 (64 bit)
         /// </summary>
@@ -89,7 +87,6 @@ public static class ByteExtensions
 
         return Result.Success;
     }
-
     /// <summary>
     /// 将 uint 转换为字节数组（大端序）
     /// </summary>
@@ -117,7 +114,6 @@ public static class ByteExtensions
 
         return Result.Success;
     }
-
     /// <summary>
     /// 将 ulong 转换为字节数组（大端序）
     /// </summary>

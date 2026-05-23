@@ -1,4 +1,6 @@
-﻿namespace ThabeSoft.IndustrialHub.Modbus.Crc;
+﻿using ThabeSoft.ProtocolGateway.Primitives;
+
+namespace ThabeSoft.ProtocolGateway.Modbus.Crc;
 
 
 /// <summary>
@@ -35,8 +37,11 @@ public static class CrcCalculator
     /// </summary>
     /// <param name="data">数据</param>
     /// <param name="crcCode">校验码</param>
-    public static bool Validate(ReadOnlySpan<byte> data, ushort crcCode)
+    public static Result Validate(ReadOnlySpan<byte> data, ushort crcCode)
     {
-        return Calculate(data) == crcCode;
+        var calculated = Calculate(data);
+        if (calculated == crcCode) return true;
+
+        return Result.Error(ErrorType.InvalidData, $"CRC校验失败，计算值: 0x{calculated:X4}，接收值: 0x{crcCode:X4}");
     }
 }

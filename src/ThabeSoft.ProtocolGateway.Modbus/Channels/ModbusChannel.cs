@@ -1,4 +1,6 @@
 ﻿using System.Buffers;
+using ThabeSoft.ProtocolGateway.Modbus.Channels;
+using ThabeSoft.ProtocolGateway.Modbus.Primitives;
 using ThabeSoft.ProtocolGateway.Primitives;
 using ThabeSoft.ProtocolGateway.Protocols;
 using ThabeSoft.ProtocolGateway.Transports;
@@ -11,7 +13,7 @@ public sealed class ModbusChannel(
         IEncoderFactory encoderFactory,
         ILayoutFactory layoutFactory,
         IDecoderFactory decoderFactory
-    ) : IReadChannel, IWriteChannel
+    ) : IReader, IWriter
 {
     private async ValueTask<Result<TResponse>> ReadAsync<TRequest, TResponse, TResponseValue>(
             TRequest request,
@@ -57,54 +59,39 @@ public sealed class ModbusChannel(
     }
 
 
-    public async ValueTask<Result> ReadAsync(
-            IReadRequest request,
-            Memory<byte> destination,
-            CancellationToken cancellationToken = default
-        )
+    public async ValueTask<Result<TValue>> ReadAsync<TValue>(ITag<TValue> tag, CancellationToken cancellationToken = default) where TValue : unmanaged
     {
-        if (request is ModbusReadCoilRequest modbus)
+        if (tag.Address is not ModbusAddress address) return Result.Error<TValue>(ErrorType.InvalidOperation, "无效地址");
+        if (!address.FunctionCode.IsRead) Result.Error<TValue>(ErrorType.InvalidOperation, "不是有效的 Modbus 读值地址");
+
+
+        if(address.FunctionCode == ModbusFunctionCode.ReadCoils)
         {
-            return await ReadAsync<ModbusReadCoilRequest, ModbusReadResponse, byte>(modbus, destination, cancellationToken);
+            
+            //address.Start
         }
 
-        return Result.Error(ErrorType.InvalidOperation, "Modbus 无法识别的读取操作");
+        if (address.FunctionCode == ModbusFunctionCode.ReadDiscreteInputs)
+        {
+
+        }
+
+        if (address.FunctionCode == ModbusFunctionCode.ReadHoldingRegisters)
+        {
+
+        }
+
+        if (address.FunctionCode == ModbusFunctionCode.ReadInputRegisters)
+        {
+
+        }
+
+
+        return Result.Error<TValue>(ErrorType.ProtocolErrored, "Modbus 无法识别的读取操作");
     }
 
-    public ValueTask<Result> WriteAsync(
-            IWriteRequest request,
-            ReadOnlyMemory<byte> source,
-            CancellationToken cancellationToken = default
-        )
+    public ValueTask<Result> WriteAsync<TValue>(ITag<TValue> tagInfo, TValue value, CancellationToken cancellationToken = default) where TValue : unmanaged
     {
         throw new NotImplementedException();
     }
-}
-
-
-public class TestDe : IDecoder<ModbusReadResponse>
-{
-    public Result<ModbusReadResponse> Decode(ReadOnlySpan<byte> source)
-    {
-        ModbusReadResponse resp = new();
-        return Result.Ok(resp);
-    }
-}
-
-public readonly struct ModbusReadCoilRequest(byte slaveId, ushort address, ushort quantity) : IReadRequest
-{
-    public byte SlaveId => slaveId;
-    public ushort Address => address;
-    public ushort Quantity => quantity;
-
-    public override string ToString()
-    {
-        // 100,10
-        return $"{Address}..{Quantity}";
-    }
-}
-
-public readonly struct ModbusReadResponse
-{
-
 }

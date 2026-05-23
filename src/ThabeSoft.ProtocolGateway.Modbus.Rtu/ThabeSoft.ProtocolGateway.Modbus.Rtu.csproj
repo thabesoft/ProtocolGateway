@@ -5,11 +5,10 @@
 		<LangVersion>preview</LangVersion>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<RootNamespace>ThabeSoft.ProtocolGateway</RootNamespace>
+		<RootNamespace>ThabeSoft.ProtocolGateway.Modbus</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\ThabeSoft.ProtocolGateway.Common\ThabeSoft.ProtocolGateway.csproj" />
 		<ProjectReference Include="..\ThabeSoft.ProtocolGateway.Modbus\ThabeSoft.ProtocolGateway.Modbus.csproj" />
 	</ItemGroup>
 

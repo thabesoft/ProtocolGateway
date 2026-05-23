@@ -1,7 +1,8 @@
-﻿using ThabeSoft.IndustrialHub.Modbus.Crc;
-using ThabeSoft.ProtocolGateway.Conversion;
+﻿using ThabeSoft.ProtocolGateway.Conversion;
 using ThabeSoft.ProtocolGateway.Protocols.Layouts;
 using ThabeSoft.ProtocolGateway.Primitives;
+using ThabeSoft.ProtocolGateway.Modbus.Primitives;
+using ThabeSoft.ProtocolGateway.Modbus.Crc;
 
 namespace ThabeSoft.ProtocolGateway.Protocols.Serializer;
 

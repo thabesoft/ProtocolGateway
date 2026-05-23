@@ -1,10 +1,7 @@
 <Solution>
   <Folder Name="/Modules/">
     <Project Path="src/ThabeSoft.ProtocolGateway.Abstractions/ThabeSoft.ProtocolGateway.Abstractions.csproj" />
-    <Project Path="src/ThabeSoft.ProtocolGateway.Common/ThabeSoft.ProtocolGateway.csproj" />
-  </Folder>
-  <Folder Name="/Modules/Helpers/">
-    <Project Path="src/ThabeSoft.ProtocolGateway.ResultPipeline/ThabeSoft.ProtocolGateway.ResultPipeline.csproj" />
+    <Project Path="src/ThabeSoft.ProtocolGateway/ThabeSoft.ProtocolGateway.csproj" />
   </Folder>
   <Folder Name="/Modules/Modbus/">
     <Project Path="src/ThabeSoft.ProtocolGateway.Modbus.Rtu/ThabeSoft.ProtocolGateway.Modbus.Rtu.csproj" />

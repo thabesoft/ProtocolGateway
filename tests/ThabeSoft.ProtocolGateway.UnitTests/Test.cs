@@ -1,4 +1,5 @@
 ﻿using ThabeSoft.ProtocolGateway.Primitives;
+using ThabeSoft.ProtocolGateway.Tags;
 
 namespace ThabeSoft.ProtocolGateway;
 
@@ -7,10 +8,10 @@ internal static class Test
     public static async Task Process()
     {
         // 构建标签
-        ITagInfoBuilder<int> builder = null!;
+        ITagBuilder<int> builder = null!;
         var tag = builder
             .Name("Test")
-            .Address("40000")
+            .Address(new ModbusAddress() { Address = 1000 })
             .Converter(DWordConverter.FromLittleEndian(ByteSwap.SwapByte | ByteSwap.SwapQWord))
             .Build();
 
@@ -27,18 +28,38 @@ internal static class Test
         subcriber.Subscribe(tag, x => Console.Write(x));
     }
 
-    
+    public enum ModbusAddressType
+    {
+        Coils,
+        HodingRegister
+    }
+
+    public sealed class ModbusAddress : IAddress
+    {
+        public ushort Address { get; set; }
+        public ModbusAddressType Type { get; set; }
+    }
 
     public sealed class ModbusChannel : IReader, IWriter
     {
-        public ValueTask<Result<TValue>> ReadAsync<TValue>(ITag<TValue> tagInfo, CancellationToken cancellationToken = default) where TValue : unmanaged
+        public async ValueTask<Result<TValue>> ReadAsync<TValue>(ITag<TValue> tag, CancellationToken cancellationToken = default) where TValue : unmanaged
         {
-            tagInfo.
+            if (tag.Address is not ModbusAddress modbusAddress) return Result.Error<TValue>(ErrorType.InvalidOperation, "不持支的协议");
+
+            // 读线圈
+            if(modbusAddress.Type == ModbusAddressType.Coils)
+            {
+                Span<byte> value = stackalloc byte[1];
+                return tag.ValueConvert(value);
+            }
+
+            return Result.Error<TValue>(ErrorType.InvalidParameter, "无法识别的Modbus地址类型");
         }
 
-        public ValueTask<Result> WriteAsync<TValue>(ITag<TValue> tagInfo, TValue value, CancellationToken cancellationToken = default) where TValue : unmanaged
+        public async ValueTask<Result> WriteAsync<TValue>(ITag<TValue> tagInfo, TValue value, CancellationToken cancellationToken = default) where TValue : unmanaged
         {
-            throw new NotImplementedException();
+            Span<byte> data = stackalloc byte[4];
+            return tagInfo.ValueConvert(value, data);
         }
     }
 

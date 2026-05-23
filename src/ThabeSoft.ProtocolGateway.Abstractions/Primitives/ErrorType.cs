@@ -16,6 +16,11 @@ public enum ErrorType
 
     /// <summary>无效操作</summary>
     InvalidOperation,
+    /// <summary>无效参数</summary>
+    InvalidParameter,
+    /// <summary>无效数据</summary>
+    InvalidData,
+
     /// <summary>操作超时</summary>
     OperationTimeout,
     /// <summary>操作被取消</summary>
@@ -27,11 +32,6 @@ public enum ErrorType
     ConnectionLost,
     /// <summary>连接被拒绝</summary>
     ConnectionRefused,
-
-
-
-
     /// <summary>协议错误</summary>
     ProtocolErrored,
-    InvalidParameter,
 }

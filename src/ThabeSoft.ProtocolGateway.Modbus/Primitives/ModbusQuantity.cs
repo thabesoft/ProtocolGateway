@@ -12,6 +12,7 @@ public readonly record struct ModbusReadCoilsQuantity
 
     public static implicit operator ushort(ModbusReadCoilsQuantity quantity) => quantity._value;
 
+    [Obsolete("使用Result模式")]
     public static bool TryCreate(int value, out ModbusReadCoilsQuantity result)
     {
         if (value is < 1 or > 2000)
@@ -22,6 +23,16 @@ public readonly record struct ModbusReadCoilsQuantity
 
         result = new ModbusReadCoilsQuantity((ushort)value);
         return true;
+    }
+
+    public static Result<ModbusReadCoilsQuantity> Create(int value)
+    {
+        if (value is < 1 or > 2000)
+        {
+            return Result.Error<ModbusReadCoilsQuantity>(ErrorType.InvalidParameter, "读线圈数量必须在 [1~2000] 之内");
+        }
+
+        return new ModbusReadCoilsQuantity((ushort)value);
     }
 }
 
@@ -37,6 +48,7 @@ public readonly record struct ModbusReadRegistersQuantity
 
     public static implicit operator ushort(ModbusReadRegistersQuantity quantity) => quantity._value;
 
+    [Obsolete("使用Result模式")]
     public static bool TryCreate(int value, out ModbusReadRegistersQuantity result)
     {
         if (value is < 1 or > 125)
@@ -47,6 +59,16 @@ public readonly record struct ModbusReadRegistersQuantity
 
         result = new ModbusReadRegistersQuantity((ushort)value);
         return true;
+    }
+
+    public static Result<ModbusReadRegistersQuantity> Create(int value)
+    {
+        if (value is < 1 or > 125)
+        {
+            return Result.Error<ModbusReadRegistersQuantity>(ErrorType.InvalidParameter, "读寄存器数量必须在 [1~2000] 之内");
+        }
+
+        return new ModbusReadRegistersQuantity((ushort)value);
     }
 }
 
@@ -62,6 +84,7 @@ public readonly record struct ModbusWriteCoilsQuantity
 
     public static implicit operator ushort(ModbusWriteCoilsQuantity quantity) => quantity._value;
 
+    [Obsolete("使用Result模式")]
     public static bool TryCreate(int value, out ModbusWriteCoilsQuantity result)
     {
         if (value is < 1 or > 1968)
@@ -72,6 +95,16 @@ public readonly record struct ModbusWriteCoilsQuantity
 
         result = new ModbusWriteCoilsQuantity((ushort)value);
         return true;
+    }
+
+    public static Result<ModbusWriteCoilsQuantity> Create(int value)
+    {
+        if (value is < 1 or > 1968)
+        {
+            return Result.Error<ModbusWriteCoilsQuantity>(ErrorType.InvalidParameter, "写线圈数量必须在 [1~1968] 之内");
+        }
+
+        return new ModbusWriteCoilsQuantity((ushort)value);
     }
 }
 
@@ -87,6 +120,7 @@ public readonly record struct ModbusWriteRegistersQuantity
 
     public static implicit operator ushort(ModbusWriteRegistersQuantity quantity) => quantity._value;
 
+    [Obsolete("使用Result模式")]
     public static bool TryCreate(int value, out ModbusWriteRegistersQuantity result)
     {
         if (value is < 1 or > 123)
@@ -97,5 +131,15 @@ public readonly record struct ModbusWriteRegistersQuantity
 
         result = new ModbusWriteRegistersQuantity((ushort)value);
         return true;
+    }
+
+    public static Result<ModbusWriteRegistersQuantity> Create(int value)
+    {
+        if (value is < 1 or > 1968)
+        {
+            return Result.Error<ModbusWriteRegistersQuantity>(ErrorType.InvalidParameter, "写寄存器数量必须在 [1~123] 之内");
+        }
+
+        return new ModbusWriteRegistersQuantity((ushort)value);
     }
 }
