@@ -1,4 +1,6 @@
-﻿namespace ThabeSoft.ProtocolGateway.Primitives;
+﻿using ThabeSoft.ProtocolGateway.Primitives;
+
+namespace ThabeSoft.ProtocolGateway.Modbus.Primitives;
 
 /// <summary>
 /// 写多个线圈数量

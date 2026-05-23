@@ -1,6 +1,8 @@
-﻿using ThabeSoft.ProtocolGateway.Modbus.Protocols;
+﻿using ThabeSoft.ProtocolGateway.Modbus.Primitives;
+using ThabeSoft.ProtocolGateway.Modbus.Protocols;
 using ThabeSoft.ProtocolGateway.Modbus.Protocols.Headers;
 using ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
+using ThabeSoft.ProtocolGateway.Primitives;
 
 namespace ThabeSoft.ProtocolGateway.Protocol;
 
@@ -13,13 +15,15 @@ public sealed class ModbusRtuProtocolTests
 
     [DataRow((byte)01, (ushort)100, (byte)1, DisplayName = "从站01, 寄存器(100~101]")]
     [DataRow((byte)03, (ushort)200, (byte)5, DisplayName = "从站03, 寄存器(200~205]")]
-    [DataRow((byte)05, (ushort)300, (byte)125, DisplayName = "从站05, 寄存器(300~425]")]
+    [DataRow((byte)05, (ushort)300, (byte)123, DisplayName = "从站05, 寄存器(300~425]")]
     [TestMethod(DisplayName = "写多个寄存器打包解包")]
     public async Task WriteMultipleRegisters_Pack_Unpack(byte slaveId, ushort address, byte quantity)
     {
         // 获取帧布局
-        var layout_result = RtuWriteMultipleRequestLayout.CreateCoils(quantity);
+        var layout_result = WriteCoilsQuantity.Create(quantity)
+            .Then(RtuWriteMultipleRequestLayout.CreateCoils);
         Assert.IsTrue(layout_result, layout_result.Message);
+
         Span<byte> pack_buffer = stackalloc byte[layout_result.Value.TotalLength];
 
         // 创建请求头
@@ -62,7 +66,8 @@ public sealed class ModbusRtuProtocolTests
     public async Task WriteMultipleCoils_Pack_Unpack(byte slaveId, ushort address, ushort quantity)
     {
         // 获取帧布局
-        var layout_result = RtuWriteMultipleRequestLayout.CreateCoils(quantity);
+        var layout_result = WriteCoilsQuantity.Create(quantity)
+            .Then(RtuWriteMultipleRequestLayout.CreateCoils);
         Assert.IsTrue(layout_result, layout_result.Message);
 
         Span<byte> pack_buffer = stackalloc byte[layout_result.Value.TotalLength];

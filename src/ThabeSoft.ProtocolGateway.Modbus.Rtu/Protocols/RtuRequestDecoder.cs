@@ -62,7 +62,11 @@ public static class RtuRequestDecoder
         if (!validate_result) return validate_result.PropagateError<RtuWriteSingleCoilRequestHeader>();
 
 
-        return new RtuWriteSingleCoilRequestHeader(slaveId, function_code, value_result, crc_result.Value);
+        return new RtuWriteSingleCoilRequestHeader(
+            slaveId: slaveId,
+            address: address_result.Value,
+            value: value_result,
+            crc: crc_result.Value);
     }
     public static Result<RtuWriteSingleRegisterRequestHeader> WriteSingleRegister(ReadOnlySpan<byte> source)
     {
@@ -97,7 +101,11 @@ public static class RtuRequestDecoder
         if (!validate_result) return validate_result.PropagateError<RtuWriteSingleRegisterRequestHeader>();
 
 
-        return new RtuWriteSingleRegisterRequestHeader(slaveId, function_code, value_result.Value, crc_result.Value);
+        return new RtuWriteSingleRegisterRequestHeader(
+            slaveId: slaveId,
+            address: address_result.Value,
+            value: value_result.Value,
+            crc: crc_result.Value);
     }
     public static Result<RtuWriteMultipleRequestHeader> WriteMultipleCoils(ReadOnlySpan<byte> source, Span<bool> destination)
     {
@@ -113,8 +121,6 @@ public static class RtuRequestDecoder
         // 缓冲区不足
         if (destination.Length < layout.DataQuantity)
             return Result.BufferInsufficient<RtuWriteMultipleRequestHeader>(layout.TotalLength, source.Length);
-
-        Span<bool> buffer = stackalloc bool[layout.DataQuantity];
 
         // 从站Id
         var slave_id = source[layout.SlaveIdIndex];
@@ -137,18 +143,23 @@ public static class RtuRequestDecoder
         if (!CrcCalculator.Validate(source[layout.PayloadRange], crc_result.Value))
             return Result.Error<RtuWriteMultipleRequestHeader>(ErrorType.InvalidData, "Crc校验失败");
         // 数据
+        Span<bool> buffer = stackalloc bool[layout.DataQuantity];
         var value_result = source[layout.DataRange].ToBits(buffer, Endianness.BigEndian);
         if (!value_result) return value_result.PropagateError<RtuWriteMultipleRequestHeader>();
 
         buffer.CopyTo(destination);
-        return new RtuWriteMultipleRequestHeader(slave_id, FunctionCode.WriteMultipleCoils, address_result.Value, crc_result.Value);
+        return new RtuWriteMultipleRequestHeader(
+            slaveId: slave_id,
+            functionCode: FunctionCode.WriteMultipleCoils,
+            address: address_result.Value,
+            crc: crc_result.Value);
     }
     public static Result<RtuWriteMultipleRequestHeader> WriteMultipleRegisters(ReadOnlySpan<byte> source, Span<ushort> destination)
     {
-        var length_result = WriteCoilsQuantity.Create(destination.Length);
+        var length_result = WriteRegistersQuantity.Create(destination.Length);
         if (!length_result) return length_result.PropagateError<RtuWriteMultipleRequestHeader>();
 
-        var layout = RtuWriteMultipleRequestLayout.CreateCoils(length_result.Value);
+        var layout = RtuWriteMultipleRequestLayout.CreateRegisters(length_result.Value);
 
         // 校验包长度
         if (source.Length < layout.TotalLength)
@@ -156,8 +167,6 @@ public static class RtuRequestDecoder
         // 缓冲区不足
         if (destination.Length < layout.DataQuantity)
             return Result.BufferInsufficient<RtuWriteMultipleRequestHeader>(layout.DataQuantity, destination.Length);
-
-        Span<ushort> buffer = stackalloc ushort[layout.DataQuantity];
 
         // 从站Id
         var slave_id = source[layout.SlaveIdIndex];
@@ -172,19 +181,24 @@ public static class RtuRequestDecoder
         // 数据长度
         var data_length = source[layout.DataLengthIndex];
         if (data_length != layout.DataByteLength)
-            return Result.Error<RtuWriteMultipleRequestHeader>(ErrorType.InvalidData, "数据长度不匹配");
+            return Result.InvalidData<RtuWriteMultipleRequestHeader>("数据长度不匹配");
         // Crc
         var crc_result = source[layout.CrcRange].ToWord(Endianness.LittleEndian);
         if (!crc_result) return crc_result.PropagateError<RtuWriteMultipleRequestHeader>();
         // 验证
         if (!CrcCalculator.Validate(source[layout.PayloadRange], crc_result.Value))
-            return Result.Error<RtuWriteMultipleRequestHeader>(ErrorType.InvalidData, "Crc校验失败");
+            return Result.InvalidData<RtuWriteMultipleRequestHeader>("Crc校验失败");
         // 数据
+        Span<ushort> buffer = stackalloc ushort[layout.DataQuantity];
         var value_result = source[layout.DataRange].ToWords(buffer, Endianness.BigEndian);
         if (!value_result) return value_result.PropagateError<RtuWriteMultipleRequestHeader>();
 
         buffer.CopyTo(destination);
-        return new RtuWriteMultipleRequestHeader(slave_id, FunctionCode.WriteMultipleRegisters, address_result.Value, crc_result.Value);
+        return new RtuWriteMultipleRequestHeader(
+            slaveId: slave_id,
+            functionCode: FunctionCode.WriteMultipleRegisters,
+            address: address_result.Value,
+            crc: crc_result.Value);
     }
 
 
@@ -195,7 +209,7 @@ public static class RtuRequestDecoder
             return Result.DataTooShort<RtuReadRequestHeader>(layout.TotalLength, source.Length);
 
         // 从站
-        var slaveId = source[layout.SlaveIdIndex];
+        var slave_id = source[layout.SlaveIdIndex];
         // 功能码
         var function_code_result = FunctionCode
             .FromCode(source[layout.FunctionCodeIndex])
@@ -222,6 +236,11 @@ public static class RtuRequestDecoder
         if (!validate_result) return validate_result.PropagateError<RtuReadRequestHeader>();
 
 
-        return new RtuReadRequestHeader(slaveId, function_code_result.Value, address_result.Value, quantity_result.Value, crc_result.Value);
+        return new RtuReadRequestHeader(
+           slaveId: slave_id,
+           functionCode: function_code_result.Value,
+           address: address_result.Value,
+           quantity: quantity_result.Value,
+           crc: crc_result.Value);
     }
 }

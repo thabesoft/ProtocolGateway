@@ -69,6 +69,17 @@ public static class ByteExtensions
     /// </summary>
     extension(byte source)
     {
+        public Result<bool> GetBit(int index, int maxBit = 8, Endianness endianness = Endianness.BigEndian)
+        {
+            if (index < 0 || maxBit > 8 || index >= maxBit)
+            {
+                return Result.InvalidParameter<bool>($"位索引必须在 0~{BitsPerByte - 1} 之间，实际 {index}");
+            }
+
+            int bit_index = endianness == Endianness.LittleEndian ? index : maxBit - 1 - index;
+            return (source & (1 << bit_index)) != 0;
+        }
+
         /// <summary>
         /// 将字节转为位组
         /// </summary>
@@ -80,19 +91,12 @@ public static class ByteExtensions
             int length = Math.Min(8, destination.Length);
             Span<bool> buffer = stackalloc bool[length];
 
-            for (int i = 0; i < destination.Length; i++)
+            for (int i = 0; i < length; i++)
             {
-                if (endianness == Endianness.BigEndian)
-                {
-                    // 大端序：destination[0] = bit7
-                    int bit_index = BitsPerByte - 1 - i;
-                    buffer[i] = (source & (1 << bit_index)) != 0;
-                }
-                else
-                {
-                    // 小端序：destination[0] = bit0
-                    buffer[i] = (source & (1 << i)) != 0;
-                }
+                var result = source.GetBit(i, length, endianness: endianness);
+                if (!result) return result.PropagateError<int>();
+
+                buffer[i] = result.Value;
             }
 
             buffer.CopyTo(destination);
@@ -184,6 +188,7 @@ public static class ByteExtensions
                 if (!result) return result;
             }
 
+            buffer.CopyTo(destination);
             return true;
         }
 

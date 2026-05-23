@@ -78,7 +78,7 @@ public static class ProtocolExtensions
         }
 
         /// <summary>
-        /// 泛型版本 - 缓冲区不足错误
+        /// 缓冲区不足错误
         /// </summary>
         public static Result<T> BufferInsufficient<T>(int required, int actual)
         {
@@ -98,7 +98,7 @@ public static class ProtocolExtensions
         }
 
         /// <summary>
-        /// 泛型版本 - 数据长度不足错误
+        /// 数据长度不足错误
         /// </summary>
         public static Result<T> DataTooShort<T>(int required, int actual)
         {

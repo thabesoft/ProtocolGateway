@@ -1,5 +1,4 @@
 ﻿using ThabeSoft.ProtocolGateway.Modbus.Primitives;
-using ThabeSoft.ProtocolGateway.Primitives;
 
 namespace ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
 
@@ -87,17 +86,6 @@ public readonly record struct RtuWriteMultipleRequestLayout : ICrcRangeable,
     }
 
     /// <summary>
-    /// 创建一个拥有指定数量寄存器的帧布局
-    /// </summary>
-    /// <param name="quantity">寄存器数量</param>
-    public static Result<RtuWriteMultipleRequestLayout> CreateRegisters(int quantity)
-    {
-        return WriteRegistersQuantity.Create(quantity)
-            .Then(CreateRegisters);
-    }
-
-
-    /// <summary>
     /// 创建一个拥有指定数量线圈的帧布局
     /// </summary>
     /// <param name="quantity">线圈数量</param>
@@ -126,13 +114,10 @@ public readonly record struct RtuWriteMultipleRequestLayout : ICrcRangeable,
             dataMaxQuantity: quantity);
     }
 
-    /// <summary>
-    /// 创建一个拥有指定数量线圈的帧布局
-    /// </summary>
-    /// <param name="quantity">线圈数量</param>
-    public static Result<RtuWriteMultipleRequestLayout> CreateCoils(int quantity)
+
+    public override string ToString()
     {
-        return WriteCoilsQuantity.Create(quantity)
-            .Then(CreateCoils);
+        // [10] Id(1) Func(2) Addr(2..4) Qua(4..6) Len(6) Data(7..10) Crc(10..12)
+        return $"总长度={TotalLength}, Id({SlaveIdIndex})Func({FunctionCodeIndex})Addr({AddressRange})Qua({QuantityRange})Len({DataLengthIndex})Data({DataRange})Crc({CrcRange})";
     }
 }

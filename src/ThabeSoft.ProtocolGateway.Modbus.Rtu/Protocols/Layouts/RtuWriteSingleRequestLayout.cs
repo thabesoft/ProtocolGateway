@@ -23,4 +23,11 @@ public readonly record struct RtuWriteSingleRequestLayout : IWriteSingleRequestL
     public readonly Range CrcRange => new(6, 8);
     /// <summary>总长度</summary>
     public readonly int TotalLength => 8;
+
+
+    public override string ToString()
+    {
+        // [10] Id(1) Func(2) Addr(2..4) Val(4..6) Len(6) Data(7..10) Crc(10..12)
+        return $"总长度={TotalLength},Id({SlaveIdIndex})Func({FunctionCodeIndex})Addr({AddressRange})Val({ValueRange})Crc({CrcRange})";
+    }
 }

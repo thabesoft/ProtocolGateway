@@ -1,4 +1,6 @@
-﻿namespace ThabeSoft.ProtocolGateway.Primitives;
+﻿using System.Diagnostics;
+
+namespace ThabeSoft.ProtocolGateway.Primitives;
 
 /// <summary>
 /// 结果
@@ -142,6 +144,10 @@ public readonly struct Result<TValue> : IResult<TValue>
     }
     public static Result<TValue> Error(ErrorType type, string? message = null)
     {
+#if DEBUG
+        Debug.Assert(type != ErrorType.None, message);
+#endif
+
         if (type == ErrorType.None || type == ErrorType.Unspecified)
         {
             return new(false, ErrorType.Unspecified, message, default!);
@@ -173,9 +179,9 @@ public readonly struct Result<TValue> : IResult<TValue>
     {
         if (!string.IsNullOrWhiteSpace(Message))
         {
-            return IsSuccess ? $"成功: {Message}, {Value}" : $"失败[{ErrorType}]: {Message}";
+            return IsSuccess ? $"{Message}={Value}" : $"失败[{ErrorType}]: {Message}";
         }
 
-        return IsSuccess ? $"成功: {Value}" : $"失败[{ErrorType}]";
+        return IsSuccess ? $"成功={Value}" : $"失败[{ErrorType}]";
     }
 }

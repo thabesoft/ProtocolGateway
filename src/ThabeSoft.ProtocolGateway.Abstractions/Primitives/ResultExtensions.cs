@@ -140,9 +140,10 @@ public static class ResultExtensions
         }
         public Result<U> Then<U>(Func<T, U> handler)
         {
-            if (!result.IsSuccess) result.PropagateError<U>();
+            if (!result.IsSuccess) return result.PropagateError<U>();
             return handler(result.Value);
         }
+
         public Result<U> Then<U>(Func<T, Result<U>> handler)
         {
             if (!result.IsSuccess) result.PropagateError<U>();
