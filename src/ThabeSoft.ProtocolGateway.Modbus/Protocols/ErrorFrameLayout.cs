@@ -4,6 +4,7 @@
 /// <summary>
 /// 错误帧布局
 /// </summary>
+[Obsolete]
 public readonly struct ErrorFrameLayout
 {
     public static readonly int SlaveIdIndex;

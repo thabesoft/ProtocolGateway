@@ -58,4 +58,10 @@ public readonly record struct ReadRequesHeader : IRequestHeader
 
         return new ReadRequesHeader(slaveId, FunctionCode.ReadInputRegisters, address, quantity_result.Value);
     }
+
+
+    public override string ToString()
+    {
+        return $"从站={SlaveId}, 功能码={FunctionCode}, 地址={Address}, 数量={Quantity}";
+    }
 }

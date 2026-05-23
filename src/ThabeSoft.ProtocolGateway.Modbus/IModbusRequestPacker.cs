@@ -4,6 +4,7 @@
 /// <summary>
 /// Modbus打包器
 /// </summary>
+[Obsolete]
 public interface IModbusRequestPacker
 {
     /// <summary>

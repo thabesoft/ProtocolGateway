@@ -6,18 +6,33 @@
 /// </summary>
 public static class ResultExtensions
 {
-    extension<T>(T) where T : IResult
+    extension(Result)
     {
-        [Obsolete]
-        public static Result Error(string? message = null)
+        public static Result InvalidParameter(string message)
         {
-            return Result.Error(ErrorType.Unspecified, message);
+            return Result.Error(ErrorType.InvalidParameter, message);
         }
-        [Obsolete]
-        public static Result<U> If<U>(bool co, Func<U> selector)
+        public static Result<T> InvalidParameter<T>(string message)
         {
-            if (co) return selector();
-            return Result.Error<U>(ErrorType.Unspecified, "比较失败");
+            return Result.Error<T>(ErrorType.InvalidParameter, message);
+        }
+
+        public static Result InvalidData(string message)
+        {
+            return Result.Error(ErrorType.InvalidData, message);
+        }
+        public static Result<T> InvalidData<T>(string message)
+        {
+            return Result.Error<T>(ErrorType.InvalidData, message);
+        }
+
+        public static Result InvalidOperation(string message)
+        {
+            return Result.Error(ErrorType.InvalidOperation, message);
+        }
+        public static Result<T> InvalidOperation<T>(string message)
+        {
+            return Result.Error<T>(ErrorType.InvalidOperation, message);
         }
     }
 

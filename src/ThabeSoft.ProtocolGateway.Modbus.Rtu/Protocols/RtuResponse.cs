@@ -1,14 +1,14 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using ThabeSoft.IndustrialHub.Modbus.Crc;
 using ThabeSoft.IndustrialHub.Modbus.Exceptions;
-using ThabeSoft.ProtocolGateway.Modbus.Crc;
 
-namespace ThabeSoft.ProtocolGateway.Protocols;
+namespace ThabeSoft.ProtocolGateway.Modbus.Protocols;
 
 
 /// <summary>
 /// Rtu 响应
 /// </summary>
+[Obsolete]
 public readonly struct RtuResponse
 {
     private readonly byte[] _bytes;
@@ -90,16 +90,5 @@ public readonly struct RtuResponse
     public static bool IsErrorFunctionCode(byte functionCode)
     {
         return (functionCode & 0x80) != 0;
-    }
-}
-
-public static class RtuResponseExtensions
-{
-    extension(byte[] bytes)
-    {
-        public RtuResponse AsRtuResponse()
-        {
-            return RtuResponse.Create(bytes);
-        }
     }
 }

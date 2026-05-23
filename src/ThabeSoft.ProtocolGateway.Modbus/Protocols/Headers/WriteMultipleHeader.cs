@@ -34,4 +34,9 @@ public readonly struct WriteMultipleHeader : IRequestHeader
     {
         return new WriteMultipleHeader(slaveId, FunctionCode.WriteMultipleRegisters, address);
     }
+
+    public override string ToString()
+    {
+        return $"从站={SlaveId}, 功能码={FunctionCode}, 地址={Address}";
+    }
 }

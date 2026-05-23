@@ -1,5 +1,4 @@
-﻿using ThabeSoft.ProtocolGateway.Modbus.Crc;
-using ThabeSoft.ProtocolGateway.Modbus.Primitives;
+﻿using ThabeSoft.ProtocolGateway.Modbus.Primitives;
 using ThabeSoft.ProtocolGateway.Modbus.Protocols.Headers;
 using ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
 using ThabeSoft.ProtocolGateway.Primitives;
@@ -34,12 +33,9 @@ public static class RtuRequestDecoder
     {
         var layout = RtuWriteSingleRequestLayout.Instance;
 
-
+        // 缓冲区不足
         if (source.Length < layout.TotalLength)
-        {
-            return Result<RtuWriteSingleCoilRequestHeader>.Error(ErrorType.InvalidData,
-                $"响应数据长度不足，需要 {layout.TotalLength} 字节，实际 {source.Length} 字节");
-        }
+            return Result.BufferInsufficient<RtuWriteSingleCoilRequestHeader>(layout.TotalLength, source.Length);
 
         // 从站
         var slaveId = source[layout.SlaveIdIndex];
@@ -53,7 +49,7 @@ public static class RtuRequestDecoder
         // 值
         var value_result = source[layout.ValueRange]
             .ToWord(Endianness.BigEndian)
-            .Then(LayoutExtensions.GetSingleCoilValue);
+            .Then(ProtocolExtensions.GetSingleCoilValue);
         if (!value_result) return value_result.PropagateError<RtuWriteSingleCoilRequestHeader>();
 
         // Crc
@@ -72,12 +68,9 @@ public static class RtuRequestDecoder
     {
         var layout = RtuWriteSingleRequestLayout.Instance;
 
-
+        // 缓冲区不足
         if (source.Length < layout.TotalLength)
-        {
-            return Result<RtuWriteSingleRegisterRequestHeader>.Error(ErrorType.InvalidData,
-                $"响应数据长度不足，需要 {layout.TotalLength} 字节，实际 {source.Length} 字节");
-        }
+            return Result.BufferInsufficient<RtuWriteSingleRegisterRequestHeader>(layout.TotalLength, source.Length);
 
         // 从站
         var slaveId = source[layout.SlaveIdIndex];
@@ -115,16 +108,11 @@ public static class RtuRequestDecoder
 
         // 校验包长度
         if (source.Length < layout.TotalLength)
-        {
-            return Result<RtuWriteMultipleRequestHeader>.Error(ErrorType.InvalidData,
-                $"响应数据长度不足，需要 {layout.TotalLength} 字节，实际 {source.Length} 字节");
-        }
+            return Result.BufferInsufficient<RtuWriteMultipleRequestHeader>(layout.TotalLength, source.Length);
 
-        if(destination.Length < layout.DataQuantity)
-        {
-            return Result<RtuWriteMultipleRequestHeader>.Error(ErrorType.InvalidData,
-                $"线圈缓冲区长度不足，需要 {layout.DataQuantity} 位，实际 {destination.Length} 位");
-        }
+        // 缓冲区不足
+        if (destination.Length < layout.DataQuantity)
+            return Result.BufferInsufficient<RtuWriteMultipleRequestHeader>(layout.TotalLength, source.Length);
 
         Span<bool> buffer = stackalloc bool[layout.DataQuantity];
 
@@ -140,7 +128,7 @@ public static class RtuRequestDecoder
         if (!quantity_result) return quantity_result.PropagateError<RtuWriteMultipleRequestHeader>();
         // 数据长度
         var data_length = source[layout.DataLengthIndex];
-        if (data_length != layout.DataByteLength) 
+        if (data_length != layout.DataByteLength)
             return Result.Error<RtuWriteMultipleRequestHeader>(ErrorType.InvalidData, "数据长度不匹配");
         // Crc
         var crc_result = source[layout.CrcRange].ToWord(Endianness.LittleEndian);
@@ -153,7 +141,7 @@ public static class RtuRequestDecoder
         if (!value_result) return value_result.PropagateError<RtuWriteMultipleRequestHeader>();
 
         buffer.CopyTo(destination);
-        return RtuWriteMultipleRequestHeader.Registers(slave_id, address_result.Value, crc_result.Value);
+        return new RtuWriteMultipleRequestHeader(slave_id, FunctionCode.WriteMultipleCoils, address_result.Value, crc_result.Value);
     }
     public static Result<RtuWriteMultipleRequestHeader> WriteMultipleRegisters(ReadOnlySpan<byte> source, Span<ushort> destination)
     {
@@ -164,16 +152,10 @@ public static class RtuRequestDecoder
 
         // 校验包长度
         if (source.Length < layout.TotalLength)
-        {
-            return Result<RtuWriteMultipleRequestHeader>.Error(ErrorType.InvalidData,
-                $"响应数据长度不足，需要 {layout.TotalLength} 字节，实际 {source.Length} 字节");
-        }
-
+            return Result.DataTooShort<RtuWriteMultipleRequestHeader>(layout.TotalLength, source.Length);
+        // 缓冲区不足
         if (destination.Length < layout.DataQuantity)
-        {
-            return Result<RtuWriteMultipleRequestHeader>.Error(ErrorType.InvalidData,
-                $"线圈缓冲区长度不足，需要 {layout.DataQuantity} 位，实际 {destination.Length} 位");
-        }
+            return Result.BufferInsufficient<RtuWriteMultipleRequestHeader>(layout.DataQuantity, destination.Length);
 
         Span<ushort> buffer = stackalloc ushort[layout.DataQuantity];
 
@@ -202,17 +184,15 @@ public static class RtuRequestDecoder
         if (!value_result) return value_result.PropagateError<RtuWriteMultipleRequestHeader>();
 
         buffer.CopyTo(destination);
-        return RtuWriteMultipleRequestHeader.Coils(slave_id, address_result.Value, crc_result.Value);
+        return new RtuWriteMultipleRequestHeader(slave_id, FunctionCode.WriteMultipleRegisters, address_result.Value, crc_result.Value);
     }
 
 
     private static Result<RtuReadRequestHeader> DecodeRead(ReadOnlySpan<byte> source, RtuReadRequestLayout layout, FunctionCode functionCode)
     {
+        // 数据不足
         if (source.Length < layout.TotalLength)
-        {
-            return Result<RtuReadRequestHeader>.Error(ErrorType.InvalidData,
-                $"响应数据长度不足，需要 {layout.TotalLength} 字节，实际 {source.Length} 字节");
-        }
+            return Result.DataTooShort<RtuReadRequestHeader>(layout.TotalLength, source.Length);
 
         // 从站
         var slaveId = source[layout.SlaveIdIndex];

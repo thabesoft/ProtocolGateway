@@ -7,7 +7,7 @@ namespace ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
 /// <summary>
 /// Modbus Rtu 写多值请求布局
 /// </summary>
-public readonly struct RtuWriteMultipleRequestLayout : ICrcRangeable,
+public readonly record struct RtuWriteMultipleRequestLayout : ICrcRangeable,
     IWriteMultipleRequestLayout
 {
     public static readonly RtuWriteMultipleRequestLayout Empty;
@@ -64,7 +64,7 @@ public readonly struct RtuWriteMultipleRequestLayout : ICrcRangeable,
     public static RtuWriteMultipleRequestLayout CreateRegisters(WriteRegistersQuantity quantity)
     {
         // Data
-        var data_byte_length = LayoutExtensions.GetRegistersToByteLength(quantity);
+        var data_byte_length = ProtocolExtensions.GetRegistersToByteLength(quantity);
         const int data_start = 7;
         int data_end = data_start + data_byte_length;
         var data_range = new Range(data_start, data_end);
@@ -104,7 +104,7 @@ public readonly struct RtuWriteMultipleRequestLayout : ICrcRangeable,
     public static RtuWriteMultipleRequestLayout CreateCoils(WriteCoilsQuantity quantity)
     {
         // Data
-        var data_byte_length = LayoutExtensions.GetColisToByteLength(quantity);
+        var data_byte_length = ProtocolExtensions.GetColisToByteLength(quantity);
         const int data_start = 7;
         int data_end = data_start + data_byte_length;
         var data_range = new Range(data_start, data_end);

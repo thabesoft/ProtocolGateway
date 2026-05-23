@@ -1,5 +1,4 @@
 ﻿using ThabeSoft.ProtocolGateway.Modbus.Primitives;
-using ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
 using ThabeSoft.ProtocolGateway.Primitives;
 
 namespace ThabeSoft.ProtocolGateway.Modbus.Protocols.Headers;
@@ -29,12 +28,18 @@ public readonly record struct WriteSingleHeader : IWriteSingleHeader
 
     public static Result<WriteSingleHeader> Coil(byte slaveId, ushort address, bool value)
     {
-        ushort word_value = LayoutExtensions.GetCoilWordValue(value);
+        ushort word_value = ProtocolExtensions.GetCoilWordValue(value);
         return new WriteSingleHeader(slaveId, FunctionCode.WriteSingleCoil, address, word_value);
     }
 
     public static Result<WriteSingleHeader> Register(byte slaveId, ushort address, ushort value)
     {
         return new WriteSingleHeader(slaveId, FunctionCode.WriteSingleRegister, address, value);
+    }
+
+
+    public override string ToString()
+    {
+        return $"从站={SlaveId}, 功能码={FunctionCode}, 地址={Address}, 值={Value}";
     }
 }

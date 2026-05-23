@@ -4,7 +4,7 @@
 /// <summary>
 /// Modbus Rtu 读请求布局
 /// </summary>
-public readonly struct RtuReadRequestLayout : IReadRequestLayout, ICrcRangeable
+public readonly record struct RtuReadRequestLayout : IReadRequestLayout, ICrcRangeable
 {
     public static RtuReadRequestLayout Instance => default;
 
@@ -20,7 +20,7 @@ public readonly struct RtuReadRequestLayout : IReadRequestLayout, ICrcRangeable
     /// <summary>负载范围(不含Crc之外的数据)</summary>
     public Range PayloadRange => new(0, 6);
     /// <summary>Crc范围</summary>
-    public Range CrcRange => new(0, 6);
+    public Range CrcRange => new(6, 8);
     /// <summary>总长度</summary>
     public int TotalLength => 8;
 }

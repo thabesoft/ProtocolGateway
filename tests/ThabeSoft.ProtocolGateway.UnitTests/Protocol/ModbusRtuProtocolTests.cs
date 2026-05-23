@@ -18,12 +18,13 @@ public sealed class ModbusRtuProtocolTests
     public async Task WriteMultipleRegisters_Pack_Unpack(byte slaveId, ushort address, byte quantity)
     {
         // 获取帧布局
-        var layout = RtuReadRequestLayout.Instance;
-        Span<byte> pack_buffer = stackalloc byte[layout.TotalLength];
+        var layout_result = RtuWriteMultipleRequestLayout.CreateCoils(quantity);
+        Assert.IsTrue(layout_result, layout_result.Message);
+        Span<byte> pack_buffer = stackalloc byte[layout_result.Value.TotalLength];
 
         // 创建请求头
         var header_result = WriteMultipleHeader.Registers(slaveId, address);
-        Assert.IsFalse(header_result, header_result.Message);
+        Assert.IsTrue(header_result, header_result.Message);
 
         // 创建请求数据
         Span<ushort> pack_value = stackalloc ushort[quantity];
@@ -31,12 +32,12 @@ public sealed class ModbusRtuProtocolTests
 
         // 编码
         var encode_result = RtuRequestEncoder.WriteMultipleRegisters(pack_buffer, header_result.Value, pack_value);
-        Assert.IsFalse(encode_result, encode_result.Message);
+        Assert.IsTrue(encode_result, encode_result.Message);
 
         // 解码
         Span<ushort> unpack_value = stackalloc ushort[quantity];
         var unpack_result = RtuRequestDecoder.WriteMultipleRegisters(pack_buffer, unpack_value);
-        Assert.IsFalse(unpack_result, unpack_result.Message);
+        Assert.IsTrue(unpack_result, unpack_result.Message);
 
 
         // Assert
@@ -61,12 +62,14 @@ public sealed class ModbusRtuProtocolTests
     public async Task WriteMultipleCoils_Pack_Unpack(byte slaveId, ushort address, ushort quantity)
     {
         // 获取帧布局
-        var layout = RtuReadRequestLayout.Instance;
-        Span<byte> pack_buffer = stackalloc byte[layout.TotalLength];
+        var layout_result = RtuWriteMultipleRequestLayout.CreateCoils(quantity);
+        Assert.IsTrue(layout_result, layout_result.Message);
+
+        Span<byte> pack_buffer = stackalloc byte[layout_result.Value.TotalLength];
 
         // 创建请求头
         var header_result = WriteMultipleHeader.Registers(slaveId, address);
-        Assert.IsFalse(header_result, header_result.Message);
+        Assert.IsTrue(header_result, header_result.Message);
 
         // 创建请求数据
         Span<bool> pack_value = stackalloc bool[quantity];
@@ -74,12 +77,12 @@ public sealed class ModbusRtuProtocolTests
 
         // 编码
         var encode_result = RtuRequestEncoder.WriteMultipleCoils(pack_buffer, header_result.Value, pack_value);
-        Assert.IsFalse(encode_result, encode_result.Message);
+        Assert.IsTrue(encode_result, encode_result.Message);
 
         // 解码
         Span<bool> unpack_value = stackalloc bool[quantity];
         var unpack_result = RtuRequestDecoder.WriteMultipleCoils(pack_buffer, unpack_value);
-        Assert.IsFalse(unpack_result, unpack_result.Message);
+        Assert.IsTrue(unpack_result, unpack_result.Message);
 
 
         // Assert
@@ -103,20 +106,20 @@ public sealed class ModbusRtuProtocolTests
     public async Task WriteSingleCoil_Pack_Unpack(byte slaveId, ushort address, bool value)
     {
         // 获取帧布局
-        var layout = RtuReadRequestLayout.Instance;
+        var layout = RtuWriteSingleRequestLayout.Instance;
         Span<byte> pack_buffer = stackalloc byte[layout.TotalLength];
 
         // 创建请求头
         var header_result = WriteSingleHeader.Coil(slaveId, address, true);
-        Assert.IsFalse(header_result, header_result.Message);
+        Assert.IsTrue(header_result, header_result.Message);
 
         // 编码
         var encode_result = RtuRequestEncoder.WriteSingle(pack_buffer, header_result.Value);
-        Assert.IsFalse(encode_result, encode_result.Message);
+        Assert.IsTrue(encode_result, encode_result.Message);
 
         // 解码
         var unpack_result = RtuRequestDecoder.WriteSingleCoil(pack_buffer);
-        Assert.IsFalse(unpack_result, unpack_result.Message);
+        Assert.IsTrue(unpack_result, unpack_result.Message);
 
 
         // Assert
@@ -138,20 +141,20 @@ public sealed class ModbusRtuProtocolTests
     public async Task WriteSingleRegister_Pack_Unpack(byte slaveId, ushort address, ushort value)
     {
         // 获取帧布局
-        var layout = RtuReadRequestLayout.Instance;
+        var layout = RtuWriteSingleRequestLayout.Instance;
         Span<byte> pack_buffer = stackalloc byte[layout.TotalLength];
 
         // 创建请求头
         var header_result = WriteSingleHeader.Register(slaveId, address, 0xF0);
-        Assert.IsFalse(header_result, header_result.Message);
+        Assert.IsTrue(header_result, header_result.Message);
 
         // 编码
         var encode_result = RtuRequestEncoder.WriteSingle(pack_buffer, header_result.Value);
-        Assert.IsFalse(encode_result, encode_result.Message);
+        Assert.IsTrue(encode_result, encode_result.Message);
 
         // 解码
         var unpack_result = RtuRequestDecoder.WriteSingleRegister(pack_buffer);
-        Assert.IsFalse(unpack_result, unpack_result.Message);
+        Assert.IsTrue(unpack_result, unpack_result.Message);
 
 
         // Assert
@@ -177,15 +180,15 @@ public sealed class ModbusRtuProtocolTests
 
         // 创建请求头
         var header_result = ReadRequesHeader.Coils(slaveId, address, 10);
-        Assert.IsFalse(header_result, header_result.Message);
+        Assert.IsTrue(header_result, header_result.Message);
 
         // 编码
         var encode_result = RtuRequestEncoder.Read(pack_buffer, header_result.Value);
-        Assert.IsFalse(encode_result, encode_result.Message);
+        Assert.IsTrue(encode_result, encode_result.Message);
 
         // 解码
         var unpack_result = RtuRequestDecoder.ReadCoils(pack_buffer);
-        Assert.IsFalse(unpack_result, unpack_result.Message);
+        Assert.IsTrue(unpack_result, unpack_result.Message);
 
 
         // Assert

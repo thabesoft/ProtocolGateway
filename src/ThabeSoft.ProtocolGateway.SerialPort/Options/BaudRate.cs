@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using ThabeSoft.ProtocolGateway.Primitives;
 
 namespace ThabeSoft.ProtocolGateway.Options;
 
@@ -6,26 +7,19 @@ namespace ThabeSoft.ProtocolGateway.Options;
 /// <summary>
 /// 波特率
 /// </summary>
-public readonly struct BaudRate : IEquatable<BaudRate>
+public readonly record struct BaudRate : IEquatable<BaudRate>
 {
+    private static readonly int[] CommonBaudRate =
+    [
+        300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 38400, 56000, 57600, 115200, 128000, 256000, 460800
+    ];
+
+
+
     public static BaudRate Empty;
 
     private readonly int _value;
     private BaudRate(int value) => _value = value;
-
-
-    public override bool Equals(object obj) => obj is BaudRate other && Equals(other);
-    public bool Equals(BaudRate other) => other._value.Equals(_value);
-    public override int GetHashCode() => _value.GetHashCode();
-    public override string ToString() => $"{_value}bps";
-
-
-    public static bool operator ==(BaudRate left, BaudRate right) => left.Equals(right);
-    public static bool operator !=(BaudRate left, BaudRate right) => !left.Equals(right);
-
-    public static explicit operator BaudRate(int value) => Create(value);
-    public static implicit operator int(BaudRate value) => value._value;
-
 
 
     public static BaudRate Rate300 { get; } = new BaudRate(300);
@@ -39,17 +33,12 @@ public readonly struct BaudRate : IEquatable<BaudRate>
     public static BaudRate Rate115200 { get; } = new BaudRate(115200);
 
 
-
-    private static readonly int[] CommonBaudRate =
-    [
-        300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 38400, 56000, 57600, 115200, 128000, 256000, 460800
-    ];
-    public static BaudRate Create(int baudRate)
+    /// <summary>
+    /// 创建
+    /// </summary>
+    public static Result<BaudRate> Create(int baudRate)
     {
-        if (baudRate <= 0)
-        {
-            throw new ArgumentException(nameof(baudRate), "波特率不可小于等于0");
-        }
+        if (baudRate <= 0) return Result.InvalidParameter<BaudRate>("波特率不可小于等于0");
 
         if (!CommonBaudRate.Contains(baudRate))
         {
@@ -58,17 +47,9 @@ public readonly struct BaudRate : IEquatable<BaudRate>
 
         return new BaudRate(baudRate);
     }
-    public static bool TryCreate(int baudRate, out BaudRate result)
-    {
-        result = default;
-        if (baudRate <= 0) return false;
 
-        if (!CommonBaudRate.Contains(baudRate))
-        {
-            Debug.WriteLine($"警告: 波特率 {baudRate} 不是标准值，请确认硬件支持");
-        }
 
-        result = new BaudRate(baudRate);
-        return true;
-    }
+    public static implicit operator int(BaudRate value) => value._value;
+
+    public override string ToString() => $"{_value}bps";
 }

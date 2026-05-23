@@ -1,5 +1,4 @@
-﻿using ThabeSoft.ProtocolGateway.Modbus.Crc;
-using ThabeSoft.ProtocolGateway.Modbus.Primitives;
+﻿using ThabeSoft.ProtocolGateway.Modbus.Primitives;
 using ThabeSoft.ProtocolGateway.Modbus.Protocols.Headers;
 using ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
 using ThabeSoft.ProtocolGateway.Primitives;
@@ -14,16 +13,15 @@ public static class RtuRequestEncoder
 {
     public static Result<int> Read(Span<byte> destination, in ReadRequesHeader header)
     {
+        // 缺少请求头
         if (header == ReadRequesHeader.Empty)
-            return Result.Error<int>(ErrorType.InvalidParameter, "请求头不可为空");
+            return Result.MissingRequestHeader<int>();
 
         var layout = RtuReadRequestLayout.Instance;
 
+        // 缓冲区不足
         if (destination.Length < layout.TotalLength)
-        {
-            return Result.Error<int>(ErrorType.InvalidOperation,
-                $"缓冲区不足，需要 {layout.TotalLength} 字节，实际 {destination.Length} 字节");
-        }
+            return ProtocolExtensions.BufferInsufficient<int>(layout.TotalLength, destination.Length);
 
         Span<byte> buffer = stackalloc byte[layout.TotalLength];
 
@@ -48,14 +46,11 @@ public static class RtuRequestEncoder
     public static Result<int> WriteSingle(Span<byte> destination, in WriteSingleHeader header)
     {
         if (header == WriteSingleHeader.Empty)
-            return Result.Error<int>(ErrorType.InvalidParameter, "请求头不可为空");
+            return Result.MissingRequestHeader<int>();
 
         var layout = RtuWriteSingleRequestLayout.Instance;
         if (destination.Length < layout.TotalLength)
-        {
-            return Result.Error<int>(ErrorType.InvalidOperation,
-                $"缓冲区不足，需要 {layout.TotalLength} 字节，实际 {destination.Length} 字节");
-        }
+            return Result.BufferInsufficient<int>(layout.TotalLength, destination.Length);
 
         Span<byte> buffer = stackalloc byte[layout.TotalLength];
 
@@ -88,9 +83,12 @@ public static class RtuRequestEncoder
         var layout = RtuWriteMultipleRequestLayout.CreateCoils(value_length_result.Value);
 
         // 缓冲区长度不足
-        if (destination.Length < layout.TotalLength) return false;
+        if (destination.Length < layout.TotalLength)
+            return Result.BufferInsufficient(layout.TotalLength, destination.Length);
+
         // 参数数量超过预期
-        if (quantity > layout.DataQuantity) return false;
+        if (quantity > layout.DataQuantity)
+            return Result.InvalidParameter($"读取数量 {quantity} 超过协议允许的最大值 {layout.DataQuantity}");
 
 
         // 数据帧暂存
@@ -114,7 +112,7 @@ public static class RtuRequestEncoder
         // Crc
         var crc = CrcCalculator.Calculate(buffer[layout.PayloadRange]);
         var crc_result = crc.ToBytes(buffer[layout.CrcRange], Endianness.LittleEndian);
-        if (crc_result) return crc_result;
+        if (!crc_result) return crc_result;
 
         // 返回数据
         buffer.CopyTo(destination);
@@ -131,9 +129,11 @@ public static class RtuRequestEncoder
         var layout = RtuWriteMultipleRequestLayout.CreateRegisters(value_length_result.Value);
 
         // 缓冲区长度不足
-        if (destination.Length < layout.TotalLength) return false;
+        if (destination.Length < layout.TotalLength)
+            return Result.BufferInsufficient(layout.TotalLength, destination.Length);
         // 参数数量超过预期
-        if (quantity > layout.DataQuantity) return false;
+        if (quantity > layout.DataQuantity)
+            return Result.InvalidParameter($"读取数量 {quantity} 超过协议允许的最大值 {layout.DataQuantity}");
 
 
         // 数据帧暂存
