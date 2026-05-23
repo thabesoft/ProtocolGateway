@@ -1,4 +1,4 @@
-﻿namespace ThabeSoft.ProtocolGateway.Modbus.Protocols;
+﻿namespace ThabeSoft.ProtocolGateway.Modbus.Protocols.Headers;
 
 
 /// <summary>

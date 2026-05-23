@@ -1,4 +1,5 @@
-﻿using ThabeSoft.ProtocolGateway.Primitives;
+﻿using ThabeSoft.ProtocolGateway.Builders;
+using ThabeSoft.ProtocolGateway.Primitives;
 using ThabeSoft.ProtocolGateway.Tags;
 
 namespace ThabeSoft.ProtocolGateway;
@@ -50,7 +51,7 @@ internal static class Test
             if(modbusAddress.Type == ModbusAddressType.Coils)
             {
                 Span<byte> value = stackalloc byte[1];
-                return tag.ValueConvert(value);
+                return tag.Converter.Convert(value);
             }
 
             return Result.Error<TValue>(ErrorType.InvalidParameter, "无法识别的Modbus地址类型");
@@ -59,7 +60,7 @@ internal static class Test
         public async ValueTask<Result> WriteAsync<TValue>(ITag<TValue> tagInfo, TValue value, CancellationToken cancellationToken = default) where TValue : unmanaged
         {
             Span<byte> data = stackalloc byte[4];
-            return tagInfo.ValueConvert(value, data);
+            return tagInfo.Converter.Convert(value, data);
         }
     }
 

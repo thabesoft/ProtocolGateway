@@ -64,7 +64,7 @@ public readonly struct RtuWriteMultipleRequestLayout : ICrcRangeable,
     public static RtuWriteMultipleRequestLayout CreateRegisters(WriteRegistersQuantity quantity)
     {
         // Data
-        var data_byte_length = ModbusFrameLayout.GetRegistersToByteLength(quantity);
+        var data_byte_length = LayoutExtensions.GetRegistersToByteLength(quantity);
         const int data_start = 7;
         int data_end = data_start + data_byte_length;
         var data_range = new Range(data_start, data_end);
@@ -104,7 +104,7 @@ public readonly struct RtuWriteMultipleRequestLayout : ICrcRangeable,
     public static RtuWriteMultipleRequestLayout CreateCoils(WriteCoilsQuantity quantity)
     {
         // Data
-        var data_byte_length = ModbusFrameLayout.GetColisToByteLength(quantity);
+        var data_byte_length = LayoutExtensions.GetColisToByteLength(quantity);
         const int data_start = 7;
         int data_end = data_start + data_byte_length;
         var data_range = new Range(data_start, data_end);

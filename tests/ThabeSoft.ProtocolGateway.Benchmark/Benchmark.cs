@@ -57,11 +57,11 @@ public class Benchmark
     [Benchmark]
     public async Task PipeAsync()
     {
-        var result = await ResultPipeExtensions.AsyncPipe(await GetIntResultAsync())
-            .Then(GetStringResultAsync)
-            .Then(GetHashCodeResultAsync)
-            .Then(GetHashCodeStringResultAsync)
-            .ExecuteAsync();
+        //var result = await ResultPipeExtensions.AsyncPipe(await GetIntResultAsync())
+        //    .Then(x => GetStringResultAsync(x))
+        //    .Then(GetHashCodeResultAsync)
+        //    .Then(GetHashCodeStringResultAsync)
+        //    .ExecuteAsync();
     }
 
 

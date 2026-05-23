@@ -1,5 +1,4 @@
 ﻿using ThabeSoft.ProtocolGateway.Primitives;
-using ThabeSoft.ProtocolGateway.Protocols.Serializer;
 using ThabeSoft.ProtocolGateway.Transports;
 
 namespace ThabeSoft.ProtocolGateway.Modbus;
@@ -12,7 +11,7 @@ public  sealed class ModbusRtuMaster(ITransport transport) : IModbusMaster
 {
     public ValueTask<Result<int>> ReadColisAsync(Memory<bool> destination, byte slaveId, ushort address, ushort quantity, CancellationToken cancellationToken = default)
     {
-        ModbusRtuReadRequestSerializer.Instance.
+        throw new NotImplementedException();
     }
 
     public ValueTask<Result<int>> ReadDiscreteInputsAsync(Memory<bool> destination, byte slaveId, ushort address, ushort quantity, CancellationToken cancellationToken = default)

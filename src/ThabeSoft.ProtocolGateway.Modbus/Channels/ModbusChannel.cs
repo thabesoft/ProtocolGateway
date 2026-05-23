@@ -27,7 +27,7 @@ public sealed class ModbusChannel(IModbusMaster master) : IReader, IWriter
         if (address.FunctionCode == FunctionCode.ReadHoldingRegisters)
         {
             
-            await master.ReadInputRegistersAsync(buffer, address.SlaveId, address.Start, 1, cancellationToken);
+            //await master.ReadInputRegistersAsync(buffer, address.SlaveId, address.Start, 1, cancellationToken);
             Span<byte> c = stackalloc byte[1];
             return tag.Converter.Convert(c);
         }

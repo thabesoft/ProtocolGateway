@@ -1,4 +1,6 @@
-﻿namespace ThabeSoft.ProtocolGateway.Primitives;
+﻿using ThabeSoft.ProtocolGateway.Primitives;
+
+namespace ThabeSoft.ProtocolGateway.Builders;
 
 
 /// <summary>
@@ -10,4 +12,9 @@ public interface IValueConverter<TValue> where TValue : unmanaged
     /// 从字节转为具体类型
     /// </summary>
     Result<TValue> Convert(ReadOnlySpan<byte> source);
+
+    /// <summary>
+    /// 从具体类型转为字节组
+    /// </summary>
+    Result Convert(TValue source, Span<byte> destination);
 }

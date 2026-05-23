@@ -1,0 +1,40 @@
+﻿using ThabeSoft.ProtocolGateway.Modbus.Primitives;
+using ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
+using ThabeSoft.ProtocolGateway.Primitives;
+
+namespace ThabeSoft.ProtocolGateway.Modbus.Protocols.Headers;
+
+/// <summary>
+/// 写单个值请求头
+/// </summary>
+public readonly record struct WriteSingleHeader : IWriteSingleHeader
+{
+    public static readonly WriteSingleHeader Empty = default;
+
+    public readonly byte SlaveId { get; }
+    public readonly FunctionCode FunctionCode { get; }
+    public readonly ushort Address { get; }
+    public readonly ushort Value { get; }
+
+
+    [Obsolete("禁止调用构造, 请使用工厂方法")]
+    public WriteSingleHeader() { }
+    private WriteSingleHeader(byte slaveId, FunctionCode functionCode, ushort address, ushort value)
+    {
+        SlaveId = slaveId;
+        FunctionCode = functionCode;
+        Address = address;
+        Value = value;
+    }
+
+    public static Result<WriteSingleHeader> Coil(byte slaveId, ushort address, bool value)
+    {
+        ushort word_value = LayoutExtensions.GetCoilWordValue(value);
+        return new WriteSingleHeader(slaveId, FunctionCode.WriteSingleCoil, address, word_value);
+    }
+
+    public static Result<WriteSingleHeader> Register(byte slaveId, ushort address, ushort value)
+    {
+        return new WriteSingleHeader(slaveId, FunctionCode.WriteSingleRegister, address, value);
+    }
+}

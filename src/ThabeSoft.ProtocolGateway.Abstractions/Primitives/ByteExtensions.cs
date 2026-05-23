@@ -1,6 +1,5 @@
-﻿using System.Diagnostics;
+﻿namespace ThabeSoft.ProtocolGateway.Primitives;
 
-namespace ThabeSoft.ProtocolGateway.Primitives;
 
 /// <summary>
 /// 字节扩展

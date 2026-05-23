@@ -1,4 +1,6 @@
-﻿namespace ThabeSoft.ProtocolGateway.Primitives;
+﻿using ThabeSoft.ProtocolGateway.Primitives;
+
+namespace ThabeSoft.ProtocolGateway.Builders;
 
 /// <summary>
 /// 16 位数据转换
@@ -20,9 +22,18 @@ public class WordConverter(ByteSwap byteSwap, Endianness endianness = Endianness
         source.Swap(destination, byteSwap);
         return destination.ToWord(endianness);
     }
+    private Result Convert(ushort value, Span<byte> destination)
+    {
+        //TODO: 反向写入如何决定字节序
+        return value.ToBytes(destination, endianness);
+    }
 
 
     Result<ushort> IValueConverter<ushort>.Convert(ReadOnlySpan<byte> source) => Convert(source);
     Result<short> IValueConverter<short>.Convert(ReadOnlySpan<byte> source) => Convert(source).Map(x => (short)x);
     Result<char> IValueConverter<char>.Convert(ReadOnlySpan<byte> source) => Convert(source).Map(x => (char)x);
+
+    Result IValueConverter<ushort>.Convert(ushort source, Span<byte> destination) => Convert(source, destination);
+    Result IValueConverter<short>.Convert(short source, Span<byte> destination) => Convert((ushort)source, destination);
+    Result IValueConverter<char>.Convert(char source, Span<byte> destination) => Convert(source, destination);
 }

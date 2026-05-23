@@ -1,6 +1,6 @@
-﻿using ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
-using ThabeSoft.ProtocolGateway.Protocols;
-using ThabeSoft.ProtocolGateway.Protocols.Serializer;
+﻿using ThabeSoft.ProtocolGateway.Modbus.Protocols;
+using ThabeSoft.ProtocolGateway.Modbus.Protocols.Headers;
+using ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
 
 namespace ThabeSoft.ProtocolGateway.Protocol;
 
@@ -17,37 +17,40 @@ public sealed class ModbusRtuProtocolTests
     [TestMethod(DisplayName = "写多个寄存器打包解包")]
     public async Task WriteMultipleRegisters_Pack_Unpack(byte slaveId, ushort address, byte quantity)
     {
-        IModbusWriteMultipleRegistersRequestSerializer serializer = ModbusRtuRequest.WriteMultipleRegistersSerializer;
+        // 获取帧布局
+        var layout = RtuReadRequestLayout.Instance;
+        Span<byte> pack_buffer = stackalloc byte[layout.TotalLength];
 
+        // 创建请求头
+        var header_result = WriteMultipleHeader.Registers(slaveId, address);
+        Assert.IsFalse(header_result, header_result.Message);
 
-        RtuWriteMultipleRequestLayout.TryCreayeRegisters(quantity, out var layout);
+        // 创建请求数据
+        Span<ushort> pack_value = stackalloc ushort[quantity];
+        RandomFill(pack_value, ushort.MinValue, ushort.MaxValue);
 
-        ModbusRtuWriteMultipleRequestSerializer.TryPackRegisters(layout, null, slaveId, address, []);
+        // 编码
+        var encode_result = RtuRequestEncoder.WriteMultipleRegisters(pack_buffer, header_result.Value, pack_value);
+        Assert.IsFalse(encode_result, encode_result.Message);
 
+        // 解码
+        Span<ushort> unpack_value = stackalloc ushort[quantity];
+        var unpack_result = RtuRequestDecoder.WriteMultipleRegisters(pack_buffer, unpack_value);
+        Assert.IsFalse(unpack_result, unpack_result.Message);
 
-
-        Span<byte> buffer_span = stackalloc byte[1024];
-        Span<ushort> value_span = stackalloc ushort[quantity];
-        RandomFill(value_span, ushort.MinValue, ushort.MaxValue);
-
-        // Pack
-        serializer.TryPack(buffer_span, slaveId, address, value_span);
-
-        // Unpack
-        Span<ushort> unpack_value_span = stackalloc ushort[quantity];
-        serializer.TryUnpack(buffer_span, out var unpack_slave_id, out var unpack_address, unpack_value_span);
 
         // Assert
-        var values = value_span.ToArray();
-        var unpack_values = unpack_value_span.ToArray();
+        var pack_values = pack_value.ToArray();
+        var unpack_header = unpack_result.Value;
+        var unpack_values = unpack_value.ToArray();
 
-        Assert.AreEqual(slaveId, unpack_slave_id);
-        Assert.AreEqual(address, unpack_address);
-        CollectionAssert.AreEqual(values, unpack_values);
+        Assert.AreEqual(slaveId, unpack_header.SlaveId);
+        Assert.AreEqual(address, unpack_header.Address);
+        CollectionAssert.AreEqual(pack_values, unpack_values);
 
-        Console.WriteLine($"写入{quantity}个寄存器: {ToString(buffer_span.ToArray())}");
-        Console.WriteLine($"从站Id: {unpack_slave_id}");
-        Console.WriteLine($"起始地址: {unpack_address}");
+        Console.WriteLine($"写入{quantity}个寄存器: {ToString(pack_values)}");
+        Console.WriteLine($"从站Id: {unpack_header.SlaveId}");
+        Console.WriteLine($"起始地址: {unpack_header.Address}");
         Console.WriteLine($"数据: {ToString(unpack_values)}");
     }
 
@@ -57,30 +60,40 @@ public sealed class ModbusRtuProtocolTests
     [TestMethod(DisplayName = "写多个线圈打包解包")]
     public async Task WriteMultipleCoils_Pack_Unpack(byte slaveId, ushort address, ushort quantity)
     {
-        IModbusWriteMultipleCoilsRequestSerializer serializer = ModbusRtuRequest.WriteMultipleCoilsSerializer;
+        // 获取帧布局
+        var layout = RtuReadRequestLayout.Instance;
+        Span<byte> pack_buffer = stackalloc byte[layout.TotalLength];
 
-        Span<byte> source_span = stackalloc byte[1024];
-        Span<bool> value_span = stackalloc bool[quantity];
-        RandomFill(value_span);
+        // 创建请求头
+        var header_result = WriteMultipleHeader.Registers(slaveId, address);
+        Assert.IsFalse(header_result, header_result.Message);
 
-        // Pack
-        serializer.TryPack(source_span, slaveId, address, value_span);
+        // 创建请求数据
+        Span<bool> pack_value = stackalloc bool[quantity];
+        RandomFill(pack_value);
 
-        // Unpack
-        Span<bool> unpack_value_span = stackalloc bool[quantity];
-        serializer.TryUnpack(source_span, out var unpack_slave_id, out var unpack_address, unpack_value_span);
+        // 编码
+        var encode_result = RtuRequestEncoder.WriteMultipleCoils(pack_buffer, header_result.Value, pack_value);
+        Assert.IsFalse(encode_result, encode_result.Message);
+
+        // 解码
+        Span<bool> unpack_value = stackalloc bool[quantity];
+        var unpack_result = RtuRequestDecoder.WriteMultipleCoils(pack_buffer, unpack_value);
+        Assert.IsFalse(unpack_result, unpack_result.Message);
+
 
         // Assert
-        var values = value_span.ToArray();
-        var unpack_values = unpack_value_span.ToArray();
+        var pack_values = pack_value.ToArray();
+        var unpack_header = unpack_result.Value;
+        var unpack_values = unpack_value.ToArray();
 
-        Assert.AreEqual(slaveId, unpack_slave_id);
-        Assert.AreEqual(address, unpack_address);
-        CollectionAssert.AreEqual(values, unpack_values);
+        Assert.AreEqual(slaveId, unpack_header.SlaveId);
+        Assert.AreEqual(address, unpack_header.Address);
+        CollectionAssert.AreEqual(pack_values, unpack_values);
 
-        Console.WriteLine($"写入{quantity}个线圈: {ToString(value_span.ToArray())}");
-        Console.WriteLine($"从站Id: {unpack_slave_id}");
-        Console.WriteLine($"起始地址: {unpack_address}");
+        Console.WriteLine($"写入{quantity}个线圈: {ToString(pack_values)}");
+        Console.WriteLine($"从站Id: {unpack_header.SlaveId}");
+        Console.WriteLine($"起始地址: {unpack_header.Address}");
         Console.WriteLine($"数据: {ToString(unpack_values)}");
     }
 
@@ -89,24 +102,33 @@ public sealed class ModbusRtuProtocolTests
     [TestMethod(DisplayName = "写单个线圈打包解包")]
     public async Task WriteSingleCoil_Pack_Unpack(byte slaveId, ushort address, bool value)
     {
-        IModbusWriteSingleCoilRequestSerializer serializer = ModbusRtuRequest.WriteSingleCoilSerializer;
+        // 获取帧布局
+        var layout = RtuReadRequestLayout.Instance;
+        Span<byte> pack_buffer = stackalloc byte[layout.TotalLength];
 
-        Span<byte> source_span = stackalloc byte[1024];
+        // 创建请求头
+        var header_result = WriteSingleHeader.Coil(slaveId, address, true);
+        Assert.IsFalse(header_result, header_result.Message);
 
-        // Pack
-        serializer.TryPack(source_span, slaveId, address, value);
-        // Unpack
-        serializer.TryUnpack(source_span, out var unpack_slave_id, out var unpack_address, out var unpack_value);
+        // 编码
+        var encode_result = RtuRequestEncoder.WriteSingle(pack_buffer, header_result.Value);
+        Assert.IsFalse(encode_result, encode_result.Message);
+
+        // 解码
+        var unpack_result = RtuRequestDecoder.WriteSingleCoil(pack_buffer);
+        Assert.IsFalse(unpack_result, unpack_result.Message);
+
 
         // Assert
-        Assert.AreEqual(slaveId, unpack_slave_id);
-        Assert.AreEqual(address, unpack_address);
-        Assert.AreEqual(value, unpack_value);
+        var unpack_header = unpack_result.Value;
 
-        Console.WriteLine($"写入线圈: {ToString(source_span.ToArray())}");
-        Console.WriteLine($"从站Id: {unpack_slave_id}");
-        Console.WriteLine($"起始地址: {unpack_address}");
-        Console.WriteLine($"值: {value}");
+        Assert.AreEqual(slaveId, unpack_header.SlaveId);
+        Assert.AreEqual(address, unpack_header.Address);
+
+        Console.WriteLine($"写入线圈: {unpack_header.Value}");
+        Console.WriteLine($"从站Id: {unpack_header.SlaveId}");
+        Console.WriteLine($"起始地址: {unpack_header.Address}");
+        Console.WriteLine($"数据: {unpack_header.Value}");
     }
 
     [DataRow((byte)01, (ushort)100, (ushort)0xFF, DisplayName = "从站01, 线圈100, 值0xFF")]
@@ -115,24 +137,33 @@ public sealed class ModbusRtuProtocolTests
     [TestMethod(DisplayName = "写单个寄存器打包解包")]
     public async Task WriteSingleRegister_Pack_Unpack(byte slaveId, ushort address, ushort value)
     {
-        IModbusWriteSingleRegisterRequestSerializer serializer = ModbusRtuRequest.WriteSingleRegisterSerializer;
+        // 获取帧布局
+        var layout = RtuReadRequestLayout.Instance;
+        Span<byte> pack_buffer = stackalloc byte[layout.TotalLength];
 
-        Span<byte> source_span = stackalloc byte[1024];
+        // 创建请求头
+        var header_result = WriteSingleHeader.Register(slaveId, address, 0xF0);
+        Assert.IsFalse(header_result, header_result.Message);
 
-        // Pack
-        serializer.TryPack(source_span, slaveId, address, value);
-        // Unpack
-        serializer.TryUnpack(source_span, out var unpack_slave_id, out var unpack_address, out var unpack_value);
+        // 编码
+        var encode_result = RtuRequestEncoder.WriteSingle(pack_buffer, header_result.Value);
+        Assert.IsFalse(encode_result, encode_result.Message);
+
+        // 解码
+        var unpack_result = RtuRequestDecoder.WriteSingleRegister(pack_buffer);
+        Assert.IsFalse(unpack_result, unpack_result.Message);
+
 
         // Assert
-        Assert.AreEqual(slaveId, unpack_slave_id);
-        Assert.AreEqual(address, unpack_address);
-        Assert.AreEqual(value, unpack_value);
+        var unpack_header = unpack_result.Value;
 
-        Console.WriteLine($"写入线圈: {ToString(source_span.ToArray())}");
-        Console.WriteLine($"从站Id: {unpack_slave_id}");
-        Console.WriteLine($"起始地址: {unpack_address}");
-        Console.WriteLine($"值: {value}");
+        Assert.AreEqual(slaveId, unpack_header.SlaveId);
+        Assert.AreEqual(address, unpack_header.Address);
+
+        Console.WriteLine($"写入寄存器: {unpack_header.Value}");
+        Console.WriteLine($"从站Id: {unpack_header.SlaveId}");
+        Console.WriteLine($"起始地址: {unpack_header.Address}");
+        Console.WriteLine($"数据: {unpack_header.Value}");
     }
 
     [DataRow((byte)01, (ushort)100, (ushort)3, DisplayName = "从站01, 线圈100, 数量3")]
@@ -140,24 +171,33 @@ public sealed class ModbusRtuProtocolTests
     [TestMethod(DisplayName = "读取线圈打包解包")]
     public async Task ReadCoils_Pack_Unpack(byte slaveId, ushort address, ushort quantity)
     {
-        IModbusWriteSingleRegisterRequestSerializer serializer = ModbusRtuRequest.WriteSingleRegisterSerializer;
+        // 获取帧布局
+        var layout = RtuReadRequestLayout.Instance;
+        Span<byte> pack_buffer = stackalloc byte[layout.TotalLength];
 
-        Span<byte> source_span = stackalloc byte[1024];
+        // 创建请求头
+        var header_result = ReadRequesHeader.Coils(slaveId, address, 10);
+        Assert.IsFalse(header_result, header_result.Message);
 
-        // Pack
-        serializer.TryPack(source_span, slaveId, address, quantity);
-        // Unpack
-        serializer.TryUnpack(source_span, out var unpack_slave_id, out var unpack_address, out var unpack_quantity);
+        // 编码
+        var encode_result = RtuRequestEncoder.Read(pack_buffer, header_result.Value);
+        Assert.IsFalse(encode_result, encode_result.Message);
+
+        // 解码
+        var unpack_result = RtuRequestDecoder.ReadCoils(pack_buffer);
+        Assert.IsFalse(unpack_result, unpack_result.Message);
+
 
         // Assert
-        Assert.AreEqual(slaveId, unpack_slave_id);
-        Assert.AreEqual(address, unpack_address);
-        Assert.AreEqual(quantity, unpack_quantity);
+        var unpack_header = unpack_result.Value;
 
-        Console.WriteLine($"写入线圈: {ToString(source_span.ToArray())}");
-        Console.WriteLine($"从站Id: {unpack_slave_id}");
-        Console.WriteLine($"起始地址: {unpack_address}");
-        Console.WriteLine($"数量: {quantity}");
+        Assert.AreEqual(slaveId, unpack_header.SlaveId);
+        Assert.AreEqual(address, unpack_header.Address);
+
+        Console.WriteLine($"从站Id: {unpack_header.SlaveId}");
+        Console.WriteLine($"功能码: {unpack_header.FunctionCode}");
+        Console.WriteLine($"起始地址: {unpack_header.Address}");
+        Console.WriteLine($"读取数量: {unpack_header.Quantity}");
     }
 
 

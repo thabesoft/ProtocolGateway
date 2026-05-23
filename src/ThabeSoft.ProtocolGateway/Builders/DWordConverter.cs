@@ -1,4 +1,6 @@
-﻿namespace ThabeSoft.ProtocolGateway.Primitives;
+﻿using ThabeSoft.ProtocolGateway.Primitives;
+
+namespace ThabeSoft.ProtocolGateway.Builders;
 
 /// <summary>
 /// 32 位数据转换
@@ -20,9 +22,20 @@ public readonly struct DWordConverter(ByteSwap byteSwap, Endianness endianness =
         source.Swap(destination, byteSwap);
         return destination.ToDWord(endianness);
     }
+    private Result Convert(uint value, Span<byte> destination)
+    {
+        //TODO: 反向写入如何决定字节序
+        return value.ToBytes(destination, endianness);
+    }
+
 
 
     Result<uint> IValueConverter<uint>.Convert(ReadOnlySpan<byte> source) => Convert(source);
     Result<int> IValueConverter<int>.Convert(ReadOnlySpan<byte> source) => Convert(source).Map(x => (int)x);
     Result<float> IValueConverter<float>.Convert(ReadOnlySpan<byte> source) => Convert(source).Map(x => (float)x);
+
+
+    Result IValueConverter<uint>.Convert(uint source, Span<byte> destination) => Convert(source, destination);
+    Result IValueConverter<int>.Convert(int source, Span<byte> destination) => Convert((ushort)source, destination);
+    Result IValueConverter<float>.Convert(float source, Span<byte> destination) => Convert((ushort)source, destination);
 }
