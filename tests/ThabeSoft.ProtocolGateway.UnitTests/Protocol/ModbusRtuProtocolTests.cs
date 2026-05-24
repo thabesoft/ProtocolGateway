@@ -1,4 +1,5 @@
-﻿using ThabeSoft.ProtocolGateway.Modbus.Primitives;
+﻿using ThabeSoft.Primitives;
+using ThabeSoft.ProtocolGateway.Modbus.Primitives;
 using ThabeSoft.ProtocolGateway.Modbus.Protocols;
 using ThabeSoft.ProtocolGateway.Modbus.Protocols.Headers;
 using ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
@@ -21,7 +22,7 @@ public sealed class ModbusRtuProtocolTests
     {
         // 获取帧布局
         var layout_result = WriteRegistersQuantity.Create(quantity)
-            .Then(RtuWriteMultipleRegisterRequestLayout.Create);
+            .Bind(RtuWriteMultipleRegisterRequestLayout.Create);
         Assert.IsTrue(layout_result, layout_result.Message);
 
         Span<byte> pack_buffer = stackalloc byte[layout_result.Value.TotalLength];
@@ -67,7 +68,7 @@ public sealed class ModbusRtuProtocolTests
     {
         // 获取帧布局
         var layout_result = WriteCoilsQuantity.Create(quantity)
-            .Then(RtuWriteMultipleCoilsRequestLayout.Create);
+            .Bind(RtuWriteMultipleCoilsRequestLayout.Create);
         Assert.IsTrue(layout_result, layout_result.Message);
 
         Span<byte> pack_buffer = stackalloc byte[layout_result.Value.TotalLength];

@@ -1,4 +1,4 @@
-﻿using ThabeSoft.ProtocolGateway.Primitives;
+﻿using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Transports;
 
 namespace ThabeSoft.ProtocolGateway.Modbus;

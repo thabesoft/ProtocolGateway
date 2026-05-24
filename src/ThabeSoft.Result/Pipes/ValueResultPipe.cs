@@ -1,4 +1,4 @@
-﻿namespace ThabeSoft.ProtocolGateway.Primitives.Pipes;
+﻿namespace ThabeSoft.Primitives.Pipes;
 
 
 /// <summary>

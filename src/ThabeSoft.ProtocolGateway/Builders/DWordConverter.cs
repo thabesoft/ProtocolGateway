@@ -1,4 +1,5 @@
-﻿using ThabeSoft.ProtocolGateway.Primitives;
+﻿using ThabeSoft.Primitives;
+using ThabeSoft.ProtocolGateway.Primitives;
 
 namespace ThabeSoft.ProtocolGateway.Builders;
 

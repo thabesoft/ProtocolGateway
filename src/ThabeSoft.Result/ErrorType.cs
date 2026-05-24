@@ -1,4 +1,4 @@
-﻿namespace ThabeSoft.ProtocolGateway.Primitives;
+﻿namespace ThabeSoft.Primitives;
 
 /// <summary>
 /// 错误类型

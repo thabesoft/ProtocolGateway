@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace ThabeSoft.ProtocolGateway.Primitives;
+namespace ThabeSoft.Primitives;
 
 /// <summary>
 /// 结果异常

@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.IO.Ports;
+using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Options;
 using ThabeSoft.ProtocolGateway.Primitives;
 

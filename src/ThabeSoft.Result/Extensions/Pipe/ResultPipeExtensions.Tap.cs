@@ -1,4 +1,6 @@
-﻿namespace ThabeSoft.ProtocolGateway.Primitives;
+﻿using ThabeSoft.Primitives;
+
+namespace ThabeSoft.ProtocolGateway.Primitives;
 
 public static partial class ResultPipeExtensions
 {

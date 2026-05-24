@@ -1,4 +1,5 @@
-﻿using ThabeSoft.ProtocolGateway.Builders;
+﻿using ThabeSoft.Primitives;
+using ThabeSoft.ProtocolGateway.Builders;
 using ThabeSoft.ProtocolGateway.Primitives;
 using ThabeSoft.ProtocolGateway.Tags;
 

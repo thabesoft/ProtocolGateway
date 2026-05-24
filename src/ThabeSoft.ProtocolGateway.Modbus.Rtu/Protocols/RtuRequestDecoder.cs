@@ -1,4 +1,5 @@
-﻿using ThabeSoft.ProtocolGateway.Modbus.Primitives;
+﻿using ThabeSoft.Primitives;
+using ThabeSoft.ProtocolGateway.Modbus.Primitives;
 using ThabeSoft.ProtocolGateway.Modbus.Protocols.Headers;
 using ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
 using ThabeSoft.ProtocolGateway.Primitives;
@@ -93,7 +94,7 @@ public static class RtuRequestDecoder
         // 值
         var value_result = source[layout.ValueRange]
             .ToWord(Endianness.BigEndian)
-            .Then(ProtocolExtensions.GetSingleCoilValue);
+            .Bind(ProtocolExtensions.GetSingleCoilValue);
         if (!value_result) return value_result.PropagateError<RtuWriteSingleCoilRequestHeader>();
 
         // Crc
@@ -160,7 +161,7 @@ public static class RtuRequestDecoder
     {
         // 根据数量创建布局
         var layout_result = WriteCoilsQuantity.Create(destination.Length)
-            .Then(RtuWriteMultipleCoilsRequestLayout.Create);
+            .Bind(RtuWriteMultipleCoilsRequestLayout.Create);
         if (!layout_result) return layout_result.PropagateError<RtuWriteMultipleRequestHeader>();
 
         return WriteMultipleCoils(source, destination, layout_result.Value);
@@ -217,7 +218,7 @@ public static class RtuRequestDecoder
     {
         // 根据数量创建布局
         var layout_result = WriteRegistersQuantity.Create(destination.Length)
-            .Then(RtuWriteMultipleRegisterRequestLayout.Create);
+            .Bind(RtuWriteMultipleRegisterRequestLayout.Create);
         if (!layout_result) return layout_result.PropagateError<RtuWriteMultipleRequestHeader>();
 
         return WriteMultipleRegisters(source, destination, layout_result.Value);

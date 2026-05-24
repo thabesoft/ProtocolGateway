@@ -5,7 +5,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<LangVersion>preview</LangVersion>
-		<RootNamespace>ThabeSoft.ProtocolGateway</RootNamespace>
+		<RootNamespace>ThabeSoft.Primitives</RootNamespace>
 	</PropertyGroup>
 
 	<!-- std2.0 引入 ValueTask 和 Memory-->

@@ -1,5 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
-using ThabeSoft.ProtocolGateway.Primitives;
+using ThabeSoft.Primitives;
 
 namespace ThabeSoft.ProtocolGateway.Modbus.Protocols;
 

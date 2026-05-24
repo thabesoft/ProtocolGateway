@@ -1,4 +1,6 @@
-﻿namespace ThabeSoft.ProtocolGateway.Primitives;
+﻿using ThabeSoft.Primitives;
+
+namespace ThabeSoft.ProtocolGateway.Primitives;
 
 /// <summary>
 /// 字节调换扩展

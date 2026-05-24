@@ -1,4 +1,4 @@
-﻿namespace ThabeSoft.ProtocolGateway.Primitives.Pipes;
+﻿namespace ThabeSoft.Primitives.Pipes;
 
 /// <summary>
 /// 委托的异步结果查询器

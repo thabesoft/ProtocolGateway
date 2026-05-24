@@ -1,4 +1,4 @@
-﻿using ThabeSoft.ProtocolGateway.Primitives;
+﻿using ThabeSoft.Primitives;
 
 namespace ThabeSoft.ProtocolGateway.Modbus.Primitives;
 
@@ -27,7 +27,7 @@ public readonly record struct ErrorFunctionCode : IEquatable<ErrorFunctionCode>
         }
 
         return FunctionCode.FromCode((byte)(code & 0x7F))
-            .Then(x => new ErrorFunctionCode(x));
+            .Bind(x => new ErrorFunctionCode(x));
     }
 
     [Obsolete]

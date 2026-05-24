@@ -1,5 +1,5 @@
-﻿using ThabeSoft.ProtocolGateway.Modbus.Primitives;
-using ThabeSoft.ProtocolGateway.Primitives;
+﻿using ThabeSoft.Primitives;
+using ThabeSoft.ProtocolGateway.Modbus.Primitives;
 
 namespace ThabeSoft.ProtocolGateway.Modbus.Protocols.Headers;
 
