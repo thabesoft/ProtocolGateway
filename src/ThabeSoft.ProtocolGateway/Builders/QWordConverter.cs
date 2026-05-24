@@ -6,13 +6,13 @@ namespace ThabeSoft.ProtocolGateway.Builders;
 /// <summary>
 /// 64 位数据转换
 /// </summary>
-public class QWordConverter(ByteSwap byteSwap, Endianness endianness = Endianness.BigEndian) :
+public class QWordConverter(QWordLayout layout) :
     IByteConverter<ulong>,
     IByteConverter<long>,
     IByteConverter<double>
 {
-    public static QWordConverter FromBigEndian(ByteSwap swap = ByteSwap.None) => new(swap, Endianness.BigEndian);
-    public static QWordConverter FromLittleEndian(ByteSwap swap = ByteSwap.None) => new(swap, Endianness.LittleEndian);
+    public static QWordConverter BigEndian { get; } = new(QWordLayout.BigEndian);
+    public static QWordConverter LittleEndian { get; } = new(QWordLayout.LittleEndian);
 
 
     private Result<ulong> Convert(ReadOnlySpan<byte> source)
@@ -20,13 +20,13 @@ public class QWordConverter(ByteSwap byteSwap, Endianness endianness = Endiannes
         if (source.Length < 8) return Result.Error<ulong>(ErrorType.InvalidParameter, "四字至少需要8字节");
 
         Span<byte> destination = stackalloc byte[8];
-        source.Swap(destination, byteSwap);
-        return destination.ToQWord(endianness);
+        source.Swap(destination, layout);
+        return destination.ToQWord(layout);
     }
     private Result Convert(ulong value, Span<byte> destination)
     {
         //TODO: 反向写入如何决定字节序
-        return value.ToBytes(destination, endianness);
+        return value.ToBytes(destination, layout);
     }
 
 

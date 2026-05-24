@@ -22,7 +22,7 @@ public static class ByteExtensions
         /// <param name="destination">字节组</param>
         /// <param name="endianness">端序</param>
         /// <returns>是否转换成功</returns>
-        public Result ToBytes(Span<byte> destination, Endianness endianness = Endianness.BigEndian)
+        public Result ToBytes(Span<byte> destination, Endianness endianness = default)
         {
             var bits_count = source.Length;
             var byte_count = (bits_count + 7) / BitsPerByte;
@@ -50,7 +50,7 @@ public static class ByteExtensions
         /// </summary>
         /// <param name="endianness">端序</param>
         /// <returns>是否转换成功</returns>
-        public Result<byte> ToByte(Endianness endianness = Endianness.BigEndian)
+        public Result<byte> ToByte(Endianness endianness = default)
         {
             var bit_count = Math.Min(8, source.Length);
             byte byte_value = 0;
@@ -75,7 +75,7 @@ public static class ByteExtensions
         /// <summary>
         /// 获取字节的某一个位
         /// </summary>
-        public Result<bool> GetBit(int index, int maxBit = 8, Endianness endianness = Endianness.BigEndian)
+        public Result<bool> GetBit(int index, int maxBit = 8, Endianness endianness = default)
         {
             if (index < 0 || maxBit > 8 || index >= maxBit)
             {
@@ -92,7 +92,7 @@ public static class ByteExtensions
         /// <param name="destination">目标位组</param>
         /// <param name="endianness">端序</param>
         /// <returns>实际写入的位数</returns>
-        public Result<int> ToBits(Span<bool> destination, Endianness endianness = Endianness.BigEndian)
+        public Result<int> ToBits(Span<bool> destination, Endianness endianness = default)
         {
             int length = Math.Min(8, destination.Length);
             Span<bool> buffer = stackalloc bool[length];
@@ -117,8 +117,8 @@ public static class ByteExtensions
         /// <summary>
         /// 将字节组转换为 字 (16 bit)
         /// </summary>
-        /// <param name="endianness">来源的端序类型</param>
-        public Result<ushort> ToWord(Endianness endianness = Endianness.BigEndian)
+        /// <param name="layout">来源的端序类型</param>
+        public Result<ushort> ToWord(WordLayout layout = default)
         {
             if (source.Length < 2)
             {
@@ -126,7 +126,7 @@ public static class ByteExtensions
                     $"Byte[] 转 Word 失败，至少需要 2 字节，实际 {source.Length} 字节");
             }
 
-            if (endianness == Endianness.BigEndian)
+            if (layout == Endianness.BigEndian)
             {
                 return (ushort)(source[0] << 8 | source[1]);
             }
@@ -136,8 +136,8 @@ public static class ByteExtensions
         /// <summary>
         /// 将字节组转换为 双字 (32 bit)
         /// </summary>
-        /// <param name="endianness">来源的端序类型</param>
-        public Result<uint> ToDWord(Endianness endianness = Endianness.BigEndian)
+        /// <param name="layout">来源的端序类型</param>
+        public Result<uint> ToDWord(DWordLayout layout = default)
         {
             if (source.Length < 4)
             {
@@ -145,7 +145,7 @@ public static class ByteExtensions
                     $"Byte[] 转 DWord 失败，至少需要 4 字节，实际 {source.Length} 字节");
             }
 
-            if (endianness == Endianness.BigEndian)
+            if (layout == Endianness.BigEndian)
             {
                 return (uint)((source[0] << 24) | (source[1] << 16) | (source[2] << 8) | source[3]);
             }
@@ -155,8 +155,8 @@ public static class ByteExtensions
         /// <summary>
         /// 将字节组转换为 四字 (64 bit)
         /// </summary>
-        /// <param name="endianness">来源的端序类型</param>
-        public Result<ulong> ToQWord(Endianness endianness = Endianness.BigEndian)
+        /// <param name="layout">来源的端序类型</param>
+        public Result<ulong> ToQWord(QWordLayout layout = default)
         {
             if (source.Length < 8)
             {
@@ -164,7 +164,7 @@ public static class ByteExtensions
                     $"Byte[] 转 QWord 失败，至少需要 8 字节，实际 {source.Length} 字节");
             }
 
-            if (endianness == Endianness.BigEndian)
+            if (layout == Endianness.BigEndian)
             {
                 return ((ulong)source[0] << 56) | ((ulong)source[1] << 48) |
                        ((ulong)source[2] << 40) | ((ulong)source[3] << 32) |
@@ -185,7 +185,7 @@ public static class ByteExtensions
         /// <param name="destination">目标位组</param>
         /// <param name="endianness">端序</param>
         /// <returns>是否转换成功</returns>
-        public Result ToBits(Span<bool> destination, Endianness endianness = Endianness.BigEndian)
+        public Result ToBits(Span<bool> destination, Endianness endianness = default)
         {
             int total_length = Math.Min(destination.Length, source.Length * BitsPerByte);
             Span<bool> buffer = stackalloc bool[total_length];
@@ -210,8 +210,8 @@ public static class ByteExtensions
         /// 将字节序转为16位无符号整数序
         /// </summary>
         /// <param name="destination">目标16位无符号整数组</param>
-        /// <param name="endianness">端序</param>
-        public Result ToWords(Span<ushort> destination, Endianness endianness = Endianness.BigEndian)
+        /// <param name="layout">端序</param>
+        public Result ToWords(Span<ushort> destination, WordLayout layout = default)
         {
             int total_length = Math.Min(destination.Length, source.Length / 2);
 
@@ -223,7 +223,7 @@ public static class ByteExtensions
                 const int length = 2;
                 var span = source.Slice(begin, length);
 
-                var result = span.ToWord(endianness);
+                var result = span.ToWord(layout);
                 if(!result) return result;
 
                 buffer[i] = result.Value;
@@ -244,8 +244,8 @@ public static class ByteExtensions
         /// 将 ushort 数组转换为字节数组
         /// </summary>
         /// <param name="destination">目标字节缓冲区</param>
-        /// <param name="endianness">字节序，默认大端</param>
-        public Result ToByte(Span<byte> destination, Endianness endianness = Endianness.BigEndian)
+        /// <param name="layout">字节序，默认大端</param>
+        public Result ToByte(Span<byte> destination, WordLayout layout = default)
         {
             // 元数据数量
             var source_count = source.Length;
@@ -268,7 +268,7 @@ public static class ByteExtensions
                 const int byte_length = 2;
                 var byte_range = buffer.Slice(byte_start, byte_length);
 
-                var result = source[source_index].ToBytes(byte_range, endianness);
+                var result = source[source_index].ToBytes(byte_range, layout);
                 if (!result) return result;
             }
 
@@ -286,7 +286,7 @@ public static class ByteExtensions
         /// 将 ushort 转换为字节数组
         /// </summary>
         /// <param name="destination">目标字节数组（至少2字节）</param>
-        public Result ToBytes(Span<byte> destination, Endianness endianness = Endianness.BigEndian)
+        public Result ToBytes(Span<byte> destination, WordLayout layout = default)
         {
             if (destination.Length < 2)
             {
@@ -294,7 +294,7 @@ public static class ByteExtensions
                     $"Word 转 Byte[] 失败, Byte[] 缓冲区不足，至少需要 2 字节, 实际 {destination.Length} 字节");
             }
 
-            if (endianness == Endianness.BigEndian)
+            if (layout == Endianness.BigEndian)
             {
                 destination[0] = (byte)(source >> 8);
                 destination[1] = (byte)source;
@@ -319,7 +319,7 @@ public static class ByteExtensions
         /// 将 uint 转换为字节数组（大端序）
         /// </summary>
         /// <param name="destination">目标字节数组（至少4字节）</param>
-        public Result ToBytes(Span<byte> destination, Endianness endianness = Endianness.BigEndian)
+        public Result ToBytes(Span<byte> destination, DWordLayout layout = default)
         {
             if (destination.Length < 4)
             {
@@ -327,20 +327,20 @@ public static class ByteExtensions
                     $"DWord 转 Byte[] 失败, Byte[] 缓冲区不足，至少需要 4 字节, 实际 {destination.Length} 字节");
             }
 
-            if (endianness == Endianness.BigEndian)
-            {
-                destination[0] = (byte)(source >> 24);
-                destination[1] = (byte)(source >> 16);
-                destination[2] = (byte)(source >> 8);
-                destination[3] = (byte)source;
-            }
-            else
-            {
-                destination[0] = (byte)source;
-                destination[1] = (byte)(source >> 8);
-                destination[2] = (byte)(source >> 16);
-                destination[3] = (byte)(source >> 24);
-            }
+            // 大端解析
+            Span<byte> buffer = stackalloc byte[4];
+            buffer[0] = (byte)(source >> 24);
+            buffer[1] = (byte)(source >> 16);
+            buffer[2] = (byte)(source >> 8);
+            buffer[3] = (byte)source;
+
+            // 调换字序
+            var result = buffer.Swap(layout);
+            if (!result) return result;
+
+            // 调换端序
+            if (layout == Endianness.LittleEndian) buffer.Reverse();
+            buffer.CopyTo(destination);
 
             return Result.Success;
         }
@@ -355,13 +355,13 @@ public static class ByteExtensions
         /// 将 ulong 转换为字节数组（大端序）
         /// </summary>
         /// <param name="destination">目标字节数组（至少8字节）</param>
-        public Result ToBytes(Span<byte> destination, Endianness endianness = Endianness.BigEndian)
+        public Result ToBytes(Span<byte> destination, QWordLayout layout = default)
         {
             if (destination.Length < 8)
                 return Result.Error(ErrorType.InvalidParameter,
                     $"QWord 转 Byte[] 失败, Byte[] 缓冲区不足，至少需要 8 字节, 实际 {destination.Length} 字节");
 
-            if (endianness == Endianness.BigEndian)
+            if (layout == Endianness.BigEndian)
             {
                 destination[0] = (byte)(source >> 56);
                 destination[1] = (byte)(source >> 48);

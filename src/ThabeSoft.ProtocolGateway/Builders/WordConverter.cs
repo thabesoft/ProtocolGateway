@@ -6,13 +6,13 @@ namespace ThabeSoft.ProtocolGateway.Builders;
 /// <summary>
 /// 16 位数据转换
 /// </summary>
-public class WordConverter(ByteSwap byteSwap, Endianness endianness = Endianness.BigEndian) :
+public class WordConverter(WordLayout layout) :
     IByteConverter<ushort>,
     IByteConverter<short>,
     IByteConverter<char>
 {
-    public static WordConverter FromBigEndian(ByteSwap swap = ByteSwap.None) => new(swap, Endianness.BigEndian);
-    public static WordConverter FromLittleEndian(ByteSwap swap = ByteSwap.None) => new(swap, Endianness.LittleEndian);
+    public static WordConverter BigEndian { get;} = new(WordLayout.BigEndian);
+    public static WordConverter LittleEndian { get; } = new(Endianness.LittleEndian);
 
 
     private Result<ushort> Convert(ReadOnlySpan<byte> source)
@@ -20,13 +20,13 @@ public class WordConverter(ByteSwap byteSwap, Endianness endianness = Endianness
         if (source.Length < 2) return Result.Error<ushort>(ErrorType.InvalidParameter, "字至少需要2字节");
 
         Span<byte> destination = stackalloc byte[2];
-        source.Swap(destination, byteSwap);
-        return destination.ToWord(endianness);
+        source.Swap(destination, layout);
+        return destination.ToWord(layout);
     }
     private Result Convert(ushort value, Span<byte> destination)
     {
         //TODO: 反向写入如何决定字节序
-        return value.ToBytes(destination, endianness);
+        return value.ToBytes(destination, layout);
     }
 
 

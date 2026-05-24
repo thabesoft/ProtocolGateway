@@ -13,12 +13,12 @@ namespace ThabeSoft.ProtocolGateway.Modbus;
 /// <summary>
 /// Modbus Rtu 主站
 /// </summary>
-public sealed class ModbusRtuMaster(ITransport transport) : IModbusMaster
+public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
 {
-    public async ValueTask<Result> ReadCoilsAsync(Memory<bool> destination, byte slaveId, ushort address, ushort quantity, CancellationToken cancellationToken = default)
+    public async ValueTask<Result> ReadCoilsAsync(Memory<bool> destination, byte slaveId, ushort address, CancellationToken cancellationToken = default)
     {
         // 线圈数量
-        var quantity_result = ReadCoilsQuantity.Create(quantity);
+        var quantity_result = ReadCoilsQuantity.Create(destination.Length);
         if (!quantity_result) return quantity_result.PropagateError<int>();
 
         // 协议布局
@@ -39,7 +39,7 @@ public sealed class ModbusRtuMaster(ITransport transport) : IModbusMaster
 
             // 发送请求
             var send_mem = buffer.AsMemory(0, send_layout.TotalLength);
-            var request_result = await transport.WriteAsync(send_mem, cancellationToken);
+            var request_result = await port.WriteAsync(send_mem, cancellationToken);
             if (!request_result) return request_result.PropagateError<int>();
 
 
@@ -56,17 +56,17 @@ public sealed class ModbusRtuMaster(ITransport transport) : IModbusMaster
         }
     }
 
-    public ValueTask<Result> ReadDiscreteInputsAsync(Memory<bool> destination, byte slaveId, ushort address, ushort quantity, CancellationToken cancellationToken = default)
+    public ValueTask<Result> ReadDiscreteInputsAsync(Memory<bool> destination, byte slaveId, ushort address, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
-    public ValueTask<Result> ReadHoldingRegistersAsync(Memory<byte> destination, byte slaveId, ushort address, ushort quantity, CancellationToken cancellationToken = default)
+    public ValueTask<Result> ReadHoldingRegistersAsync(Memory<byte> destination, byte slaveId, ushort address, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
-    public ValueTask<Result> ReadInputRegistersAsync(Memory<byte> destination, byte slaveId, ushort address, ushort quantity, CancellationToken cancellationToken = default)
+    public ValueTask<Result> ReadInputRegistersAsync(Memory<byte> destination, byte slaveId, ushort address, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
@@ -100,7 +100,7 @@ public sealed class ModbusRtuMaster(ITransport transport) : IModbusMaster
 
         // 有两种情况, Rtu异常共5字节, 其他数据都大于5字节, 所以先读取5个
         var resp_header = destination[..MinReadBytes];
-        await transport.ReadExactAsync(resp_header, cancellationToken);
+        await port.ReadExactAsync(resp_header, cancellationToken);
 
         var error_layout = RtuErrorResponseLayout.Instance;
         var slave_id = resp_header.Span[error_layout.SlaveIdIndex];
@@ -135,13 +135,13 @@ public sealed class ModbusRtuMaster(ITransport transport) : IModbusMaster
             var tail_length = data_length - 2 + 2;
 
             var tail_span = destination.Slice(5, tail_length);
-            return await transport.ReadExactAsync(tail_span, cancellationToken);
+            return await port.ReadExactAsync(tail_span, cancellationToken);
         }
         else
         {
             // 写单个和写多个都是固定长度8
             var tail_span = destination.Slice(5, 3);
-            return await transport.ReadExactAsync(tail_span, cancellationToken);
+            return await port.ReadExactAsync(tail_span, cancellationToken);
         }
     }
 }

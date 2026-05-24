@@ -1,5 +1,4 @@
-﻿using System.Net;
-using ThabeSoft.Primitives;
+﻿using ThabeSoft.Primitives;
 
 namespace ThabeSoft.ProtocolGateway;
 

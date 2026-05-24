@@ -1,10 +1,10 @@
 ﻿using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Modbus.Primitives;
 
-namespace ThabeSoft.ProtocolGateway.Modbus.Channels;
+namespace ThabeSoft.ProtocolGateway.Modbus;
 
 
-public sealed class ModbusChannel(IModbusMaster master) : IReader, IWriter
+public sealed class ModbusChannel(IModbusMaster master) : IChannel
 {
     public async ValueTask<Result<TValue>> ReadAsync<TValue>(ITag<TValue> tag, CancellationToken cancellationToken = default) where TValue : unmanaged
     {
@@ -15,7 +15,7 @@ public sealed class ModbusChannel(IModbusMaster master) : IReader, IWriter
         if(address.FunctionCode == FunctionCode.ReadCoils)
         {
             bool[] buffer = new bool[1];
-            await master.ReadCoilsAsync(buffer, 0, address.Start, 1, cancellationToken);
+            await master.ReadCoilsAsync(buffer, address.SlaveId, address.Start, cancellationToken);
             Span<byte> c = stackalloc byte[1];
             //return tag.Converter.From(buffer);
         }
@@ -37,7 +37,7 @@ public sealed class ModbusChannel(IModbusMaster master) : IReader, IWriter
         }
 
 
-        return Result.Error<TValue>(ErrorType.ProtocolErrored, "Modbus 无法识别的读取操作");
+        return Result.NotSupported<TValue>("Modbus 无法识别的读取操作");
     }
 
     public async ValueTask<Result> WriteAsync<TValue>(ITag<TValue> tag, TValue value, CancellationToken cancellationToken = default) where TValue : unmanaged
@@ -55,23 +55,24 @@ public sealed class ModbusChannel(IModbusMaster master) : IReader, IWriter
             return tag.Converter.From(c);
         }
 
-        if (address.FunctionCode == FunctionCode.ReadDiscreteInputs)
+        if (address.FunctionCode == FunctionCode.WriteMultipleRegisters)
         {
+            return true;
         }
 
-        if (address.FunctionCode == FunctionCode.ReadHoldingRegisters)
+        if (address.FunctionCode == FunctionCode.WriteSingleCoil)
         {
             //await master.ReadInputRegistersAsync(buffer, address.SlaveId, address.Start, 1, cancellationToken);
             Span<byte> c = stackalloc byte[1];
             return tag.Converter.From(c);
         }
 
-        if (address.FunctionCode == FunctionCode.ReadInputRegisters)
+        if (address.FunctionCode == FunctionCode.WriteSingleRegister)
         {
-
+            return true;
         }
 
 
-        return Result.Error<TValue>(ErrorType.ProtocolErrored, "Modbus 无法识别的读取操作");
+        return Result.NotSupported<TValue>("Modbus 无法识别的读取操作");
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace ThabeSoft.Primitives;
 
@@ -27,6 +28,7 @@ public sealed class ResultException : Exception
 
 
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static void ThrowIfDebugger(ErrorType errorType, string? message = null)
     {
 #if DEBUG

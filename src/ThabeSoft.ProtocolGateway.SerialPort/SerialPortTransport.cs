@@ -1,11 +1,13 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
-using System.IO.Ports;
 using ThabeSoft.Primitives;
-using ThabeSoft.ProtocolGateway.Options;
 using ThabeSoft.ProtocolGateway.Primitives;
+using ThabeSoft.ProtocolGateway.SerialPort.Options;
+using ThabeSoft.ProtocolGateway.Transports;
 
-namespace ThabeSoft.ProtocolGateway.Transports;
+using SystemSerialPort = System.IO.Ports.SerialPort;
+
+namespace ThabeSoft.ProtocolGateway.SerialPort;
 
 
 /// <summary>
@@ -17,7 +19,7 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
 
 
     private ISerialOptions? _options;
-    private SerialPort? port;
+    private SystemSerialPort? port;
 
     private readonly SemaphoreSlim _lock = new(1, 1);
     private readonly SemaphoreSlim _readLock = new(1, 1);
@@ -39,13 +41,17 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
     } = TransporterState.Pending;
 
 
-    public async ValueTask<Result> ConnectAsync(ITransportOptions options, CancellationToken cancellation = default)
+    ValueTask<Result> ITransport.ConnectAsync(ITransportOptions options, CancellationToken cancellation)
     {
         if (options is not ISerialOptions serialOptions)
         {
-            return Result.Error(ErrorType.InvalidOperation, "当前配置不持支创建串口链接");
+            return new ValueTask<Result>(Result.Error(ErrorType.InvalidOperation, "当前配置不持支创建串口链接"));
         }
 
+        return ConnectAsync(serialOptions);
+    }
+    public async ValueTask<Result> ConnectAsync(ISerialOptions options, CancellationToken cancellation = default)
+    {
         if (State != TransporterState.Pending &&
             State != TransporterState.Disconnected &&
             State != TransporterState.Faulted)
@@ -59,9 +65,9 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
 
         try
         {
-            _options = serialOptions;
+            _options = options;
 
-            return CreateSerialPort(serialOptions).Tap(x =>
+            return CreateSerialPort(options).Tap(x =>
             {
                 port = x;
                 port.Open();
@@ -69,31 +75,32 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
                 State = TransporterState.Connected;
             });
         }
-        catch(UnauthorizedAccessException)
+        catch (UnauthorizedAccessException)
         {
             State = TransporterState.Faulted;
-            return Result.Error(ErrorType.ConnectionRefused, "访问被拒绝, 无法打开串口");
+            return Result.InvalidOperation("访问被拒绝, 无法打开串口");
         }
-        catch(ArgumentOutOfRangeException)
+        catch (ArgumentOutOfRangeException)
         {
             State = TransporterState.Faulted;
-            return Result.Error(ErrorType.ConnectionRefused, "参数超出范围, 无法打开串口");
+            return Result.InvalidOperation("参数超出范围, 无法打开串口");
         }
-        catch(IOException)
+        catch (IOException)
         {
             State = TransporterState.Faulted;
-            return Result.Error(ErrorType.ConnectionRefused, "IO异常, 无法打开串口");
+            return Result.InvalidOperation( "IO异常, 无法打开串口");
         }
         catch (InvalidOperationException ex)
         {
             State = TransporterState.Faulted;
-            return Result.Error(ErrorType.ConnectionLost, $"串口连接失败: {ex.Message}");
+            return Result.InvalidOperation( $"串口连接失败: {ex.Message}");
         }
         finally
         {
             _lock.Release();
         }
     }
+
     public async ValueTask<Result> DisconnectAsync(CancellationToken cancellation = default)
     {
         if (State != TransporterState.Connected && State != TransporterState.Connecting)
@@ -113,7 +120,7 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
         catch(IOException ex)
         {
             State = TransporterState.Faulted;
-            return Result.Error(ErrorType.ConnectionLost, $"断开连接时发生错误: {ex.Message}");
+            return Result.InvalidOperation( $"断开连接时发生错误: {ex.Message}");
         }
         finally
         {
@@ -144,7 +151,7 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
         }
         catch (EndOfStreamException)
         {
-            return Result.Error<int>(ErrorType.ConnectionLost, "连接意外中断");
+            return Result.InvalidOperation<int>("连接意外中断");
         }
         finally
         {
@@ -238,11 +245,11 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
     }
 
 
-    private static Result<SerialPort> CreateSerialPort(ISerialOptions options)
+    private static Result<SystemSerialPort> CreateSerialPort(ISerialOptions options)
     {
         try
         {
-            return new SerialPort(options.PortName, options.BaudRate, options.Parity, options.DataBits, options.StopBits)
+            return new SystemSerialPort(options.PortName, options.BaudRate, options.Parity, options.DataBits, options.StopBits)
             {
                 ReadTimeout = (int)options.ReadTimeout.TotalMilliseconds,
                 WriteTimeout = (int)options.WriteTimeout.TotalMilliseconds
@@ -250,7 +257,7 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
         }
         catch (IOException ex)
         {
-            return Result.Error<SerialPort>(ErrorType.InvalidOperation, $"无法创建串口: {ex.Message}");
+            return Result.Error<SystemSerialPort>(ErrorType.InvalidOperation, $"无法创建串口: {ex.Message}");
         }
     }
 }

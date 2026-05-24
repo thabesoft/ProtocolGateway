@@ -1,6 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿namespace ThabeSoft.ProtocolGateway;
 
-namespace ThabeSoft.ProtocolGateway;
 
 /// <summary>
 /// 数据订阅器

@@ -16,13 +16,13 @@ public static class ByteSwapExtensions
         {
             if (source.Length <= 0) return Result.Error(ErrorType.InvalidParameter, "字节数组为空");
 
-            if (swap.HasFlag(ByteSwap.SwapQWord))
-            {
-                if (source.Length % 16 != 0) return Result.Error(ErrorType.InvalidParameter, "无法调换四字序, 字节数量不是16的倍数");
+            //if (swap.HasFlag(ByteSwap.SwapQWord))
+            //{
+            //    if (source.Length % 16 != 0) return Result.Error(ErrorType.InvalidParameter, "无法调换四字序, 字节数量不是16的倍数");
 
-                var result = source.SwapQWord();
-                if (!result) return result;
-            }
+            //    var result = source.SwapQWord();
+            //    if (!result) return result;
+            //}
 
             if (swap.HasFlag(ByteSwap.SwapDWord))
             {
@@ -41,10 +41,30 @@ public static class ByteSwapExtensions
             }
 
             // 调换字节序
-            if (swap.HasFlag(ByteSwap.SwapByte)) return source.SwapByte();
+            if (swap.HasFlag(ByteSwap.SwapByte))
+            {
+                if (source.Length % 2 != 0) return Result.Error(ErrorType.InvalidParameter, "无法调换字节序, 字节数量不是2的倍数");
+                return source.SwapByte();
+            }
+
             return Result.Success;
         }
 
+
+        /// <summary>
+        /// 反转字节, 高位到低位, 低位到高位
+        /// </summary>
+        /// <returns></returns>
+        public void Reverse()
+        {
+            if (source.Length == 0) return;
+
+            for (int i = 0; i < source.Length / 2; i++)
+            {
+                int j = source.Length - 1 - i;
+                (source[i], source[j]) = (source[j], source[i]);
+            }
+        }
 
         /// <summary>
         /// 调换字节序 (反转整个数组的字节顺序)
@@ -214,7 +234,7 @@ public static class ByteSwapExtensions
         /// 双字交换 (每4个字节为一组进行交换) 字节长度必须是8的倍数
         /// 适用于8字节及以上数据，将 [b0,b1,b2,b3, b4,b5,b6,b7] 转换为 [b4,b5,b6,b7, b0,b1,b2,b3]
         /// </summary>
-        public Result SwapDWord( Span<byte> destination)
+        public Result SwapDWord(Span<byte> destination)
         {
             if (source.Length == 0)
                 return Result.Error(ErrorType.InvalidParameter, "源字节数组为空");

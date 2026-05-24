@@ -14,7 +14,7 @@ internal static class Test
         var tag = builder
             .Name("Test")
             .Address(new ModbusAddress() { Address = 1000 })
-            .Converter(DWordConverter.FromLittleEndian(ByteSwap.SwapByte | ByteSwap.SwapQWord))
+            //.Converter(DWordConverter.LittleEndian(ByteSwap.SwapByte | ByteSwap.SwapQWord))
             .Build();
 
         // 创建通讯通道

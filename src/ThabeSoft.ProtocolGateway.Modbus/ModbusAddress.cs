@@ -1,6 +1,6 @@
 ﻿using ThabeSoft.ProtocolGateway.Modbus.Primitives;
 
-namespace ThabeSoft.ProtocolGateway.Modbus.Channels;
+namespace ThabeSoft.ProtocolGateway.Modbus;
 
 
 /// <summary>

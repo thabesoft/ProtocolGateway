@@ -30,5 +30,6 @@ public enum ByteSwap
     /// <summary>
     /// 调换四倍字序 (>= 16字节) <b>QWord1-QWord2</b> -> <b>QWord2-QWord1</b>
     /// </summary>
-    SwapQWord = 1 << 8
+    [Obsolete("目前C#还没有128位的数据", true)]
+    SwapQWord = 1 << 8,
 }
