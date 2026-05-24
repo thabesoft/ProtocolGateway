@@ -1,6 +1,4 @@
-﻿using ThabeSoft.ProtocolGateway.Builders;
-
-namespace ThabeSoft.ProtocolGateway.Tags;
+﻿namespace ThabeSoft.ProtocolGateway.Tags;
 
 /// <summary>
 /// 标签信息构建器
@@ -10,7 +8,7 @@ public interface ITagBuilder<TValue>
 {
     ITagBuilder<TValue> Name(string name);
     ITagBuilder<TValue> Address(IAddress address);
-    ITagBuilder<TValue> Converter(IValueConverter<TValue> bytesConverter);
+    ITagBuilder<TValue> Converter(IByteConverter<TValue> bytesConverter);
 
     ITag<TValue> Build();
 }

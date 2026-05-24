@@ -1,6 +1,4 @@
-﻿using ThabeSoft.ProtocolGateway.Builders;
-
-namespace ThabeSoft.ProtocolGateway;
+﻿namespace ThabeSoft.ProtocolGateway;
 
 /// <summary>
 /// 表示设备上一个数据的信息
@@ -22,11 +20,5 @@ public interface ITag<TValue>
     /// <summary>
     /// 值转换器
     /// </summary>
-    IValueConverter<TValue> Converter { get; }
-}
-
-
-public interface IAddress
-{
-
+    IByteConverter<TValue> Converter { get; }
 }

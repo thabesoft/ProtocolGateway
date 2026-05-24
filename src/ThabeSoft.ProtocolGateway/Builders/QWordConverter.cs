@@ -7,9 +7,9 @@ namespace ThabeSoft.ProtocolGateway.Builders;
 /// 64 位数据转换
 /// </summary>
 public class QWordConverter(ByteSwap byteSwap, Endianness endianness = Endianness.BigEndian) :
-    IValueConverter<ulong>,
-    IValueConverter<long>,
-    IValueConverter<double>
+    IByteConverter<ulong>,
+    IByteConverter<long>,
+    IByteConverter<double>
 {
     public static QWordConverter FromBigEndian(ByteSwap swap = ByteSwap.None) => new(swap, Endianness.BigEndian);
     public static QWordConverter FromLittleEndian(ByteSwap swap = ByteSwap.None) => new(swap, Endianness.LittleEndian);
@@ -30,11 +30,11 @@ public class QWordConverter(ByteSwap byteSwap, Endianness endianness = Endiannes
     }
 
 
-    Result<ulong> IValueConverter<ulong>.Convert(ReadOnlySpan<byte> source) => Convert(source);
-    Result<long> IValueConverter<long>.Convert(ReadOnlySpan<byte> source) => Convert(source).Map(x => (long)x);
-    Result<double> IValueConverter<double>.Convert(ReadOnlySpan<byte> source) => Convert(source).Map(x => (double)x);
+    Result<ulong> IByteConverter<ulong>.From(ReadOnlySpan<byte> source) => Convert(source);
+    Result<long> IByteConverter<long>.From(ReadOnlySpan<byte> source) => Convert(source).Map(x => (long)x);
+    Result<double> IByteConverter<double>.From(ReadOnlySpan<byte> source) => Convert(source).Map(x => (double)x);
 
-    Result IValueConverter<ulong>.Convert(ulong source, Span<byte> destination) => Convert(source, destination);
-    Result IValueConverter<long>.Convert(long source, Span<byte> destination) => Convert((ulong)source, destination);
-    Result IValueConverter<double>.Convert(double source, Span<byte> destination) => Convert((ulong)source, destination);
+    Result IByteConverter<ulong>.To(ulong source, Span<byte> destination) => Convert(source, destination);
+    Result IByteConverter<long>.To(long source, Span<byte> destination) => Convert((ulong)source, destination);
+    Result IByteConverter<double>.To(double source, Span<byte> destination) => Convert((ulong)source, destination);
 }

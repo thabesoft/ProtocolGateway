@@ -10,6 +10,7 @@ public static class ByteExtensions
 {
     private const int BitsPerByte = 8;
 
+
     /// <summary>
     /// 位组
     /// </summary>
@@ -71,6 +72,9 @@ public static class ByteExtensions
     /// </summary>
     extension(byte source)
     {
+        /// <summary>
+        /// 获取字节的某一个位
+        /// </summary>
         public Result<bool> GetBit(int index, int maxBit = 8, Endianness endianness = Endianness.BigEndian)
         {
             if (index < 0 || maxBit > 8 || index >= maxBit)
@@ -202,7 +206,6 @@ public static class ByteExtensions
             buffer.CopyTo(destination);
             return true;
         }
-
         /// <summary>
         /// 将字节序转为16位无符号整数序
         /// </summary>

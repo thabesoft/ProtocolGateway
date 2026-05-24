@@ -7,9 +7,9 @@ namespace ThabeSoft.ProtocolGateway.Builders;
 /// 32 位数据转换
 /// </summary>
 public readonly struct DWordConverter(ByteSwap byteSwap, Endianness endianness = Endianness.BigEndian) :
-    IValueConverter<uint>,
-    IValueConverter<int>,
-    IValueConverter<float>
+    IByteConverter<uint>,
+    IByteConverter<int>,
+    IByteConverter<float>
 {
     public static DWordConverter FromBigEndian(ByteSwap swap = ByteSwap.None) => new(swap, Endianness.BigEndian);
     public static DWordConverter FromLittleEndian(ByteSwap swap = ByteSwap.None) => new(swap, Endianness.LittleEndian);
@@ -31,12 +31,12 @@ public readonly struct DWordConverter(ByteSwap byteSwap, Endianness endianness =
 
 
 
-    Result<uint> IValueConverter<uint>.Convert(ReadOnlySpan<byte> source) => Convert(source);
-    Result<int> IValueConverter<int>.Convert(ReadOnlySpan<byte> source) => Convert(source).Map(x => (int)x);
-    Result<float> IValueConverter<float>.Convert(ReadOnlySpan<byte> source) => Convert(source).Map(x => (float)x);
+    Result<uint> IByteConverter<uint>.From(ReadOnlySpan<byte> source) => Convert(source);
+    Result<int> IByteConverter<int>.From(ReadOnlySpan<byte> source) => Convert(source).Map(x => (int)x);
+    Result<float> IByteConverter<float>.From(ReadOnlySpan<byte> source) => Convert(source).Map(x => (float)x);
 
 
-    Result IValueConverter<uint>.Convert(uint source, Span<byte> destination) => Convert(source, destination);
-    Result IValueConverter<int>.Convert(int source, Span<byte> destination) => Convert((ushort)source, destination);
-    Result IValueConverter<float>.Convert(float source, Span<byte> destination) => Convert((ushort)source, destination);
+    Result IByteConverter<uint>.To(uint source, Span<byte> destination) => Convert(source, destination);
+    Result IByteConverter<int>.To(int source, Span<byte> destination) => Convert((ushort)source, destination);
+    Result IByteConverter<float>.To(float source, Span<byte> destination) => Convert((ushort)source, destination);
 }

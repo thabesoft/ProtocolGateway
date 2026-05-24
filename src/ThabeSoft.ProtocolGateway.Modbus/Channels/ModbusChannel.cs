@@ -17,7 +17,7 @@ public sealed class ModbusChannel(IModbusMaster master) : IReader, IWriter
             bool[] buffer = new bool[1];
             await master.ReadCoilsAsync(buffer, 0, address.Start, 1, cancellationToken);
             Span<byte> c = stackalloc byte[1];
-            return tag.Converter.Convert(c);
+            //return tag.Converter.From(buffer);
         }
 
         if (address.FunctionCode == FunctionCode.ReadDiscreteInputs)
@@ -28,7 +28,7 @@ public sealed class ModbusChannel(IModbusMaster master) : IReader, IWriter
         {
             //await master.ReadInputRegistersAsync(buffer, address.SlaveId, address.Start, 1, cancellationToken);
             Span<byte> c = stackalloc byte[1];
-            return tag.Converter.Convert(c);
+            return tag.Converter.From(c);
         }
 
         if (address.FunctionCode == FunctionCode.ReadInputRegisters)
@@ -40,8 +40,38 @@ public sealed class ModbusChannel(IModbusMaster master) : IReader, IWriter
         return Result.Error<TValue>(ErrorType.ProtocolErrored, "Modbus 无法识别的读取操作");
     }
 
-    public ValueTask<Result> WriteAsync<TValue>(ITag<TValue> tagInfo, TValue value, CancellationToken cancellationToken = default) where TValue : unmanaged
+    public async ValueTask<Result> WriteAsync<TValue>(ITag<TValue> tag, TValue value, CancellationToken cancellationToken = default) where TValue : unmanaged
     {
-        throw new NotImplementedException();
+        if (tag.Address is not ModbusAddress address) return Result.InvalidOperation("无效地址");
+        if (!address.FunctionCode.IsWrite) Result.Error<TValue>(ErrorType.InvalidOperation, "不是有效的 Modbus 写值地址");
+
+
+        if (address.FunctionCode == FunctionCode.WriteMultipleCoils)
+        {
+            bool[] buffer = new bool[1];
+            //await master.WriteMultipleCoilsAsync(address.SlaveId, address.Start,  cancellationToken);
+            Span<byte> c = stackalloc byte[1];
+
+            return tag.Converter.From(c);
+        }
+
+        if (address.FunctionCode == FunctionCode.ReadDiscreteInputs)
+        {
+        }
+
+        if (address.FunctionCode == FunctionCode.ReadHoldingRegisters)
+        {
+            //await master.ReadInputRegistersAsync(buffer, address.SlaveId, address.Start, 1, cancellationToken);
+            Span<byte> c = stackalloc byte[1];
+            return tag.Converter.From(c);
+        }
+
+        if (address.FunctionCode == FunctionCode.ReadInputRegisters)
+        {
+
+        }
+
+
+        return Result.Error<TValue>(ErrorType.ProtocolErrored, "Modbus 无法识别的读取操作");
     }
 }

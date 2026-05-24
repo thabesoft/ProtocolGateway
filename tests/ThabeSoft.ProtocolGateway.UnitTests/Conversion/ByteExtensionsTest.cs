@@ -1,10 +1,11 @@
-﻿using ThabeSoft.ProtocolGateway.Primitives;
+﻿using ThabeSoft.Primitives;
+using ThabeSoft.ProtocolGateway.Primitives;
 
 namespace ThabeSoft.ProtocolGateway.Conversion;
 
 
 [TestClass]
-public class BitArrayConverterTest
+public class ByteExtensionsTest
 {
 
     [DataRow((byte)0b0000_1111, (byte)0b1111_0000, Endianness.LittleEndian, (ushort)0b1111_0000_0000_1111, DisplayName = "小端序：低字节0x0F,高字节0xF0 → 0xF00F")]
@@ -22,9 +23,7 @@ public class BitArrayConverterTest
     {
         byte[] source = [first, second];
 
-        source.TryToUInt16(out var destination, endianness);
-
-        Assert.AreEqual(expected, destination);
+        source.ToWord(endianness).Tap(x => Assert.AreEqual(expected, x));
     }
 
     [TestMethod(DisplayName = "字节转位数组测试_小端序")]
@@ -33,7 +32,8 @@ public class BitArrayConverterTest
         const byte source = 0b1010_1010;
         bool[] destination = new bool[8];
 
-        source.TryToBit(destination, Endianness.LittleEndian);
+        var result = source.ToBits(destination, Endianness.LittleEndian);
+        Assert.IsTrue(result, result.Message);
 
         bool[] expected = [false, true, false, true, false, true, false, true];
         CollectionAssert.AreEqual(expected, destination);
@@ -45,7 +45,8 @@ public class BitArrayConverterTest
         const byte source = 0b1010_1010;
         bool[] destination = new bool[8];
 
-        source.TryToBit(destination, Endianness.BigEndian);
+        var result = source.ToBits(destination, Endianness.BigEndian);
+        Assert.IsTrue(result, result.Message);
 
         bool[] expected = [true, false, true, false, true, false, true, false];
         CollectionAssert.AreEqual(expected, destination);
