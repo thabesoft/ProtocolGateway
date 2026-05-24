@@ -1,4 +1,6 @@
-﻿namespace ThabeSoft.ProtocolGateway;
+﻿using ThabeSoft.ProtocolGateway.Builders;
+
+namespace ThabeSoft.ProtocolGateway;
 
 
 public interface IProtocolGateway

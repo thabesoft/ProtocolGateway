@@ -25,7 +25,7 @@ public static class RtuRequestEncoder
 
         // 缓冲区不足
         if (destination.Length < layout.TotalLength)
-            return BufferTooSmall(layout.TotalLength, destination.Length);
+            return BufferTooSmall($"{nameof(Read)} ({header.FunctionCode})", layout.TotalLength, destination.Length);
 
         Span<byte> buffer = stackalloc byte[layout.TotalLength];
 
@@ -58,11 +58,11 @@ public static class RtuRequestEncoder
     {
         // 缺少请求头
         if (header == WriteSingleRequestHeader.Empty)
-            return Result.MissingRequestHeader<int>();
+            return MissingRequestHeader(nameof(WriteSingle));
 
         // 缓冲区不足
         if (destination.Length < layout.TotalLength)
-            return Result.BufferInsufficient<int>(layout.TotalLength, destination.Length);
+            return BufferTooSmall(nameof(WriteSingle), layout.TotalLength, destination.Length);
 
         Span<byte> buffer = stackalloc byte[layout.TotalLength];
 
@@ -107,7 +107,7 @@ public static class RtuRequestEncoder
 
         // 缓冲区长度不足
         if (destination.Length < layout.TotalLength)
-            return BufferTooSmall(layout.TotalLength, destination.Length);
+            return BufferTooSmall(nameof(WriteMultipleCoils), layout.TotalLength, destination.Length);
 
         // 参数数量超过预期
         var data_quantity = (ushort)values.Length;
@@ -168,7 +168,7 @@ public static class RtuRequestEncoder
 
         // 构建缓冲区长度不足
         if (destination.Length < layout.TotalLength)
-            return BufferTooSmall(layout.TotalLength, destination.Length);
+            return BufferTooSmall(nameof(WriteMultipleRegisters), layout.TotalLength, destination.Length);
 
         // 参数数量超过预期
         if (data_quantity > layout.DataQuantity)
@@ -209,6 +209,6 @@ public static class RtuRequestEncoder
         $"[{actionName}] 请求头不可为空");
     public static Result MissingRequestLayout(string actionName, string layoutName) => Result.InvalidParameter(
        $"[{actionName}] 缺少布局信息: {layoutName}");
-    private static Result BufferTooSmall(int required, int actual) => Result.InvalidParameter(
-        $"编码所需建缓冲区不足，需要 {required} 字节，实际 {actual} 字节");
+    private static Result BufferTooSmall(string actionName, int required, int actual) => Result.InvalidParameter(
+        $"[{actionName}] 编码所需建缓冲区不足，需要 {required} 字节，实际 {actual} 字节");
 }

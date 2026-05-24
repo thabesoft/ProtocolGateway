@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using ThabeSoft.ProtocolGateway.Tags;
 
-namespace ThabeSoft.ProtocolGateway;
+namespace ThabeSoft.ProtocolGateway.Builders;
 
 /// <summary>
 /// 设备配置构建器

@@ -11,6 +11,12 @@
 	<ItemGroup>
 		<PackageReference Include="System.IO.Ports" Version="10.0.4" />
 	</ItemGroup>
+	
+	<!--netstd 2.0 引入 Range-->
+	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+		<PackageReference Include="IndexRange" Version="1.1.1" />
+	</ItemGroup>
+
 
 	<ItemGroup>
 	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.Abstractions\ThabeSoft.ProtocolGateway.Abstractions.csproj" />

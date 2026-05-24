@@ -11,7 +11,7 @@
     <Project Path="src/ThabeSoft.ProtocolGateway.SerialPort/ThabeSoft.ProtocolGateway.SerialPort.csproj" />
   </Folder>
   <Folder Name="/Primitives/">
-    <Project Path="src/ThabeSoft.Result/ThabeSoft.Primitives.Result.csproj" />
+    <Project Path="src/ThabeSoft.Primitives.Result/ThabeSoft.Primitives.Result.csproj" />
   </Folder>
   <Folder Name="/Tests/">
     <Project Path="tests/ThabeSoft.ProtocolGateway.Benchmark/ThabeSoft.ProtocolGateway.Benchmark.csproj" />
