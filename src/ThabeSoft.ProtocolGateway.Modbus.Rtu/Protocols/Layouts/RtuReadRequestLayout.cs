@@ -4,7 +4,7 @@
 /// <summary>
 /// Modbus Rtu 读请求布局
 /// </summary>
-public readonly record struct RtuReadRequestLayout : IReadRequestLayout, ICrcRangeable
+public readonly record struct RtuReadRequestLayout : IReadRequestLayout, ICrcable
 {
     public static RtuReadRequestLayout Instance => default;
 

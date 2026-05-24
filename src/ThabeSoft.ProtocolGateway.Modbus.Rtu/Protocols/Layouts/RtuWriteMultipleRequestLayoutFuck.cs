@@ -8,7 +8,7 @@ namespace ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
 /// Modbus Rtu 写多值请求布局
 /// </summary>
 [Obsolete("请使用 RtuWriteMultipleCoilsRequestLayout 和 RtuWriteMultipleRegisterRequestLayout", true)]
-public readonly record struct RtuWriteMultipleRequestLayoutFuck : ICrcRangeable,
+public readonly record struct RtuWriteMultipleRequestLayoutFuck : ICrcable,
     IWriteMultipleRequestLayout
 {
     public static readonly RtuWriteMultipleRequestLayoutFuck Empty = default;
@@ -31,7 +31,7 @@ public readonly record struct RtuWriteMultipleRequestLayoutFuck : ICrcRangeable,
     /// <summary>Crc范围</summary>
     public readonly Range CrcRange { get; }
     /// <summary>数据总字节数</summary>
-    public readonly int DataByteLength { get; }
+    public readonly int DataLength { get; }
     /// <summary>数据数量</summary>
     public readonly int DataQuantity { get; }
     /// <summary>帧总长度</summary>
@@ -50,7 +50,7 @@ public readonly record struct RtuWriteMultipleRequestLayoutFuck : ICrcRangeable,
         DataRange = dataRange;
         PayloadRange = contentRange;
         CrcRange = crcRange;
-        DataByteLength = dataByteLength;
+        DataLength = dataByteLength;
         TotalLength = fullByteLength;
         DataQuantity = dataMaxQuantity;
     }

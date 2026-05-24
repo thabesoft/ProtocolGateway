@@ -35,6 +35,11 @@ public readonly record struct ReadRequestHeader : IRequestHeader
 
         return new ReadRequestHeader(slaveId, FunctionCode.ReadCoils, address, quantity_result.Value);
     }
+    public static ReadRequestHeader Coils(byte slaveId, ushort address, ReadCoilsQuantity quantity)
+    {
+        return new ReadRequestHeader(slaveId, FunctionCode.ReadCoils, address, quantity);
+    }
+
 
     public static Result<ReadRequestHeader> DiscreteInputs(byte slaveId, ushort address, int quantity)
     {
@@ -43,6 +48,11 @@ public readonly record struct ReadRequestHeader : IRequestHeader
 
         return new ReadRequestHeader(slaveId, FunctionCode.ReadDiscreteInputs, address, quantity_result.Value);
     }
+    public static ReadRequestHeader DiscreteInputs(byte slaveId, ushort address, ReadCoilsQuantity quantity)
+    {
+        return new ReadRequestHeader(slaveId, FunctionCode.ReadDiscreteInputs, address, quantity);
+    }
+
 
     public static Result<ReadRequestHeader> HoldingRegisters(byte slaveId, ushort address, int quantity)
     {
@@ -51,12 +61,21 @@ public readonly record struct ReadRequestHeader : IRequestHeader
 
         return new ReadRequestHeader(slaveId, FunctionCode.ReadHoldingRegisters, address, quantity_result.Value);
     }
+    public static ReadRequestHeader HoldingRegisters(byte slaveId, ushort address, ReadRegistersQuantity quantity)
+    {
+        return new ReadRequestHeader(slaveId, FunctionCode.ReadHoldingRegisters, address, quantity);
+    }
+
     public static Result<ReadRequestHeader> InputRegisters(byte slaveId, ushort address, int quantity)
     {
         var quantity_result = ReadRegistersQuantity.Create(quantity);
         if (!quantity_result) return quantity_result.PropagateError<ReadRequestHeader>();
 
         return new ReadRequestHeader(slaveId, FunctionCode.ReadInputRegisters, address, quantity_result.Value);
+    }
+    public static ReadRequestHeader InputRegisters(byte slaveId, ushort address, ReadRegistersQuantity quantity)
+    {
+        return new ReadRequestHeader(slaveId, FunctionCode.ReadInputRegisters, address, quantity);
     }
 
 

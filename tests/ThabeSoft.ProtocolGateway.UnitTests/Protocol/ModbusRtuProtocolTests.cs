@@ -210,6 +210,22 @@ public sealed class ModbusRtuProtocolTests
     }
 
 
+    [TestMethod(DisplayName = "读取线圈打包解包")]
+    public async Task ReadCoils_Pack_Unpack()
+    {
+        Span<byte> raw = [0x01, 0x01, 0x01, 0x01, 0x90, 0x48];
+        Span<bool> data = stackalloc bool[8];
+
+        var layout = ReadCoilsQuantity.Create(8)
+            .Bind(RtuReadResponseLayout.Coils);
+
+        RtuResponseDecoder.ReadCoils(raw, data, layout.Value);
+
+        Console.WriteLine(ToString(data.ToArray()));
+    }
+
+
+
     // 转为字节字符串
     private static string ToString(IEnumerable<byte> items)
     {

@@ -3,7 +3,7 @@
 /// <summary>
 /// Rtu 写多个值
 /// </summary>
-internal readonly record struct RtuWriteMultipleRequestLayout : ICrcRangeable, IWriteMultipleRequestLayout
+internal readonly record struct RtuWriteMultipleRequestLayout : ICrcable, IWriteMultipleRequestLayout
 {
     /// <summary>从站Id索引</summary>
     public readonly int SlaveIdIndex => 0;
@@ -22,7 +22,7 @@ internal readonly record struct RtuWriteMultipleRequestLayout : ICrcRangeable, I
     /// <summary>Crc范围</summary>
     public readonly Range CrcRange { get; }
     /// <summary>数据总字节数</summary>
-    public readonly int DataByteLength { get; }
+    public readonly int DataLength { get; }
     /// <summary>数据数量</summary>
     public readonly int DataQuantity { get; }
     /// <summary>帧总长度</summary>
@@ -41,7 +41,7 @@ internal readonly record struct RtuWriteMultipleRequestLayout : ICrcRangeable, I
         DataRange = dataRange;
         PayloadRange = contentRange;
         CrcRange = crcRange;
-        DataByteLength = dataByteLength;
+        DataLength = dataByteLength;
         TotalLength = fullByteLength;
         DataQuantity = dataMaxQuantity;
     }

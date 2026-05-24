@@ -4,7 +4,7 @@
 /// <summary>
 /// Modbus Rtu 写单值请求布局
 /// </summary>
-public readonly record struct RtuWriteSingleRequestLayout : IWriteSingleRequestLayout, ICrcRangeable
+public readonly record struct RtuWriteSingleRequestLayout : IWriteSingleRequestLayout, ICrcable
 {
     public static RtuWriteSingleRequestLayout Instance => default;
 

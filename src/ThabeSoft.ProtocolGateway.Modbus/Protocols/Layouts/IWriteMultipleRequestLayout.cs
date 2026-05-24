@@ -4,16 +4,14 @@
 /// <summary>
 /// Rtu 写多个值请求帧布局
 /// </summary>
-public interface IWriteMultipleRequestLayout : IRequestLayout
+public interface IWriteMultipleRequestLayout : IRequestLayout, IDatable
 {
-    /// <summary>值数量范围[4..6)</summary>
+    /// <summary>值数量范围</summary>
     Range QuantityRange { get; }
-    /// <summary>数据长度索引(6)</summary>
+
+    /// <summary>数据长度索引</summary>
     int DataLengthIndex { get; }
-    /// <summary>数据范围</summary>
-    Range DataRange { get; }
-    /// <summary>数据总字节数</summary>
-    int DataByteLength { get; }
-    /// <summary>数据最大数量</summary>
+
+    /// <summary>数据数量</summary>
     int DataQuantity { get; }
 }

@@ -7,10 +7,10 @@ namespace ThabeSoft.ProtocolGateway.Modbus;
 /// </summary>
 public interface IModbusMaster
 {
-    ValueTask<Result<int>> ReadColisAsync(Memory<bool> destination, byte slaveId, ushort address, ushort quantity, CancellationToken cancellationToken = default);
-    ValueTask<Result<int>> ReadDiscreteInputsAsync(Memory<bool> destination, byte slaveId, ushort address, ushort quantity, CancellationToken cancellationToken = default);
-    ValueTask<Result<int>> ReadHoldingRegistersAsync(Memory<byte> destination, byte slaveId, ushort address, ushort quantity, CancellationToken cancellationToken = default);
-    ValueTask<Result<int>> ReadInputRegistersAsync(Memory<byte> destination, byte slaveId, ushort address, ushort quantity, CancellationToken cancellationToken = default);
+    ValueTask<Result> ReadCoilsAsync(Memory<bool> destination, byte slaveId, ushort address, ushort quantity, CancellationToken cancellationToken = default);
+    ValueTask<Result> ReadDiscreteInputsAsync(Memory<bool> destination, byte slaveId, ushort address, ushort quantity, CancellationToken cancellationToken = default);
+    ValueTask<Result> ReadHoldingRegistersAsync(Memory<byte> destination, byte slaveId, ushort address, ushort quantity, CancellationToken cancellationToken = default);
+    ValueTask<Result> ReadInputRegistersAsync(Memory<byte> destination, byte slaveId, ushort address, ushort quantity, CancellationToken cancellationToken = default);
 
 
     ValueTask<Result> WriteMultipleCoilsAsync(byte slaveId, ushort address, ReadOnlyMemory<bool> values, CancellationToken cancellationToken = default);

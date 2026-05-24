@@ -4,7 +4,7 @@
 /// <summary>
 /// 拥有 CrcRange
 /// </summary>
-public interface ICrcRangeable
+public interface ICrcable
 {
     /// <summary>Crc范围</summary>
     Range CrcRange { get; }

@@ -5,7 +5,7 @@ namespace ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
 /// <summary>
 /// Rtu 写多个寄存器布局
 /// </summary>
-public readonly record struct RtuWriteMultipleRegisterRequestLayout : ICrcRangeable, IWriteMultipleRequestLayout
+public readonly record struct RtuWriteMultipleRegisterRequestLayout : ICrcable, IWriteMultipleRequestLayout
 {
     public static readonly RtuWriteMultipleRegisterRequestLayout Empty = default;
 
@@ -39,7 +39,7 @@ public readonly record struct RtuWriteMultipleRegisterRequestLayout : ICrcRangea
     public Range CrcRange => _layout.CrcRange;
 
     /// <summary>数据总字节数</summary>
-    public int DataByteLength => _layout.DataByteLength;
+    public int DataLength => _layout.DataLength;
 
     /// <summary>数据数量</summary>
     public int DataQuantity => _layout.DataQuantity;

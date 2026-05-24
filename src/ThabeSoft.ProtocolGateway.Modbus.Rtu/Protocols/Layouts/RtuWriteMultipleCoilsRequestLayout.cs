@@ -5,11 +5,11 @@ namespace ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
 /// <summary>
 /// Rtu 写多个线圈布局
 /// </summary>
-public readonly record struct RtuWriteMultipleCoilsRequestLayout : ICrcRangeable, IWriteMultipleRequestLayout
+public readonly record struct RtuWriteMultipleCoilsRequestLayout : ICrcable, IWriteMultipleRequestLayout
 {
     public static readonly RtuWriteMultipleCoilsRequestLayout Empty = default;
 
-    private readonly RtuWriteMultipleRequestLayout _layout { get; }
+    private readonly RtuWriteMultipleRequestLayout _layout;
     private RtuWriteMultipleCoilsRequestLayout(RtuWriteMultipleRequestLayout layout) => _layout = layout;
 
 
@@ -39,7 +39,7 @@ public readonly record struct RtuWriteMultipleCoilsRequestLayout : ICrcRangeable
     public Range CrcRange => _layout.CrcRange;
 
     /// <summary>数据总字节数</summary>
-    public int DataByteLength => _layout.DataByteLength;
+    public int DataLength => _layout.DataLength;
 
     /// <summary>数据数量</summary>
     public int DataQuantity => _layout.DataQuantity;

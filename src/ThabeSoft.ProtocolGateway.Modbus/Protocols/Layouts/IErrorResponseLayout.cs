@@ -6,7 +6,23 @@
 /// </summary>
 public interface IErrorResponseLayout
 {
-    public int SlaveIdIndex { get; }
-    public int FunctionCodeIndex { get; }
-    public int ErrorCodeIndex { get; }
+    /// <summary>
+    /// 从站Id索引
+    /// </summary>
+    int SlaveIdIndex { get; }
+
+    /// <summary>
+    /// 错误功能码索引
+    /// </summary>
+    int ErrorFunctionCodeIndex { get; }
+
+    /// <summary>
+    /// 错误码索引
+    /// </summary>
+    int ErrorCodeIndex { get; }
+
+    /// <summary>
+    /// 负载数据范围
+    /// </summary>
+    Range PayloadRange { get; }
 }

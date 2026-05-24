@@ -192,7 +192,7 @@ public static class RtuRequestDecoder
         if (!quantity_result) return quantity_result.PropagateError<RtuWriteMultipleRequestHeader>();
         // 数据长度
         var data_length = source[layout.DataLengthIndex];
-        if (data_length != layout.DataByteLength)
+        if (data_length != layout.DataLength)
             return Result.Error<RtuWriteMultipleRequestHeader>(ErrorType.InvalidData, "数据长度不匹配");
         // Crc
         var crc_result = source[layout.CrcRange].ToWord(Endianness.LittleEndian);
@@ -249,7 +249,7 @@ public static class RtuRequestDecoder
         if (!quantity_result) return quantity_result.PropagateError<RtuWriteMultipleRequestHeader>();
         // 数据长度
         var data_length = source[layout.DataLengthIndex];
-        if (data_length != layout.DataByteLength)
+        if (data_length != layout.DataLength)
             return Result.InvalidData<RtuWriteMultipleRequestHeader>("数据长度不匹配");
         // Crc
         var crc_result = source[layout.CrcRange].ToWord(Endianness.LittleEndian);

@@ -15,7 +15,7 @@ public sealed class ModbusChannel(IModbusMaster master) : IReader, IWriter
         if(address.FunctionCode == FunctionCode.ReadCoils)
         {
             bool[] buffer = new bool[1];
-            await master.ReadColisAsync(buffer, 0, address.Start, 1, cancellationToken);
+            await master.ReadCoilsAsync(buffer, 0, address.Start, 1, cancellationToken);
             Span<byte> c = stackalloc byte[1];
             return tag.Converter.Convert(c);
         }

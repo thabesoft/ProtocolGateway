@@ -60,7 +60,7 @@ public static class RtuRequestEncoder
         if (header == WriteSingleRequestHeader.Empty)
             return MissingRequestHeader(nameof(WriteSingle));
 
-        // 缓冲区不足
+        // 缓冲区不足 
         if (destination.Length < layout.TotalLength)
             return BufferTooSmall(nameof(WriteSingle), layout.TotalLength, destination.Length);
 
@@ -129,7 +129,7 @@ public static class RtuRequestEncoder
         var quantity_result = data_quantity.ToBytes(buffer[layout.QuantityRange], Endianness.BigEndian);
         if (!quantity_result) return quantity_result;
         // 数据长度
-        buffer[layout.DataLengthIndex] = (byte)layout.DataByteLength;
+        buffer[layout.DataLengthIndex] = (byte)layout.DataLength;
         // 数据
         var value_result = values.ToBytes(buffer[layout.DataRange], Endianness.BigEndian);
         if (!value_result) return value_result;
@@ -189,7 +189,7 @@ public static class RtuRequestEncoder
         var quantity_result = data_quantity.ToBytes(buffer[layout.QuantityRange], Endianness.BigEndian);
         if (!quantity_result) return quantity_result;
         // 数据长度
-        buffer[layout.DataLengthIndex] = (byte)layout.DataByteLength;
+        buffer[layout.DataLengthIndex] = (byte)layout.DataLength;
         // 数据
         var value_result = values.ToByte(buffer[layout.DataRange], Endianness.BigEndian);
         if (!value_result) return value_result;
