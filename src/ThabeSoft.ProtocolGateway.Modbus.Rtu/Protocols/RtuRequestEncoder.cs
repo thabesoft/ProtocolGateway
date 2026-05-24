@@ -131,7 +131,7 @@ public static class RtuRequestEncoder
         // 数据长度
         buffer[layout.DataLengthIndex] = (byte)layout.DataLength;
         // 数据
-        var value_result = values.ToBytes(buffer[layout.DataRange], Endianness.BigEndian);
+        var value_result = values.ToBytes(buffer[layout.DataRange], BitOrder.LSB0);
         if (!value_result) return value_result;
         // Crc
         var crc = CrcCalculator.Calculate(buffer[layout.PayloadRange]);
@@ -191,7 +191,7 @@ public static class RtuRequestEncoder
         // 数据长度
         buffer[layout.DataLengthIndex] = (byte)layout.DataLength;
         // 数据
-        var value_result = values.ToByte(buffer[layout.DataRange], Endianness.BigEndian);
+        var value_result = values.ToBytes(buffer[layout.DataRange], Endianness.BigEndian);
         if (!value_result) return value_result;
         // Crc
         var crc = CrcCalculator.Calculate(buffer[layout.PayloadRange]);

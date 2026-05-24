@@ -1,6 +1,4 @@
-﻿using ThabeSoft.Primitives;
-
-namespace ThabeSoft.ProtocolGateway;
+﻿namespace ThabeSoft.ProtocolGateway;
 
 /// <summary>
 /// 表示设备上一个数据的信息

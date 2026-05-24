@@ -15,61 +15,47 @@ namespace ThabeSoft.ProtocolGateway.Modbus;
 /// </summary>
 public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
 {
-    public async ValueTask<Result> ReadCoilsAsync(Memory<bool> destination, byte slaveId, ushort address, CancellationToken cancellationToken = default)
+    public ValueTask<Result> ReadCoilsAsync(Memory<bool> destination, byte slaveId, ushort address, CancellationToken cancellationToken = default)
     {
-        // 线圈数量
-        var quantity_result = ReadCoilsQuantity.Create(destination.Length);
-        if (!quantity_result) return quantity_result.PropagateError<int>();
-
-        // 协议布局
-        var send_layout = RtuReadRequestLayout.Instance;
-        // 接收布局
-        var receive_layout = RtuReadResponseLayout.Coils(quantity_result.Value);
-
-
-        // 请求+响应
-        var buffer = ArrayPool<byte>.Shared.Rent(send_layout.TotalLength + receive_layout.TotalLength);
-        try
-        {
-            // 请求编码
-            var span = buffer.AsSpan(0, send_layout.TotalLength);
-            var header = ReadRequestHeader.Coils(slaveId, address, quantity_result.Value);
-            var encode_result = RtuRequestEncoder.Read(span, header, send_layout);
-            if (!encode_result) return encode_result.PropagateError<int>();
-
-            // 发送请求
-            var send_mem = buffer.AsMemory(0, send_layout.TotalLength);
-            var request_result = await port.WriteAsync(send_mem, cancellationToken);
-            if (!request_result) return request_result.PropagateError<int>();
-
-
-            // 读取响应
-            var receive_mem = buffer.AsMemory(send_layout.TotalLength, send_layout.TotalLength);
-            var receive_result = await GetResponseAsync(receive_mem, cancellationToken);
-
-            // 响应解码
-            return RtuResponseDecoder.ReadCoils(receive_mem.Span, destination.Span, receive_layout);
-        }
-        finally
-        {
-            ArrayPool<byte>.Shared.Return(buffer);
-        }
+        return ReadCoilsAsync(
+            destination: destination,
+            slaveId: slaveId,
+            address: address,
+            headerHandler: ReadRequestHeader.Coils,
+            decoderHandler: RtuResponseDecoder.ReadCoils,
+            cancellationToken: cancellationToken);
     }
-
     public ValueTask<Result> ReadDiscreteInputsAsync(Memory<bool> destination, byte slaveId, ushort address, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return ReadCoilsAsync(
+            destination: destination,
+            slaveId: slaveId,
+            address: address,
+            headerHandler: ReadRequestHeader.DiscreteInputs,
+            decoderHandler: RtuResponseDecoder.ReadDiscreteInputs,
+            cancellationToken: cancellationToken);
+    }
+    public ValueTask<Result> ReadHoldingRegistersAsync(Memory<ushort> destination, byte slaveId, ushort address, CancellationToken cancellationToken = default)
+    {
+        return ReadRegistersAsync(
+            destination: destination,
+            slaveId: slaveId,
+            address: address,
+            headerHandler: ReadRequestHeader.HoldingRegisters,
+            decoderHandler: RtuResponseDecoder.ReadHoldingRegisters,
+            cancellationToken: cancellationToken);
+    }
+    public ValueTask<Result> ReadInputRegistersAsync(Memory<ushort> destination, byte slaveId, ushort address, CancellationToken cancellationToken = default)
+    {
+        return ReadRegistersAsync(
+            destination: destination,
+            slaveId: slaveId,
+            address: address,
+            headerHandler: ReadRequestHeader.InputRegisters,
+            decoderHandler: RtuResponseDecoder.ReadInputRegisters,
+            cancellationToken: cancellationToken);
     }
 
-    public ValueTask<Result> ReadHoldingRegistersAsync(Memory<byte> destination, byte slaveId, ushort address, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    public ValueTask<Result> ReadInputRegistersAsync(Memory<byte> destination, byte slaveId, ushort address, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
 
     public ValueTask<Result> WriteMultipleCoilsAsync(byte slaveId, ushort address, ReadOnlyMemory<bool> values, CancellationToken cancellationToken = default)
     {
@@ -93,7 +79,158 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
 
 
 
+    
 
+
+    /// <summary>
+    /// 通用读线圈
+    /// </summary>
+    /// <param name="destination">线圈缓冲区</param>
+    /// <param name="slaveId">从站Id</param>
+    /// <param name="address">起始地址</param>
+    /// <param name="headerHandler">请求头构建处理器</param>
+    /// <param name="decoderHandler">解码处理器</param>
+    private async ValueTask<Result> ReadCoilsAsync(
+        Memory<bool> destination,
+        byte slaveId,
+        ushort address,
+        ReadCoilsRequestHeaderHandler headerHandler,
+        ReadCoilsResponseDecoderHandler decoderHandler,
+        CancellationToken cancellationToken = default)
+    {
+        // 线圈数量
+        var quantity_result = ReadCoilsQuantity.Create(destination.Length);
+        if (!quantity_result) return quantity_result;
+
+        // 协议布局
+        var send_layout = RtuReadRequestLayout.Instance;
+        // 接收布局
+        var receive_layout = RtuReadResponseLayout.FromCoilsQuantity(quantity_result.Value);
+
+
+        // 请求+响应
+        var buffer = ArrayPool<byte>.Shared.Rent(send_layout.TotalLength + receive_layout.TotalLength);
+        try
+        {
+            // 请求编码
+            var span = buffer.AsSpan(0, send_layout.TotalLength);
+            var header = headerHandler(slaveId, address, quantity_result.Value);
+            var encode_result = RtuRequestEncoder.Read(span, header, send_layout);
+            if (!encode_result) return encode_result;
+
+            // 发送请求
+            var send_mem = buffer.AsMemory(0, send_layout.TotalLength);
+            var request_result = await port.WriteAsync(send_mem, cancellationToken);
+            if (!request_result) return request_result;
+
+
+            // 读取响应
+            var receive_mem = buffer.AsMemory(send_layout.TotalLength, send_layout.TotalLength);
+            var receive_result = await GetResponseAsync(receive_mem, cancellationToken);
+            if (!receive_result) return receive_result;
+
+            // 响应解码
+            return decoderHandler(receive_mem.Span, destination.Span, receive_layout);
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(buffer);
+        }
+    }
+
+    /// <summary>
+    /// 读请求头处理器
+    /// </summary>
+    /// <param name="slaveId">从站Id</param>
+    /// <param name="address">起始地址</param>
+    /// <param name="quantity">线圈数量</param>
+    private delegate ReadRequestHeader ReadCoilsRequestHeaderHandler(byte slaveId, ushort address, ReadCoilsQuantity quantity);
+    /// <summary>
+    /// 读取响应解码处理器
+    /// </summary>
+    /// <param name="source">源数据</param>
+    /// <param name="values">解析到的值</param>
+    /// <param name="layout">帧布局</param>
+    private delegate Result ReadCoilsResponseDecoderHandler(ReadOnlySpan<byte> source, Span<bool> values, in RtuReadResponseLayout layout);
+
+
+
+    /// <summary>
+    /// 通用读寄存器
+    /// </summary>
+    /// <param name="destination">寄存器缓冲区</param>
+    /// <param name="slaveId">从站Id</param>
+    /// <param name="address">起始地址</param>
+    /// <param name="headerHandler">请求头构建处理器</param>
+    /// <param name="decoderHandler">解码处理器</param>
+    private async ValueTask<Result> ReadRegistersAsync(
+        Memory<ushort> destination,
+        byte slaveId,
+        ushort address,
+        ReadRegisterRequestHeaderHandler headerHandler,
+        ReadRegisterResponseDecoderHandler decoderHandler,
+        CancellationToken cancellationToken = default)
+    {
+        // 线圈数量
+        var quantity_result = ReadRegistersQuantity.Create(destination.Length);
+        if (!quantity_result) return quantity_result;
+
+        // 协议布局
+        var send_layout = RtuReadRequestLayout.Instance;
+        // 接收布局
+        var receive_layout = RtuReadResponseLayout.FromRegistersQuantity(quantity_result.Value);
+
+
+        // 请求+响应
+        var buffer = ArrayPool<byte>.Shared.Rent(send_layout.TotalLength + receive_layout.TotalLength);
+        try
+        {
+            // 请求编码
+            var span = buffer.AsSpan(0, send_layout.TotalLength);
+            var header = headerHandler(slaveId, address, quantity_result.Value);
+            var encode_result = RtuRequestEncoder.Read(span, header, send_layout);
+            if (!encode_result) return encode_result;
+
+            // 发送请求
+            var send_mem = buffer.AsMemory(0, send_layout.TotalLength);
+            var request_result = await port.WriteAsync(send_mem, cancellationToken);
+            if (!request_result) return request_result;
+
+
+            // 读取响应
+            var receive_mem = buffer.AsMemory(send_layout.TotalLength, send_layout.TotalLength);
+            var receive_result = await GetResponseAsync(receive_mem, cancellationToken);
+            if (!receive_result) return receive_result;
+
+            // 响应解码
+            return decoderHandler(receive_mem.Span, destination.Span, receive_layout);
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(buffer);
+        }
+    }
+
+    /// <summary>
+    /// 读请求头处理器
+    /// </summary>
+    /// <param name="slaveId">从站Id</param>
+    /// <param name="address">起始地址</param>
+    /// <param name="quantity">线圈数量</param>
+    private delegate ReadRequestHeader ReadRegisterRequestHeaderHandler(byte slaveId, ushort address, ReadRegistersQuantity quantity);
+    /// <summary>
+    /// 读取响应解码处理器
+    /// </summary>
+    /// <param name="source">源数据</param>
+    /// <param name="values">解析到的值</param>
+    /// <param name="layout">帧布局</param>
+    private delegate Result ReadRegisterResponseDecoderHandler(ReadOnlySpan<byte> source, Span<ushort> values, in RtuReadResponseLayout layout);
+
+
+
+    /// <summary>
+    /// 获取完整响应帧
+    /// </summary>
     private async ValueTask<Result> GetResponseAsync(Memory<byte> destination, CancellationToken cancellationToken)
     {
         const int MinReadBytes = 5;

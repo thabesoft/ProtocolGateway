@@ -23,6 +23,11 @@ public readonly record struct FunctionCode : IEquatable<FunctionCode>
     /// </summary>
     public bool IsRead => _value is ReadCoilsValue or ReadDiscreteInputsValue or ReadHoldingRegistersValue or ReadInputRegistersValue;
     /// <summary>
+    /// 是否是读线圈
+    /// </summary>
+    public bool IsReadCoils => _value is ReadCoilsValue or ReadDiscreteInputsValue;
+
+    /// <summary>
     /// 是否是写操作码
     /// </summary>
     public bool IsWrite => _value is WriteSingleCoilValue or WriteSingleRegisterValue or WriteMultipleCoilsValue or WriteMultipleRegistersValue;

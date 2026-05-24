@@ -26,26 +26,26 @@ public class ByteExtensionsTest
         source.ToWord(endianness).Tap(x => Assert.AreEqual(expected, x));
     }
 
-    [TestMethod(DisplayName = "字节转位数组测试_小端序")]
-    public void TryToBits_LittleEndian()
+    [TestMethod(DisplayName = "字节转位数组测试_LSB0")]
+    public void Byte_ToBits_LSB0()
     {
         const byte source = 0b1010_1010;
         bool[] destination = new bool[8];
 
-        var result = source.ToBits(destination, Endianness.LittleEndian);
+        var result = source.ToBits(destination, BitOrder.LSB0);
         Assert.IsTrue(result, result.Message);
 
         bool[] expected = [false, true, false, true, false, true, false, true];
         CollectionAssert.AreEqual(expected, destination);
     }
 
-    [TestMethod(DisplayName = "字节转位数组测试_大端序")]
-    public void TryToBits_BigEndian()
+    [TestMethod(DisplayName = "字节转位数组测试_MSB0")]
+    public void Byte_ToBits_MSB0()
     {
         const byte source = 0b1010_1010;
         bool[] destination = new bool[8];
 
-        var result = source.ToBits(destination, Endianness.BigEndian);
+        var result = source.ToBits(destination, BitOrder.MSB0);
         Assert.IsTrue(result, result.Message);
 
         bool[] expected = [true, false, true, false, true, false, true, false];

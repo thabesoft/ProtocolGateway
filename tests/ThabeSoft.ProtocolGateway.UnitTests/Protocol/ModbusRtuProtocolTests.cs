@@ -217,7 +217,7 @@ public sealed class ModbusRtuProtocolTests
         Span<bool> data = stackalloc bool[8];
 
         var layout = ReadCoilsQuantity.Create(8)
-            .Bind(RtuReadResponseLayout.Coils);
+            .Bind(RtuReadResponseLayout.FromCoilsQuantity);
 
         RtuResponseDecoder.ReadCoils(raw, data, layout.Value);
 

@@ -28,14 +28,14 @@ public interface IModbusMaster
     /// <param name="destination">缓冲区多大就是读取几个</param>
     /// <param name="slaveId">从站Id</param>
     /// <param name="address">起始地址</param>
-    ValueTask<Result> ReadHoldingRegistersAsync(Memory<byte> destination, byte slaveId, ushort address, CancellationToken cancellationToken = default);
+    ValueTask<Result> ReadHoldingRegistersAsync(Memory<ushort> destination, byte slaveId, ushort address, CancellationToken cancellationToken = default);
     /// <summary>
     /// 读取n个输入寄存器值
     /// </summary>
     /// <param name="destination">缓冲区多大就是读取几个</param>
     /// <param name="slaveId">从站Id</param>
     /// <param name="address">起始地址</param>
-    ValueTask<Result> ReadInputRegistersAsync(Memory<byte> destination, byte slaveId, ushort address, CancellationToken cancellationToken = default);
+    ValueTask<Result> ReadInputRegistersAsync(Memory<ushort> destination, byte slaveId, ushort address, CancellationToken cancellationToken = default);
 
 
     /// <summary>

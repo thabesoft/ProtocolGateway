@@ -6,6 +6,7 @@ namespace ThabeSoft.ProtocolGateway.Primitives;
 /// <summary>
 /// 字布局
 /// </summary>
+[Obsolete("直接用端序 Endianness")]
 public readonly struct WordLayout
 {
     /// <summary>

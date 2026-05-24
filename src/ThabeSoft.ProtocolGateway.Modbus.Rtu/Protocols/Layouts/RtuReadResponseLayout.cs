@@ -62,7 +62,7 @@ public readonly record struct RtuReadResponseLayout : IReadResponseLayout, ICrca
     /// <summary>
     /// 读取多个寄存器
     /// </summary>
-    public static RtuReadResponseLayout CreateRegisters(ReadRegistersQuantity quantity)
+    public static RtuReadResponseLayout FromRegistersQuantity(ReadRegistersQuantity quantity)
     {
         // Data
         const int data_start = 3;
@@ -90,7 +90,7 @@ public readonly record struct RtuReadResponseLayout : IReadResponseLayout, ICrca
     /// <summary>
     /// 读取多个线圈
     /// </summary>
-    public static RtuReadResponseLayout Coils(ReadCoilsQuantity quantity)
+    public static RtuReadResponseLayout FromCoilsQuantity(ReadCoilsQuantity quantity)
     {
         // Data
         const int data_start = 3;

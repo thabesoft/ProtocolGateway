@@ -202,7 +202,7 @@ public static class RtuRequestDecoder
             return Result.Error<RtuWriteMultipleRequestHeader>(ErrorType.InvalidData, "Crc校验失败");
         // 数据
         Span<bool> buffer = stackalloc bool[layout.DataQuantity];
-        var value_result = source[layout.DataRange].ToBits(buffer, Endianness.BigEndian);
+        var value_result = source[layout.DataRange].ToBits(buffer, BitOrder.LSB0);
         if (!value_result) return value_result.PropagateError<RtuWriteMultipleRequestHeader>();
 
         buffer.CopyTo(destination);

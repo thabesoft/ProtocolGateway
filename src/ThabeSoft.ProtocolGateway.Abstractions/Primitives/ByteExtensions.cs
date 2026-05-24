@@ -22,7 +22,7 @@ public static class ByteExtensions
         /// <param name="destination">字节组</param>
         /// <param name="endianness">端序</param>
         /// <returns>是否转换成功</returns>
-        public Result ToBytes(Span<byte> destination, Endianness endianness = default)
+        public Result ToBytes(Span<byte> destination, BitOrder bitOrder = BitOrder.LSB0)
         {
             var bits_count = source.Length;
             var byte_count = (bits_count + 7) / BitsPerByte;
@@ -35,7 +35,7 @@ public static class ByteExtensions
                 var bits_length = Math.Min(bits_count - bits_start, BitsPerByte);
                 var bits_range = source.Slice(bits_start, bits_length);
 
-                var result = bits_range.ToByte();
+                var result = bits_range.ToByte(bitOrder);
                 if (!result) return result;
 
                 buffer[byte_index] = result.Value;
@@ -50,7 +50,7 @@ public static class ByteExtensions
         /// </summary>
         /// <param name="endianness">端序</param>
         /// <returns>是否转换成功</returns>
-        public Result<byte> ToByte(Endianness endianness = default)
+        public Result<byte> ToByte(BitOrder bitOrder = default)
         {
             var bit_count = Math.Min(8, source.Length);
             byte byte_value = 0;
@@ -59,8 +59,17 @@ public static class ByteExtensions
             {
                 if (!source[i]) continue;
 
-                var bitIndex = endianness == Endianness.LittleEndian ? i : bit_count - 1 - i;
-                byte_value |= (byte)(1 << bitIndex);
+                int bitIndex;
+                if (bitOrder == BitOrder.LSB0)
+                {
+                    bitIndex = i;
+                }
+                else // MSB0
+                {
+                    bitIndex = 7 - i;
+                }
+
+                bit_count |= (byte)(1 << bitIndex);
             }
 
             return byte_value;
@@ -73,18 +82,37 @@ public static class ByteExtensions
     extension(byte source)
     {
         /// <summary>
+        /// 获取自己某个范围内
+        /// </summary>
+        /// <param name="index">需要第几个bit的值</param>
+        /// <param name="bitRange">限定bit范围</param>
+        /// <param name="bitOrder">位序</param>
+        /// <returns>True:1, False:0,  Result结果为是否获取成功</returns>
+        public Result<bool> GetBit(int index, Range bitRange, BitOrder bitOrder = BitOrder.LSB0)
+        {
+            var (offset, length) = bitRange.GetOffsetAndLength(8);
+
+            if (length <= 0 || length > 8)
+                return Result.InvalidParameter<bool>($"位范围长度必须在 1~8 之间");
+
+            if (index < 0 || index >= length)
+                return Result.InvalidParameter<bool>($"索引必须在 0~{length - 1} 之间");
+
+            int bitIndex = bitOrder == BitOrder.LSB0
+                ? offset + index           // LSB0: 偏移 + 索引
+                : offset + (length - 1 - index);  // MSB0: 反向
+
+            return (source & (1 << bitIndex)) != 0;
+
+        }
+        /// <summary>
         /// 获取字节的某一个位
         /// </summary>
-        public Result<bool> GetBit(int index, int maxBit = 8, Endianness endianness = default)
+        public Result<bool> GetBit(int index, BitOrder bitOrder = BitOrder.LSB0)
         {
-            if (index < 0 || maxBit > 8 || index >= maxBit)
-            {
-                return Result.InvalidParameter<bool>($"字节位索引必须在 0~{BitsPerByte - 1} 之间，实际 {index}");
-            }
-
-            int bit_index = endianness == Endianness.LittleEndian ? index : maxBit - 1 - index;
-            return (source & (1 << bit_index)) != 0;
+            return source.GetBit(index, 0..8, bitOrder);
         }
+
 
         /// <summary>
         /// 将字节转为位组
@@ -92,14 +120,14 @@ public static class ByteExtensions
         /// <param name="destination">目标位组</param>
         /// <param name="endianness">端序</param>
         /// <returns>实际写入的位数</returns>
-        public Result<int> ToBits(Span<bool> destination, Endianness endianness = default)
+        public Result<int> ToBits(Span<bool> destination, BitOrder bitOrder = BitOrder.LSB0)
         {
             int length = Math.Min(8, destination.Length);
             Span<bool> buffer = stackalloc bool[length];
 
             for (int i = 0; i < length; i++)
             {
-                var result = source.GetBit(i, length, endianness: endianness);
+                var result = source.GetBit(i, 0..length, bitOrder);
                 if (!result) return result.PropagateError<int>();
 
                 buffer[i] = result.Value;
@@ -183,9 +211,9 @@ public static class ByteExtensions
         /// 将字节组转为位组
         /// </summary>
         /// <param name="destination">目标位组</param>
-        /// <param name="endianness">端序</param>
+        /// <param name="birOrder">端序</param>
         /// <returns>是否转换成功</returns>
-        public Result ToBits(Span<bool> destination, Endianness endianness = default)
+        public Result ToBits(Span<bool> destination, BitOrder birOrder = BitOrder.LSB0)
         {
             int total_length = Math.Min(destination.Length, source.Length * BitsPerByte);
             Span<bool> buffer = stackalloc bool[total_length];
@@ -199,7 +227,7 @@ public static class ByteExtensions
                 int bits_in_this_byte = Math.Min(BitsPerByte, total_length - start_bit);
                 var cur_span = buffer.Slice(start_bit, bits_in_this_byte);
 
-                var result = source[i].ToBits(cur_span);
+                var result = source[i].ToBits(cur_span, birOrder);
                 if (!result) return result;
             }
 
@@ -210,8 +238,8 @@ public static class ByteExtensions
         /// 将字节序转为16位无符号整数序
         /// </summary>
         /// <param name="destination">目标16位无符号整数组</param>
-        /// <param name="layout">端序</param>
-        public Result ToWords(Span<ushort> destination, WordLayout layout = default)
+        /// <param name="endianness">端序</param>
+        public Result ToWords(Span<ushort> destination, Endianness endianness = default)
         {
             int total_length = Math.Min(destination.Length, source.Length / 2);
 
@@ -223,7 +251,7 @@ public static class ByteExtensions
                 const int length = 2;
                 var span = source.Slice(begin, length);
 
-                var result = span.ToWord(layout);
+                var result = span.ToWord(endianness);
                 if(!result) return result;
 
                 buffer[i] = result.Value;
@@ -244,8 +272,8 @@ public static class ByteExtensions
         /// 将 ushort 数组转换为字节数组
         /// </summary>
         /// <param name="destination">目标字节缓冲区</param>
-        /// <param name="layout">字节序，默认大端</param>
-        public Result ToByte(Span<byte> destination, WordLayout layout = default)
+        /// <param name="endianness">字节序，默认大端</param>
+        public Result ToBytes(Span<byte> destination, Endianness endianness = default)
         {
             // 元数据数量
             var source_count = source.Length;
@@ -268,7 +296,7 @@ public static class ByteExtensions
                 const int byte_length = 2;
                 var byte_range = buffer.Slice(byte_start, byte_length);
 
-                var result = source[source_index].ToBytes(byte_range, layout);
+                var result = source[source_index].ToBytes(byte_range, endianness);
                 if (!result) return result;
             }
 
