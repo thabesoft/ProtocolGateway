@@ -17,6 +17,12 @@ public readonly record struct WriteCoilsQuantity
     private WriteCoilsQuantity(ushort value) => _value = value;
 
     /// <summary>
+    /// 所占用字节长度
+    /// </summary>
+    public int ByteLength => GetByteLength(_value);
+    public static int GetByteLength(int quantity) => (quantity + 7) / 8;
+
+    /// <summary>
     /// 从数值创建
     /// </summary>
     public static Result<WriteCoilsQuantity> Create(int value)

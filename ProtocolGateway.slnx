@@ -5,7 +5,7 @@
   </Folder>
   <Folder Name="/Helpers/Modbus/">
     <Project Path="src/ThabeSoft.Modbus/ThabeSoft.Modbus.Abstractions.csproj" />
-    <Project Path="src/ThabeSoft.ProtocolGateway.Modbus.Rtu/ThabeSoft.ProtocolGateway.Modbus.Rtu.csproj" />
+    <Project Path="src/ThabeSoft.ProtocolGateway.Modbus.Rtu/ThabeSoft.Modbus.Rtu.Slave.csproj" />
     <Project Path="ThabeSoft.Modbus.Rtu/ThabeSoft.Modbus.Rtu.csproj" Id="fcf057d1-6daf-4789-a7c2-a4b85c7edc04" />
   </Folder>
   <Folder Name="/Helpers/Ports/">

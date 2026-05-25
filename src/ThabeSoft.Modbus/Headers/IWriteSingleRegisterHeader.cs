@@ -1,6 +1,4 @@
-﻿using ThabeSoft.Modbus.Headers.Requests;
-
-namespace ThabeSoft.Modbus.Headers;
+﻿namespace ThabeSoft.Modbus.Headers;
 
 
 /// <summary>

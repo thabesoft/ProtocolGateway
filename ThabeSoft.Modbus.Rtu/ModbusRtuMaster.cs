@@ -1,11 +1,7 @@
 ﻿using System.Buffers;
 using ThabeSoft.Modbus.Encoding;
-using ThabeSoft.Modbus.Encoding.Read;
-using ThabeSoft.Modbus.Encoding.WriteMultiple;
-using ThabeSoft.Modbus.Encoding.WriteSingle;
 using ThabeSoft.Modbus.Headers;
-using ThabeSoft.Modbus.Headers.Requests;
-using ThabeSoft.Modbus.Headers.Response;
+using ThabeSoft.Modbus.Layouts;
 using ThabeSoft.Modbus.Primitives;
 using ThabeSoft.Ports;
 using ThabeSoft.Primitives;
@@ -25,11 +21,13 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
         var request_header_result = ReadRequestHeader.Coils(slaveId, address, destination.Length);
         if (!request_header_result) return request_header_result;
 
+        IReadCodec readCodec = RtuReadCodec.Instance;
+
         return await ReadCoilsAsync(
             destination: destination,
             requestHeader: request_header_result.Value,
-            encoderHandler: RtuReadCodec.Instance.EncodeRequest,
-            decoderHandler: RtuReadCodec.Instance.DecodeCoilsResponse,
+            encoderHandler: readCodec.EncodeRequest,
+            decoderHandler: readCodec.DecodeCoilsResponse,
             cancellationToken: cancellationToken);
     }
     public async ValueTask<Result> ReadDiscreteInputsAsync(Memory<bool> destination, byte slaveId, ushort address, CancellationToken cancellationToken = default)
@@ -38,11 +36,13 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
         var request_header_result = ReadRequestHeader.DiscreteInputs(slaveId, address, destination.Length);
         if (!request_header_result) return request_header_result;
 
+        IReadCodec readCodec = RtuReadCodec.Instance;
+
         return await ReadCoilsAsync(
             destination: destination,
             requestHeader: request_header_result.Value,
-            encoderHandler: RtuReadCodec.Instance.EncodeRequest,
-            decoderHandler: RtuReadCodec.Instance.DecodeCoilsResponse,
+            encoderHandler: readCodec.EncodeRequest,
+            decoderHandler: readCodec.DecodeCoilsResponse,
             cancellationToken: cancellationToken);
     }
     public async ValueTask<Result> ReadHoldingRegistersAsync(Memory<ushort> destination, byte slaveId, ushort address, CancellationToken cancellationToken = default)
@@ -50,11 +50,13 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
         var header_result = ReadRequestHeader.HoldingRegisters(slaveId, address, destination.Length);
         if (!header_result) return header_result;
 
+        IReadCodec readCodec = RtuReadCodec.Instance;
+
         return await ReadRegistersAsync(
             destination: destination,
             requestHeader: header_result.Value,
-            encoderHandler: RtuReadCodec.Instance.EncodeRequest,
-            decoderHandler: RtuReadCodec.Instance.DecodeRegistersResponse,
+            encoderHandler: readCodec.EncodeRequest,
+            decoderHandler: readCodec.DecodeRegistersResponse,
             cancellationToken: cancellationToken);
     }
     public async ValueTask<Result> ReadInputRegistersAsync(Memory<ushort> destination, byte slaveId, ushort address, CancellationToken cancellationToken = default)
@@ -62,11 +64,13 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
         var header_result = ReadRequestHeader.InputRegisters(slaveId, address, destination.Length);
         if (!header_result) return header_result;
 
+        IReadCodec readCodec = RtuReadCodec.Instance;
+
         return await ReadRegistersAsync(
             destination: destination,
             requestHeader: header_result.Value,
-            encoderHandler: RtuReadCodec.Instance.EncodeRequest,
-            decoderHandler: RtuReadCodec.Instance.DecodeRegistersResponse,
+            encoderHandler: readCodec.EncodeRequest,
+            decoderHandler: readCodec.DecodeRegistersResponse,
             cancellationToken: cancellationToken);
     }
 
@@ -359,9 +363,9 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
         var resp_header = destination[..MinReadBytes];
         await port.ReadExactAsync(resp_header, cancellationToken);
 
-        var error_layout = ErrorResponseLayout.Instance;
+        var error_layout = RtuErrorResponseLayout.Instance;
         var slave_id = resp_header.Span[error_layout.SlaveIdIndex];
-        var function_code = resp_header.Span[error_layout.ErrorFunctionCodeIndex];
+        var function_code = resp_header.Span[error_layout.FunctionCodeIndex];
 
         var function_code_result = FunctionCode.FromCode(function_code);
 

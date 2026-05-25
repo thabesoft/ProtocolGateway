@@ -1,5 +1,4 @@
-﻿using ThabeSoft.Modbus.Headers.Requests;
-using ThabeSoft.Modbus.Headers.Response;
+﻿using ThabeSoft.Modbus.Headers;
 using ThabeSoft.Primitives;
 
 namespace ThabeSoft.Modbus.Encoding;

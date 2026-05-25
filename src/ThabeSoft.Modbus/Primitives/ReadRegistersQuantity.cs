@@ -16,6 +16,14 @@ public readonly record struct ReadRegistersQuantity
     private readonly ushort _value;
     private ReadRegistersQuantity(ushort value) => _value = value;
 
+
+    /// <summary>
+    /// 所占用字节长度
+    /// </summary>
+    public int ByteLength => GetByteLength(_value);
+    public static int GetByteLength(int quantity) => quantity * 2;
+
+
     /// <summary>
     /// 从数值创建
     /// </summary>
@@ -28,6 +36,7 @@ public readonly record struct ReadRegistersQuantity
 
         return new ReadRegistersQuantity((ushort)value);
     }
+
 
 
     public static implicit operator ushort(ReadRegistersQuantity quantity) => quantity._value;

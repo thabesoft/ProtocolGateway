@@ -16,6 +16,14 @@ public readonly record struct WriteRegistersQuantity
     private readonly ushort _value;
     private WriteRegistersQuantity(ushort value) => _value = value;
 
+
+    /// <summary>
+    /// 所占用字节长度
+    /// </summary>
+    public int ByteLength => GetByteLength(_value);
+    public static int GetByteLength(int quantity) => quantity * 2;
+
+
     /// <summary>
     /// 从数值创建
     /// </summary>

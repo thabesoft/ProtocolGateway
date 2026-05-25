@@ -11,45 +11,16 @@ public static class ModbusHelper
     private const ushort CoilClose = 0x0000;
 
     /// <summary>
-    /// 获取线圈数量转为字节后的长度
+    /// 从线圈开关值转为字 开:0xFF00, 关0x0000
     /// </summary>
-    /// <param name="quantity">线圈数量</param>
-    /// <returns>锁占用的字节</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ushort GetColisToByteLength(int quantity) => (byte)((quantity + 7) / 8);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ushort GetColisToByteLength(ReadCoilsQuantity quantity) => (byte)((quantity + 7) / 8);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ushort GetColisToByteLength(WriteCoilsQuantity quantity) => (byte)((quantity + 7) / 8);
+    public static ushort ToModbusWordValue(this bool value) => value ? CoilOpen : CoilClose;
 
     /// <summary>
-    /// 获取寄存器转为字节后的长度
-    /// </summary>
-    /// <param name="quantity">寄存器数量</param>
-    /// <returns>所占用的字节</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ushort GetRegistersToByteLength(int quantity) => (byte)(quantity * 2);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ushort GetRegistersToByteLength(ReadRegistersQuantity quantity) => (byte)(quantity * 2);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ushort GetRegistersToByteLength(WriteRegistersQuantity quantity) => (byte)(quantity * 2);
-
-
-    /// <summary>
-    /// 获取单线圈的值 (Modbus写入值最低要求 两个字节)
+    /// 转为Modbus线圈值, 只能是 0xFF00(开) 或 0x0000(关)
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ushort GetCoilWordValue(bool value) => value ? CoilOpen : CoilClose;
-
-    /// <summary>
-    /// 获取单线圈的值
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Result<bool> GetSingleCoilValue(ushort value)
+    public static Result<bool> ToModbusCoilValue(this ushort value)
     {
         return value switch
         {

@@ -1,5 +1,5 @@
-﻿using ThabeSoft.Modbus.Encoding.WriteMultiple;
-using ThabeSoft.Modbus.Headers.Requests;
+﻿using ThabeSoft.Modbus.Headers;
+using ThabeSoft.Modbus.Layouts;
 
 namespace ThabeSoft.Modbus.Encoding;
 

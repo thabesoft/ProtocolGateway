@@ -16,6 +16,14 @@ public readonly record struct ReadCoilsQuantity
     private readonly ushort _value;
     private ReadCoilsQuantity(ushort value) => _value = value;
 
+
+    /// <summary>
+    /// 所占用字节长度
+    /// </summary>
+    public int ByteLength => GetByteLength(_value);
+    public static int GetByteLength(int quantity) => (quantity + 7) / 8;
+
+
     /// <summary>
     /// 从值创建
     /// </summary>
