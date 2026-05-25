@@ -7,7 +7,7 @@ namespace ThabeSoft.ProtocolGateway.Builders;
 /// <summary>
 /// 32 位数据转换
 /// </summary>
-public readonly struct DWordConverter(DWordLayout layout) :
+public sealed class DWordConverter(DWordLayout layout) :
     IByteConverter<uint>,
     IByteConverter<int>,
     IByteConverter<float>
@@ -26,7 +26,6 @@ public readonly struct DWordConverter(DWordLayout layout) :
     }
     private Result Convert(uint value, Span<byte> destination)
     {
-        //TODO: 反向写入如何决定字节序
         return value.ToBytes(destination, layout);
     }
 

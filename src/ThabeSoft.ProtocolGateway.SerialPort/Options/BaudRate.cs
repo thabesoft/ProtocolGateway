@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using ThabeSoft.Primitives;
 
-namespace ThabeSoft.ProtocolGateway.SerialPort.Options;
+namespace ThabeSoft.Ports.Options;
 
 
 /// <summary>

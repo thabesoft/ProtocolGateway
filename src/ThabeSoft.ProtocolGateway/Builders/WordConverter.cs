@@ -6,27 +6,33 @@ namespace ThabeSoft.ProtocolGateway.Builders;
 /// <summary>
 /// 16 位数据转换
 /// </summary>
-public class WordConverter(WordLayout layout) :
+public sealed class WordConverter :
     IByteConverter<ushort>,
     IByteConverter<short>,
     IByteConverter<char>
 {
-    public static WordConverter BigEndian { get;} = new(WordLayout.BigEndian);
+    private readonly Endianness _endianness;
+    private WordConverter(Endianness endianness) => _endianness = endianness;
+
+
+    public static WordConverter BigEndian { get;} = new(Endianness.BigEndian);
     public static WordConverter LittleEndian { get; } = new(Endianness.LittleEndian);
+
+    public static WordConverter From(Endianness endianness)
+    {
+        return (endianness == Endianness.BigEndian) ? BigEndian : LittleEndian;
+    }
+
 
 
     private Result<ushort> Convert(ReadOnlySpan<byte> source)
     {
         if (source.Length < 2) return Result.Error<ushort>(ErrorType.InvalidParameter, "字至少需要2字节");
-
-        Span<byte> destination = stackalloc byte[2];
-        source.Swap(destination, layout);
-        return destination.ToWord(layout);
+        return source.ToWord(_endianness);
     }
     private Result Convert(ushort value, Span<byte> destination)
     {
-        //TODO: 反向写入如何决定字节序
-        return value.ToBytes(destination, layout);
+        return value.ToBytes(destination, _endianness);
     }
 
 

@@ -19,6 +19,7 @@
 
 
 	<ItemGroup>
+	  <ProjectReference Include="..\ThabeSoft.Modbus\ThabeSoft.Modbus.Abstractions.csproj" />
 	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.Abstractions\ThabeSoft.ProtocolGateway.Abstractions.csproj" />
 	</ItemGroup>
 

@@ -1,8 +1,6 @@
 ﻿using System.Buffers;
-using System.Net;
+using ThabeSoft.Modbus;
 using ThabeSoft.Primitives;
-using ThabeSoft.ProtocolGateway.Modbus.Primitives;
-using ThabeSoft.ProtocolGateway.Primitives;
 
 namespace ThabeSoft.ProtocolGateway.Modbus;
 
@@ -13,7 +11,6 @@ public sealed class ModbusChannel(IModbusMaster master) : IChannel
     {
         if (tag.Address is not ModbusAddress address) return Result.Error<TValue>(ErrorType.InvalidOperation, "无效地址");
         if (!address.FunctionCode.IsRead) Result.Error<TValue>(ErrorType.InvalidOperation, "不是有效的 Modbus 读值地址");
-
 
         var byte_count = address.FunctionCode.IsReadCoils ? 1 : tag.Length;
         var buffer = ArrayPool<byte>.Shared.Rent(byte_count);

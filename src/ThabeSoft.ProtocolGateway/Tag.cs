@@ -1,5 +1,5 @@
-﻿using ThabeSoft.ProtocolGateway.Builders;
-using ThabeSoft.ProtocolGateway.Primitives;
+﻿using ThabeSoft.Primitives;
+using ThabeSoft.ProtocolGateway.Builders;
 
 namespace ThabeSoft.ProtocolGateway;
 
@@ -29,15 +29,15 @@ public static class Tag
 {
     public static Tag<bool> Bool(IAddress address)
         => new(address, 1, BoolConverter.Instance);
-    public static Tag<byte> Byte(IAddress address)
-        => new(address, 1, PassthroughConverter.Instance);
+    public static Tag<byte> Byte(IAddress address, BitOrder bitOrder = BitOrder.MSB0)
+        => new(address, 1, ByteConverter.From(bitOrder));
 
-    public static Tag<short> Int16(IAddress address, WordLayout wordLayout = default)
-        => new(address, 2, new WordConverter(wordLayout));
-    public static Tag<ushort> UInt16(IAddress address, WordLayout wordLayout = default)
-        => new(address, 2, new WordConverter(wordLayout));
-    public static Tag<char> Char(IAddress address, WordLayout wordLayout = default)
-        => new(address, 2, new WordConverter(wordLayout));
+    public static Tag<short> Int16(IAddress address, Endianness endianness = Endianness.BigEndian)
+        => new(address, 2, WordConverter.From(endianness));
+    public static Tag<ushort> UInt16(IAddress address, Endianness endianness = Endianness.BigEndian)
+        => new(address, 2, WordConverter.From(endianness));
+    public static Tag<char> Char(IAddress address, Endianness endianness = Endianness.BigEndian)
+        => new(address, 2, WordConverter.From(endianness));
 
 
     public static Tag<int> Int32(IAddress address, DWordLayout layout = default)

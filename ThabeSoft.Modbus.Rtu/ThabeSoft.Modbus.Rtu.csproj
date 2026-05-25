@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+		<LangVersion>preview</LangVersion>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<RootNamespace>ThabeSoft.Modbus</RootNamespace>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Remove="vua2xprl.0yv~" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\ThabeSoft.Modbus\ThabeSoft.Modbus.Abstractions.csproj" />
+    <ProjectReference Include="..\ThabeSoft.Ports.Abstractions\ThabeSoft.Ports.Abstractions.csproj" />
+    <ProjectReference Include="..\ThabeSoft.Primitives.ByteKit\ThabeSoft.Primitives.ByteKit.csproj" />
+  </ItemGroup>
+
+</Project>

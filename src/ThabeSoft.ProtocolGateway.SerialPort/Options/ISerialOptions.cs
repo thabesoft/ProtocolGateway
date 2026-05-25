@@ -1,7 +1,6 @@
 ﻿using System.IO.Ports;
-using ThabeSoft.ProtocolGateway.Transports;
 
-namespace ThabeSoft.ProtocolGateway.SerialPort.Options;
+namespace ThabeSoft.Ports.Options;
 
 
 /// <summary>

@@ -6,7 +6,7 @@ namespace ThabeSoft.ProtocolGateway.Builders;
 /// <summary>
 /// 64 位数据转换
 /// </summary>
-public class QWordConverter(QWordLayout layout) :
+public sealed class QWordConverter(QWordLayout layout) :
     IByteConverter<ulong>,
     IByteConverter<long>,
     IByteConverter<double>

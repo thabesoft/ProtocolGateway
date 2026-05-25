@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
+using ThabeSoft.Ports;
+using ThabeSoft.Ports.Options;
 using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Primitives;
-using ThabeSoft.ProtocolGateway.SerialPort.Options;
-using ThabeSoft.ProtocolGateway.Transports;
 
 using SystemSerialPort = System.IO.Ports.SerialPort;
 

@@ -1,8 +1,7 @@
-﻿using ThabeSoft.Primitives;
+﻿using ThabeSoft.Modbus;
+using ThabeSoft.Ports.Options;
 using ThabeSoft.ProtocolGateway.Modbus;
-using ThabeSoft.ProtocolGateway.Primitives;
 using ThabeSoft.ProtocolGateway.SerialPort;
-using ThabeSoft.ProtocolGateway.SerialPort.Options;
 
 namespace ThabeSoft.ProtocolGateway;
 

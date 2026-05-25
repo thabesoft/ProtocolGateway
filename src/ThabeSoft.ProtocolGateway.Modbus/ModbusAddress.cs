@@ -1,4 +1,4 @@
-﻿using ThabeSoft.ProtocolGateway.Modbus.Primitives;
+﻿using ThabeSoft.Modbus;
 
 namespace ThabeSoft.ProtocolGateway.Modbus;
 
@@ -20,6 +20,7 @@ public sealed class ModbusAddress(byte slaveId, ushort address, FunctionCode fun
     /// 功能码
     /// </summary>
     public FunctionCode FunctionCode => functionCode;
+
 
 
     public static ModbusAddress ReadCoils(byte slaveId, ushort address) => new(slaveId, address, FunctionCode.ReadCoils);

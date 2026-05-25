@@ -17,10 +17,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.Modbus.Rtu\ThabeSoft.ProtocolGateway.Modbus.Rtu.csproj" />
 		<ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.Modbus\ThabeSoft.ProtocolGateway.Modbus.csproj" />
-		<ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.SerialPort\ThabeSoft.ProtocolGateway.SerialPort.csproj" />
+		<ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.SerialPort\ThabeSoft.Ports.SerialPort.csproj" />
 		<ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway\ThabeSoft.ProtocolGateway.csproj" />
+		<ProjectReference Include="..\..\ThabeSoft.Modbus.Rtu\ThabeSoft.Modbus.Rtu.csproj" />
 	</ItemGroup>
 
 </Project>
