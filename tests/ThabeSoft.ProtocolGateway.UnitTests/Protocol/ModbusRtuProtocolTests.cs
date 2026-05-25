@@ -1,8 +1,10 @@
 ﻿using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Modbus.Primitives;
-using ThabeSoft.ProtocolGateway.Modbus.Protocols;
 using ThabeSoft.ProtocolGateway.Modbus.Protocols.Headers;
 using ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
+using ThabeSoft.ProtocolGateway.Modbus.Rtu.Decoder;
+using ThabeSoft.ProtocolGateway.Modbus.Rtu.Encoder;
+using ThabeSoft.ProtocolGateway.Modbus.Rtu.Protocols.Layouts;
 using ThabeSoft.ProtocolGateway.Primitives;
 
 namespace ThabeSoft.ProtocolGateway.Protocol;
@@ -41,7 +43,7 @@ public sealed class ModbusRtuProtocolTests
 
         // 解码
         Span<ushort> unpack_value = stackalloc ushort[quantity];
-        var unpack_result = RtuRequestDecoder.WriteMultipleRegisters(pack_buffer, unpack_value, layout_result.Value);
+        var unpack_result = RequestDecoder.WriteMultipleRegisters(pack_buffer, unpack_value, layout_result.Value);
         Assert.IsTrue(unpack_result, unpack_result.Message);
 
 
@@ -68,7 +70,7 @@ public sealed class ModbusRtuProtocolTests
     {
         // 获取帧布局
         var layout_result = WriteCoilsQuantity.Create(quantity)
-            .Bind(RtuWriteMultipleCoilsRequestLayout.Create);
+            .Bind(WriteMultipleCoilsRequestLayout.Create);
         Assert.IsTrue(layout_result, layout_result.Message);
 
         Span<byte> pack_buffer = stackalloc byte[layout_result.Value.TotalLength];
@@ -87,7 +89,7 @@ public sealed class ModbusRtuProtocolTests
 
         // 解码
         Span<bool> unpack_value = stackalloc bool[quantity];
-        var unpack_result = RtuRequestDecoder.WriteMultipleCoils(pack_buffer, unpack_value, layout_result.Value);
+        var unpack_result = RequestDecoder.WriteMultipleCoils(pack_buffer, unpack_value, layout_result.Value);
         Assert.IsTrue(unpack_result, unpack_result.Message);
 
 
@@ -112,7 +114,7 @@ public sealed class ModbusRtuProtocolTests
     public async Task WriteSingleCoil_Pack_Unpack(byte slaveId, ushort address, bool value)
     {
         // 获取帧布局
-        var layout = RtuWriteSingleRequestLayout.Instance;
+        var layout = WriteSingleRequestLayout.Instance;
         Span<byte> pack_buffer = stackalloc byte[layout.TotalLength];
 
         // 创建请求头
@@ -124,7 +126,7 @@ public sealed class ModbusRtuProtocolTests
         Assert.IsTrue(encode_result, encode_result.Message);
 
         // 解码
-        var unpack_result = RtuRequestDecoder.WriteSingleCoil(pack_buffer);
+        var unpack_result = RequestDecoder.WriteSingleCoil(pack_buffer);
         Assert.IsTrue(unpack_result, unpack_result.Message);
 
 
@@ -147,7 +149,7 @@ public sealed class ModbusRtuProtocolTests
     public async Task WriteSingleRegister_Pack_Unpack(byte slaveId, ushort address, ushort value)
     {
         // 获取帧布局
-        var layout = RtuWriteSingleRequestLayout.Instance;
+        var layout = WriteSingleRequestLayout.Instance;
         Span<byte> pack_buffer = stackalloc byte[layout.TotalLength];
 
         // 创建请求头
@@ -159,7 +161,7 @@ public sealed class ModbusRtuProtocolTests
         Assert.IsTrue(encode_result, encode_result.Message);
 
         // 解码
-        var unpack_result = RtuRequestDecoder.WriteSingleRegister(pack_buffer);
+        var unpack_result = RequestDecoder.WriteSingleRegister(pack_buffer);
         Assert.IsTrue(unpack_result, unpack_result.Message);
 
 
@@ -181,7 +183,7 @@ public sealed class ModbusRtuProtocolTests
     public async Task ReadCoils_Pack_Unpack(byte slaveId, ushort address, ushort quantity)
     {
         // 获取帧布局
-        var layout = RtuReadRequestLayout.Instance;
+        var layout = ReadRequestLayout.Instance;
         Span<byte> pack_buffer = stackalloc byte[layout.TotalLength];
 
         // 创建请求头
@@ -193,7 +195,7 @@ public sealed class ModbusRtuProtocolTests
         Assert.IsTrue(encode_result, encode_result.Message);
 
         // 解码
-        var unpack_result = RtuRequestDecoder.ReadCoils(pack_buffer);
+        var unpack_result = RequestDecoder.ReadCoils(pack_buffer);
         Assert.IsTrue(unpack_result, unpack_result.Message);
 
 
@@ -217,9 +219,9 @@ public sealed class ModbusRtuProtocolTests
         Span<bool> data = stackalloc bool[8];
 
         var layout = ReadCoilsQuantity.Create(8)
-            .Bind(RtuReadResponseLayout.FromCoilsQuantity);
+            .Bind(ReadResponseLayout.FromCoilsQuantity);
 
-        RtuResponseDecoder.ReadCoils(raw, data, layout.Value);
+        ResponseDecoder.ReadCoils(raw, data, layout.Value);
 
         Console.WriteLine(ToString(data.ToArray()));
     }

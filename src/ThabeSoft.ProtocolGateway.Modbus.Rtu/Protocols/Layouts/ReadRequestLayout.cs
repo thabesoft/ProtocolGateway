@@ -1,12 +1,14 @@
-﻿namespace ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
+﻿using ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
+
+namespace ThabeSoft.ProtocolGateway.Modbus.Rtu.Protocols.Layouts;
 
 
 /// <summary>
 /// Modbus Rtu 读请求布局
 /// </summary>
-public readonly record struct RtuReadRequestLayout : IReadRequestLayout, ICrcable
+public readonly record struct ReadRequestLayout : IReadRequestLayout, ICrcable
 {
-    public static RtuReadRequestLayout Instance => default;
+    public static ReadRequestLayout Instance => default;
 
 
     /// <summary>从站Id索引</summary>
@@ -14,20 +16,21 @@ public readonly record struct RtuReadRequestLayout : IReadRequestLayout, ICrcabl
     /// <summary>功能码索引</summary>
     public int FunctionCodeIndex => 1;
     /// <summary>地址范围</summary>
-    public Range AddressRange => new(2, 4);
+    public Range AddressRange => 2..4;
     /// <summary>参数数量</summary>
-    public Range QuantityRange => new(4, 6);
-    /// <summary>负载范围(不含Crc之外的数据)</summary>
-    public Range PayloadRange => new(0, 6);
+    public Range QuantityRange => 4..6;
     /// <summary>Crc范围</summary>
-    public Range CrcRange => new(6, 8);
+    public Range CrcRange => 6..8;
+
+
+    /// <summary>负载范围(不含Crc之外的数据)</summary>
+    public Range PayloadRange => 0..6;
     /// <summary>总长度</summary>
     public int TotalLength => 8;
 
 
     public override string ToString()
     {
-        // [10] Id(1) Func(2) Addr(2..4) Qua(4..6) Crc(10..12)
         return $"总长度={TotalLength}, Id({SlaveIdIndex})Func({FunctionCodeIndex})Addr({AddressRange})Qua({QuantityRange})Crc({CrcRange})";
     }
 }

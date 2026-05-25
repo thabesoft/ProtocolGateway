@@ -1,5 +1,4 @@
-﻿using ThabeSoft.Primitives;
-using ThabeSoft.ProtocolGateway.Modbus.Primitives;
+﻿using ThabeSoft.ProtocolGateway.Modbus.Primitives;
 
 namespace ThabeSoft.ProtocolGateway.Modbus.Protocols.Headers;
 
@@ -14,29 +13,19 @@ public readonly record struct WriteSingleRequestHeader : IWriteSingleHeader
     public readonly FunctionCode FunctionCode { get; }
     public readonly ushort Address { get; }
     public readonly ushort Value { get; }
+    public readonly ushort Crc { get; }
+
 
 
     [Obsolete("禁止调用构造, 请使用工厂方法")]
     public WriteSingleRequestHeader() { }
-    private WriteSingleRequestHeader(byte slaveId, FunctionCode functionCode, ushort address, ushort value)
+    internal WriteSingleRequestHeader(byte slaveId, FunctionCode functionCode, ushort address, ushort value, ushort crc)
     {
         SlaveId = slaveId;
         FunctionCode = functionCode;
         Address = address;
         Value = value;
     }
-
-    public static Result<WriteSingleRequestHeader> Coil(byte slaveId, ushort address, bool value)
-    {
-        ushort word_value = ProtocolExtensions.GetCoilWordValue(value);
-        return new WriteSingleRequestHeader(slaveId, FunctionCode.WriteSingleCoil, address, word_value);
-    }
-
-    public static Result<WriteSingleRequestHeader> Register(byte slaveId, ushort address, ushort value)
-    {
-        return new WriteSingleRequestHeader(slaveId, FunctionCode.WriteSingleRegister, address, value);
-    }
-
 
     public override string ToString()
     {

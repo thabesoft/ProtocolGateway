@@ -1,13 +1,14 @@
 ﻿using ThabeSoft.ProtocolGateway.Modbus.Primitives;
 
-namespace ThabeSoft.ProtocolGateway.Modbus.Protocols.Headers;
+namespace ThabeSoft.ProtocolGateway.Modbus.Rtu.Protocols.Headers;
+
 
 /// <summary>
-/// Rtu 写单值请求头
+/// Rtu 写单值头
 /// </summary>
-public readonly record struct RtuWriteSingleCoilRequestHeader : IRtuWriteSingleCoilRequestHeader
+public readonly record struct WriteSingleCoilHeader : IWriteSingleCoilHeader
 {
-    public static readonly RtuWriteSingleCoilRequestHeader Empty = default;
+    public static readonly WriteSingleCoilHeader Empty = default;
 
 
     public byte SlaveId { get; }
@@ -17,10 +18,11 @@ public readonly record struct RtuWriteSingleCoilRequestHeader : IRtuWriteSingleC
     public ushort Crc { get; }
 
 
-    [Obsolete("禁止调用构造, 请使用工厂方法")]
-    public RtuWriteSingleCoilRequestHeader() { }
 
-    internal RtuWriteSingleCoilRequestHeader(byte slaveId, ushort address, bool value, ushort crc)
+    [Obsolete("禁止调用构造, 请使用工厂方法")]
+    public WriteSingleCoilHeader() { }
+
+    internal WriteSingleCoilHeader(byte slaveId, ushort address, bool value, ushort crc)
     {
         SlaveId = slaveId;
         Address = address;

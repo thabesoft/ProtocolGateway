@@ -38,13 +38,13 @@ public static class ProtocolExtensions
     /// 获取单线圈的值
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Result GetSingleCoilValue(ushort value)
+    public static Result<bool> GetSingleCoilValue(ushort value)
     {
         return value switch
         {
             CoilOpen => true,
             CoilClose => false,
-            _ => Result.Error(ErrorType.InvalidParameter, $"无效的 Modbus 线圈值: 0x{value:X4}，有效值为 0xFF00 (ON) 或 0x0000 (OFF)")
+            _ => Result.InvalidParameter<bool>($"无效的 Modbus 线圈值: 0x{value:X4}，有效值为 0xFF00 (ON) 或 0x0000 (OFF)")
         };
     }
 }

@@ -145,8 +145,8 @@ public static class ByteExtensions
         /// <summary>
         /// 将字节组转换为 字 (16 bit)
         /// </summary>
-        /// <param name="layout">来源的端序类型</param>
-        public Result<ushort> ToWord(WordLayout layout = default)
+        /// <param name="endianness">来源的端序类型</param>
+        public Result<ushort> ToWord(Endianness endianness = default)
         {
             if (source.Length < 2)
             {
@@ -154,7 +154,7 @@ public static class ByteExtensions
                     $"Byte[] 转 Word 失败，至少需要 2 字节，实际 {source.Length} 字节");
             }
 
-            if (layout == Endianness.BigEndian)
+            if (endianness == Endianness.BigEndian)
             {
                 return (ushort)(source[0] << 8 | source[1]);
             }

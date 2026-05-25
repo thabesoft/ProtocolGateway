@@ -1,13 +1,14 @@
 ﻿using ThabeSoft.ProtocolGateway.Modbus.Primitives;
 
-namespace ThabeSoft.ProtocolGateway.Modbus.Protocols.Headers;
+namespace ThabeSoft.ProtocolGateway.Modbus.Rtu.Protocols.Headers;
 
 /// <summary>
-/// Rtu 读单寄存器请求头
+/// Rtu 读单寄存器响应头
 /// </summary>
-public readonly record struct RtuWriteSingleRegisterRequestHeader : IRtuWriteSingleRegisterRequestHeader
+public readonly record struct RtuWriteSingleRegisterHeader : IWriteSingleRegisterHeader
 {
-    public static readonly RtuWriteSingleRegisterRequestHeader Empty = default;
+    public static readonly RtuWriteSingleRegisterHeader Empty = default;
+
 
     public byte SlaveId { get; }
     public FunctionCode FunctionCode => FunctionCode.WriteSingleRegister;
@@ -16,9 +17,10 @@ public readonly record struct RtuWriteSingleRegisterRequestHeader : IRtuWriteSin
     public ushort Crc { get; }
 
 
+
     [Obsolete("禁止调用构造, 请使用工厂方法")]
-    public RtuWriteSingleRegisterRequestHeader() { }
-    internal RtuWriteSingleRegisterRequestHeader (byte slaveId, ushort address, ushort value, ushort crc)
+    public RtuWriteSingleRegisterHeader() { }
+    internal RtuWriteSingleRegisterHeader (byte slaveId, ushort address, ushort value, ushort crc)
     {
         SlaveId = slaveId;
         Address = address;

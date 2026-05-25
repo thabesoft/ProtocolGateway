@@ -1,13 +1,14 @@
 ﻿using ThabeSoft.ProtocolGateway.Modbus.Primitives;
 
-namespace ThabeSoft.ProtocolGateway.Modbus.Protocols.Headers;
+namespace ThabeSoft.ProtocolGateway.Modbus.Rtu.Protocols.Headers;
+
 
 /// <summary>
-/// Rtu 读请求头
+/// 写多值响应头
 /// </summary>
-public readonly struct RtuReadRequestHeader : IRtuReadRequestHeader
+public readonly record struct WriteMultipleResponseHeader : IHeader
 {
-    public static readonly RtuReadRequestHeader Empty = default;
+    public static readonly WriteMultipleResponseHeader Empty = default;
 
 
     public byte SlaveId { get; }
@@ -17,9 +18,10 @@ public readonly struct RtuReadRequestHeader : IRtuReadRequestHeader
     public ushort Crc { get; }
 
 
+
     [Obsolete("禁止调用构造, 请使用工厂方法")]
-    public RtuReadRequestHeader() { }
-    internal RtuReadRequestHeader(byte slaveId, FunctionCode functionCode, ushort address, ushort quantity, ushort crc)
+    public WriteMultipleResponseHeader() { }
+    internal WriteMultipleResponseHeader(byte slaveId, FunctionCode functionCode, ushort address, ushort quantity, ushort crc)
     {
         SlaveId = slaveId;
         FunctionCode = functionCode;
@@ -30,6 +32,6 @@ public readonly struct RtuReadRequestHeader : IRtuReadRequestHeader
 
     public override string ToString()
     {
-        return $"从站={SlaveId}, 功能码={FunctionCode}, 地址={Address}, 数量={Quantity}, Crc={Crc}";
+        return $"从站={SlaveId}, 功能码={FunctionCode}, 地址={Address},数量={Quantity} Crc={Crc}";
     }
 }

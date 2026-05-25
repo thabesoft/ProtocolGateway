@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/Helpers/">
+    <Project Path="src/ThabeSoft.Modbus/ThabeSoft.Modbus.csproj" />
+    <Project Path="src/ThabeSoft.Primitives.Result/ThabeSoft.Primitives.Result.csproj" />
+  </Folder>
   <Folder Name="/Modules/">
     <Project Path="src/ThabeSoft.ProtocolGateway.Abstractions/ThabeSoft.ProtocolGateway.Abstractions.csproj" />
     <Project Path="src/ThabeSoft.ProtocolGateway/ThabeSoft.ProtocolGateway.csproj" />
@@ -9,9 +13,6 @@
   </Folder>
   <Folder Name="/Modules/Transports/">
     <Project Path="src/ThabeSoft.ProtocolGateway.SerialPort/ThabeSoft.ProtocolGateway.SerialPort.csproj" />
-  </Folder>
-  <Folder Name="/Primitives/">
-    <Project Path="src/ThabeSoft.Primitives.Result/ThabeSoft.Primitives.Result.csproj" />
   </Folder>
   <Folder Name="/Tests/">
     <Project Path="tests/ThabeSoft.ProtocolGateway.Benchmark/ThabeSoft.ProtocolGateway.Benchmark.csproj" />

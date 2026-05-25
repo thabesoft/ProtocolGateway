@@ -1,17 +1,13 @@
 ﻿using ThabeSoft.ProtocolGateway.Modbus.Primitives;
-using ThabeSoft.ProtocolGateway.Protocols;
 
 namespace ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
 
-
 /// <summary>
-/// Modbus Rtu 写多值请求布局
+/// Rtu 写多个值
 /// </summary>
-[Obsolete("请使用 RtuWriteMultipleCoilsRequestLayout 和 RtuWriteMultipleRegisterRequestLayout", true)]
-public readonly record struct RtuWriteMultipleRequestLayoutFuck : ICrcable,
-    IWriteMultipleRequestLayout
+public readonly record struct WriteMultipleRequestLayout : ICrcable, IWriteMultipleRequestLayout
 {
-    public static readonly RtuWriteMultipleRequestLayoutFuck Empty = default;
+    public static WriteMultipleRequestLayout Empty => default;
 
 
     /// <summary>从站Id索引</summary>
@@ -19,17 +15,19 @@ public readonly record struct RtuWriteMultipleRequestLayoutFuck : ICrcable,
     /// <summary>功能码索引</summary>
     public readonly int FunctionCodeIndex => 1;
     /// <summary>地址范围[</summary>
-    public readonly Range AddressRange => new(2, 4);
+    public readonly Range AddressRange => 2..4;
     /// <summary>值数量范围</summary>
-    public readonly Range QuantityRange => new(4, 6);
+    public readonly Range QuantityRange => 4..6;
     /// <summary>数据长度索引</summary>
     public readonly int DataLengthIndex => 6;
     /// <summary>数据范围</summary>
     public readonly Range DataRange { get; }
-    /// <summary>内容范围</summary>
-    public readonly Range PayloadRange { get; }
     /// <summary>Crc范围</summary>
     public readonly Range CrcRange { get; }
+
+
+    /// <summary>内容范围</summary>
+    public readonly Range PayloadRange { get; }
     /// <summary>数据总字节数</summary>
     public readonly int DataLength { get; }
     /// <summary>数据数量</summary>
@@ -38,7 +36,7 @@ public readonly record struct RtuWriteMultipleRequestLayoutFuck : ICrcable,
     public readonly int TotalLength { get; }
 
 
-    private RtuWriteMultipleRequestLayoutFuck(
+    internal WriteMultipleRequestLayout(
         Range dataRange,
         Range contentRange,
         Range crcRange,
@@ -56,40 +54,11 @@ public readonly record struct RtuWriteMultipleRequestLayoutFuck : ICrcable,
     }
 
 
-    /// <summary>
-    /// 创建一个拥有指定数量寄存器的帧布局
-    /// </summary>
-    /// <param name="quantity">寄存器数量</param>
-    public static RtuWriteMultipleRequestLayoutFuck CreateRegisters(WriteRegistersQuantity quantity)
-    {
-        // Data
-        var data_byte_length = ProtocolExtensions.GetRegistersToByteLength(quantity);
-        const int data_start = 7;
-        int data_end = data_start + data_byte_length;
-        var data_range = new Range(data_start, data_end);
-
-        // Content
-        var content = new Range(0, data_end);
-
-        // Crc
-        var crc_start = data_end;
-        var crc_end = data_end + 2;
-        var crc_range = new Range(crc_start, crc_end);
-
-        return new RtuWriteMultipleRequestLayoutFuck(
-            dataRange: data_range,
-            contentRange: content,
-            crcRange: crc_range,
-            dataByteLength: data_byte_length,
-            fullByteLength: crc_end,
-            dataMaxQuantity: quantity);
-    }
 
     /// <summary>
-    /// 创建一个拥有指定数量线圈的帧布局
+    /// 从线圈数量
     /// </summary>
-    /// <param name="quantity">线圈数量</param>
-    public static RtuWriteMultipleRequestLayoutFuck CreateCoils(WriteCoilsQuantity quantity)
+    public static WriteMultipleRequestLayout FromCoilsQuantity(WriteCoilsQuantity quantity)
     {
         // Data
         var data_byte_length = ProtocolExtensions.GetColisToByteLength(quantity);
@@ -105,7 +74,7 @@ public readonly record struct RtuWriteMultipleRequestLayoutFuck : ICrcable,
         var crc_end = data_end + 2;
         var crc_range = new Range(crc_start, crc_end);
 
-        return new RtuWriteMultipleRequestLayoutFuck(
+        return new WriteMultipleRequestLayout(
             dataRange: data_range,
             contentRange: content,
             crcRange: crc_range,
@@ -114,6 +83,35 @@ public readonly record struct RtuWriteMultipleRequestLayoutFuck : ICrcable,
             dataMaxQuantity: quantity);
     }
 
+    /// <summary>
+    /// 从寄存器数量创建
+    /// </summary>
+    /// <param name="quantity"></param>
+    /// <returns></returns>
+    public static WriteMultipleRequestLayout FromRegistersQuantity(WriteRegistersQuantity quantity)
+    {
+        // Data
+        var data_byte_length = ProtocolExtensions.GetRegistersToByteLength(quantity);
+        const int data_start = 7;
+        int data_end = data_start + data_byte_length;
+        var data_range = new Range(data_start, data_end);
+
+        // Content
+        var content = new Range(0, data_end);
+
+        // Crc
+        var crc_start = data_end;
+        var crc_end = data_end + 2;
+        var crc_range = new Range(crc_start, crc_end);
+
+        return new WriteMultipleRequestLayout(
+            dataRange: data_range,
+            contentRange: content,
+            crcRange: crc_range,
+            dataByteLength: data_byte_length,
+            fullByteLength: crc_end,
+            dataMaxQuantity: quantity);
+    }
 
     public override string ToString()
     {

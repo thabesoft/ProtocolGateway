@@ -1,5 +1,5 @@
-﻿using ThabeSoft.Primitives;
-using ThabeSoft.ProtocolGateway.Modbus.Primitives;
+﻿using ThabeSoft.ProtocolGateway.Modbus.Primitives;
+using ThabeSoft.ProtocolGateway.Modbus.Rtu.Protocols.Layouts;
 
 namespace ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
 
@@ -7,9 +7,9 @@ namespace ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
 /// <summary>
 /// Rtu 读取响应布局
 /// </summary>
-public readonly record struct RtuReadResponseLayout : IReadResponseLayout, ICrcable
+public readonly record struct ReadResponseLayout : IReadResponseLayout, ICrcable
 {
-    public static RtuErrorResponseLayout Empty = default;
+    public static ErrorResponseLayout Empty = default;
 
 
     /// <summary>从站Id索引</summary>
@@ -41,7 +41,7 @@ public readonly record struct RtuReadResponseLayout : IReadResponseLayout, ICrca
     public int TotalLength { get; }
 
 
-    internal RtuReadResponseLayout(
+    internal ReadResponseLayout(
         Range dataRange,
         Range payloadRange,
         Range crcRange,
@@ -62,7 +62,7 @@ public readonly record struct RtuReadResponseLayout : IReadResponseLayout, ICrca
     /// <summary>
     /// 读取多个寄存器
     /// </summary>
-    public static RtuReadResponseLayout FromRegistersQuantity(ReadRegistersQuantity quantity)
+    public static ReadResponseLayout FromRegistersQuantity(ReadRegistersQuantity quantity)
     {
         // Data
         const int data_start = 3;
@@ -78,7 +78,7 @@ public readonly record struct RtuReadResponseLayout : IReadResponseLayout, ICrca
         var crc_end = data_end + 2;
         var crc_range = new Range(crc_start, crc_end);
 
-        return new RtuReadResponseLayout(
+        return new ReadResponseLayout(
             dataRange: data_range,
             payloadRange: content,
             crcRange: crc_range,
@@ -90,7 +90,7 @@ public readonly record struct RtuReadResponseLayout : IReadResponseLayout, ICrca
     /// <summary>
     /// 读取多个线圈
     /// </summary>
-    public static RtuReadResponseLayout FromCoilsQuantity(ReadCoilsQuantity quantity)
+    public static ReadResponseLayout FromCoilsQuantity(ReadCoilsQuantity quantity)
     {
         // Data
         const int data_start = 3;
@@ -106,7 +106,7 @@ public readonly record struct RtuReadResponseLayout : IReadResponseLayout, ICrca
         var crc_end = data_end + 2;
         var crc_range = new Range(crc_start, crc_end);
 
-        return new RtuReadResponseLayout(
+        return new ReadResponseLayout(
             dataRange: data_range,
             payloadRange: content,
             crcRange: crc_range,
@@ -119,7 +119,6 @@ public readonly record struct RtuReadResponseLayout : IReadResponseLayout, ICrca
 
     public override string ToString()
     {
-        // [10] Id(1) Func(2) Addr(2..4) Qua(4..6) Crc(10..12)
         return $"总长度={TotalLength}, Id({SlaveIdIndex})Func({FunctionCodeIndex})Len({DataLength})Data({DataRange})Crc({CrcRange})";
     }
 }

@@ -1,10 +1,12 @@
 ﻿using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Modbus.Primitives;
+using ThabeSoft.ProtocolGateway.Modbus.Protocols;
 using ThabeSoft.ProtocolGateway.Modbus.Protocols.Headers;
-using ThabeSoft.ProtocolGateway.Modbus.Protocols.Layouts;
+using ThabeSoft.ProtocolGateway.Modbus.Rtu.Protocols.Headers;
+using ThabeSoft.ProtocolGateway.Modbus.Rtu.Protocols.Layouts;
 using ThabeSoft.ProtocolGateway.Primitives;
 
-namespace ThabeSoft.ProtocolGateway.Modbus.Protocols;
+namespace ThabeSoft.ProtocolGateway.Modbus.Rtu.Encoder;
 
 
 /// <summary>
@@ -14,10 +16,10 @@ public static class RtuRequestEncoder
 {
     public static Result<int> Read(Span<byte> destination, in ReadRequestHeader header)
     {
-        var layout = RtuReadRequestLayout.Instance;
+        var layout = ReadRequestLayout.Instance;
         return Read(destination, header, layout).Then(layout.TotalLength);
     }
-    public static Result Read(Span<byte> destination, in ReadRequestHeader header, in RtuReadRequestLayout layout)  
+    public static Result Read(Span<byte> destination, in ReadRequestHeader header, in ReadRequestLayout layout)  
     {
         // 缺少请求头
         if (header == ReadRequestHeader.Empty)
@@ -51,10 +53,10 @@ public static class RtuRequestEncoder
 
     public static Result<int> WriteSingle(Span<byte> destination, in WriteSingleRequestHeader header)
     {
-        var layout = RtuWriteSingleRequestLayout.Instance;
+        var layout = WriteSingleRequestLayout.Instance;
         return WriteSingle(destination, header, layout).Then(layout.TotalLength);
     }
-    public static Result WriteSingle(Span<byte> destination, in WriteSingleRequestHeader header, in RtuWriteSingleRequestLayout layout)
+    public static Result WriteSingle(Span<byte> destination, in WriteSingleRequestHeader header, in WriteSingleRequestLayout layout)
     {
         // 缺少请求头
         if (header == WriteSingleRequestHeader.Empty)
@@ -86,23 +88,23 @@ public static class RtuRequestEncoder
     }
 
 
-    public static Result<int> WriteMultipleCoils(Span<byte> destination, ReadOnlySpan<bool> values, in WriteMultipleRequestHeader header)
+    public static Result<int> WriteMultipleCoils(Span<byte> destination, ReadOnlySpan<bool> values, in WriteMultipleResponseHeader header)
     {
         var layout_result = WriteCoilsQuantity.Create(values.Length)
-            .Bind(RtuWriteMultipleCoilsRequestLayout.Create);
+            .Bind(WriteMultipleCoilsRequestLayout.Create);
         if (!layout_result) return layout_result.PropagateError<int>();
 
         return WriteMultipleCoils(destination, values, header, layout_result.Value)
             .Then(layout_result.Value.TotalLength);
     }
-    public static Result WriteMultipleCoils(Span<byte> destination, ReadOnlySpan<bool> values, in WriteMultipleRequestHeader header, in RtuWriteMultipleCoilsRequestLayout layout)
+    public static Result WriteMultipleCoils(Span<byte> destination, ReadOnlySpan<bool> values, in WriteMultipleResponseHeader header, in WriteMultipleCoilsRequestLayout layout)
     {
         // 协议布局无效
-        if (layout == RtuWriteMultipleCoilsRequestLayout.Empty)
-            return MissingRequestLayout(nameof(WriteMultipleCoils), nameof(RtuWriteMultipleCoilsRequestLayout));
+        if (layout == WriteMultipleCoilsRequestLayout.Empty)
+            return MissingRequestLayout(nameof(WriteMultipleCoils), nameof(WriteMultipleCoilsRequestLayout));
 
         // 缺少请求头
-        if (header == WriteMultipleRequestHeader.Empty)
+        if (header == WriteMultipleResponseHeader.Empty)
             return MissingRequestHeader(nameof(WriteMultipleCoils));
 
         // 缓冲区长度不足
@@ -144,7 +146,7 @@ public static class RtuRequestEncoder
     }
 
 
-    public static Result<int> WriteMultipleRegisters(Span<byte> destination, ReadOnlySpan<ushort> values, in WriteMultipleRequestHeader header)
+    public static Result<int> WriteMultipleRegisters(Span<byte> destination, ReadOnlySpan<ushort> values, in WriteMultipleResponseHeader header)
     {
         var layout_result = WriteRegistersQuantity.Create(values.Length)
             .Bind(RtuWriteMultipleRegisterRequestLayout.Create);
@@ -153,7 +155,7 @@ public static class RtuRequestEncoder
         return WriteMultipleRegisters(destination, values, header, layout_result.Value)
             .Then(layout_result.Value.TotalLength);
     }
-    public static Result WriteMultipleRegisters(Span<byte> destination, ReadOnlySpan<ushort> values, in WriteMultipleRequestHeader header, in RtuWriteMultipleRegisterRequestLayout layout)
+    public static Result WriteMultipleRegisters(Span<byte> destination, ReadOnlySpan<ushort> values, in WriteMultipleResponseHeader header, in RtuWriteMultipleRegisterRequestLayout layout)
     {
         // 数据数量
         var data_quantity = (ushort)values.Length;
@@ -163,7 +165,7 @@ public static class RtuRequestEncoder
             return MissingRequestLayout(nameof(WriteMultipleRegisters), nameof(RtuWriteMultipleRegisterRequestLayout));
 
         // 缺少请求头
-        if (header == WriteMultipleRequestHeader.Empty)
+        if (header == WriteMultipleResponseHeader.Empty)
             return MissingRequestHeader(nameof(WriteMultipleRegisters));
 
         // 构建缓冲区长度不足
