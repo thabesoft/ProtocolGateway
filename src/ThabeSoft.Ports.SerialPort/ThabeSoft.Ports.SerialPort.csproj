@@ -8,13 +8,13 @@
 		<RootNamespace>ThabeSoft.Ports</RootNamespace>
 	</PropertyGroup>
 
-	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.8" />
-		<PackageReference Include="System.Memory" Version="4.6.3" />
+	<ItemGroup>
+		<PackageReference Include="System.IO.Ports" Version="10.0.4" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\src\ThabeSoft.Primitives.Result\ThabeSoft.Primitives.Result.csproj" />
+	  <ProjectReference Include="..\ThabeSoft.Ports.Abstractions\ThabeSoft.Ports.Abstractions.csproj" />
 	</ItemGroup>
+
 
 </Project>

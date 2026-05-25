@@ -12,10 +12,10 @@
 	<ItemGroup Condition="'$(TargetFramework)' != 'net7.0'">
 		<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
 	</ItemGroup>
-
+	
 	<ItemGroup>
-	  <ProjectReference Include="..\..\ThabeSoft.Primitives.ByteKit\ThabeSoft.Primitives.ByteKit.csproj" />
+	  <ProjectReference Include="..\ThabeSoft.Primitives.ByteKit\ThabeSoft.Primitives.ByteKit.csproj" />
 	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.Abstractions\ThabeSoft.ProtocolGateway.Abstractions.csproj" />
 	</ItemGroup>
-
+	
 </Project>

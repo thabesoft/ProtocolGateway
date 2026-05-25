@@ -10,18 +10,16 @@
 
 	<ItemGroup>
 		<PackageReference Include="Moq" Version="4.20.72" />
+		<ProjectReference Include="..\..\src\ThabeSoft.Modbus.Rtu.Slave\ThabeSoft.Modbus.Rtu.Slave.csproj" />
+		<ProjectReference Include="..\..\src\ThabeSoft.Modbus.Rtu\ThabeSoft.Modbus.Rtu.csproj" />
+		<ProjectReference Include="..\..\src\ThabeSoft.Ports.SerialPort\ThabeSoft.Ports.SerialPort.csproj" />
+		<ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.Modbus\ThabeSoft.ProtocolGateway.Modbus.csproj" />
+		<ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway\ThabeSoft.ProtocolGateway.csproj" />
 		<PackageReference Update="Microsoft.Testing.Extensions.CodeCoverage" Version="18.6.2" />
 		<PackageReference Update="Microsoft.Testing.Extensions.TrxReport" Version="2.2.2" />
 		<PackageReference Update="MSTest.TestAdapter" Version="4.2.2" />
 		<PackageReference Update="MSTest.TestFramework" Version="4.2.2" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.Modbus\ThabeSoft.ProtocolGateway.Modbus.csproj" />
-		<ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.SerialPort\ThabeSoft.Ports.SerialPort.csproj" />
-		<ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway\ThabeSoft.ProtocolGateway.csproj" />
-		<ProjectReference Include="..\..\ThabeSoft.Modbus.Rtu\ThabeSoft.Modbus.Rtu.csproj" />
-		<ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.Modbus.Rtu\ThabeSoft.Modbus.Rtu.Slave.csproj" />
-	</ItemGroup>
 
 </Project>

@@ -1,17 +1,17 @@
 <Solution>
   <Folder Name="/Helpers/">
     <Project Path="src/ThabeSoft.Primitives.Result/ThabeSoft.Primitives.Result.csproj" />
-    <Project Path="ThabeSoft.Primitives.ByteKit/ThabeSoft.Primitives.ByteKit.csproj" Id="59f1369f-4b96-4763-ac7d-c6a5b065016e" />
+    <Project Path="src/ThabeSoft.Primitives.ByteKit/ThabeSoft.Primitives.ByteKit.csproj" Id="59f1369f-4b96-4763-ac7d-c6a5b065016e" />
   </Folder>
   <Folder Name="/Helpers/Modbus/">
-    <Project Path="src/ThabeSoft.Modbus/ThabeSoft.Modbus.Abstractions.csproj" />
-    <Project Path="src/ThabeSoft.ProtocolGateway.Modbus.Rtu/ThabeSoft.Modbus.Rtu.Slave.csproj" />
-    <Project Path="ThabeSoft.Modbus.Rtu.Abstractions/ThabeSoft.Modbus.Rtu.Abstractions.csproj" Id="4c14e8a0-1639-40ed-8596-090ef11122a9" />
-    <Project Path="ThabeSoft.Modbus.Rtu/ThabeSoft.Modbus.Rtu.csproj" Id="fcf057d1-6daf-4789-a7c2-a4b85c7edc04" />
+    <Project Path="src/ThabeSoft.Modbus.Abstractions/ThabeSoft.Modbus.Abstractions.csproj" />
+    <Project Path="src/ThabeSoft.Modbus.Rtu.Slave/ThabeSoft.Modbus.Rtu.Slave.csproj" />
+    <Project Path="src/ThabeSoft.Modbus.Rtu.Abstractions/ThabeSoft.Modbus.Rtu.Abstractions.csproj" Id="4c14e8a0-1639-40ed-8596-090ef11122a9" />
+    <Project Path="src/ThabeSoft.Modbus.Rtu/ThabeSoft.Modbus.Rtu.csproj" Id="fcf057d1-6daf-4789-a7c2-a4b85c7edc04" />
   </Folder>
   <Folder Name="/Helpers/Ports/">
-    <Project Path="src/ThabeSoft.ProtocolGateway.SerialPort/ThabeSoft.Ports.SerialPort.csproj" />
-    <Project Path="ThabeSoft.Ports.Abstractions/ThabeSoft.Ports.Abstractions.csproj" Id="a7027762-c7d2-44ad-ae44-c64383be4e91" />
+    <Project Path="src/ThabeSoft.Ports.Abstractions/ThabeSoft.Ports.Abstractions.csproj" Id="a7027762-c7d2-44ad-ae44-c64383be4e91" />
+    <Project Path="src/ThabeSoft.Ports.SerialPort/ThabeSoft.Ports.SerialPort.csproj" />
   </Folder>
   <Folder Name="/Modules/">
     <Project Path="src/ThabeSoft.ProtocolGateway.Abstractions/ThabeSoft.ProtocolGateway.Abstractions.csproj" />
@@ -19,7 +19,7 @@
     <Project Path="src/ThabeSoft.ProtocolGateway/ThabeSoft.ProtocolGateway.csproj" />
   </Folder>
   <Folder Name="/Tests/">
-    <Project Path="tests/ThabeSoft.ProtocolGateway.Benchmark/ThabeSoft.ProtocolGateway.Benchmark.csproj" />
-    <Project Path="tests/ThabeSoft.ProtocolGateway.UnitTests/ThabeSoft.UnitTests.csproj" />
+    <Project Path="tests/ThabeSoft.Benchmark/ThabeSoft.Benchmark.csproj" />
+    <Project Path="tests/ThabeSoft.UnitTests/ThabeSoft.UnitTests.csproj" />
   </Folder>
 </Solution>

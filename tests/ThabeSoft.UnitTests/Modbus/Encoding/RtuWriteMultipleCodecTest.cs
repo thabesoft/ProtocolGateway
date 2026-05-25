@@ -28,7 +28,6 @@ public sealed class RtuWriteMultipleCodecTest
         Console.WriteLine(ToString(buffer.ToArray()));
 
 
-        RtuSlaveReadCodec.
     }
 
 
