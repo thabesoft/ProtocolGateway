@@ -3,7 +3,7 @@ using ThabeSoft.Ports.Options;
 using ThabeSoft.ProtocolGateway.Modbus;
 using ThabeSoft.ProtocolGateway.SerialPort;
 
-namespace ThabeSoft.ProtocolGateway;
+namespace ThabeSoft.ProtocolGateway.ProtocolGateway;
 
 
 [TestClass]

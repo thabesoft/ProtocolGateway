@@ -9,10 +9,10 @@ namespace ThabeSoft.Modbus.Encoding.WriteSingle;
 /// <summary>
 /// Rtu读请编码器
 /// </summary>
-public sealed class WriteSingleCodec : IWriteSingleCodec
+public sealed class RtuWriteSingleCodec : IWriteSingleCodec
 {
-    private WriteSingleCodec() { }
-    public static WriteSingleCodec Instance { get; } = new();
+    private RtuWriteSingleCodec() { }
+    public static RtuWriteSingleCodec Instance { get; } = new();
 
 
     public Result<int> EncodeCoilRequest(Span<byte> destination, in WriteSingleCoilHeader header)

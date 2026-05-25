@@ -28,14 +28,14 @@ public readonly record struct WriteMultipleRequestHeader : IRequestHeader
     /// <summary>
     /// 写多个线圈
     /// </summary>
-    public static Result<WriteMultipleRequestHeader> Coils(byte slaveId, ushort address)
+    public static WriteMultipleRequestHeader Coils(byte slaveId, ushort address)
     {
         return new WriteMultipleRequestHeader(slaveId, FunctionCode.WriteMultipleCoils, address);
     }
     /// <summary>
     /// 写多个寄存器值
     /// </summary>
-    public static Result<WriteMultipleRequestHeader> Registers(byte slaveId, ushort address)
+    public static WriteMultipleRequestHeader Registers(byte slaveId, ushort address)
     {
         return new WriteMultipleRequestHeader(slaveId, FunctionCode.WriteMultipleRegisters, address);
     }

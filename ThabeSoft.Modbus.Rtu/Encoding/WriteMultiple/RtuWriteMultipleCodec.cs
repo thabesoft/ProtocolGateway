@@ -17,36 +17,34 @@ public sealed class RtuWriteMultipleCodec : IWriteMultipleCodec
 
 
 
-    public Result<int> EncodeCoilsRequest(Span<byte> destination, in WriteMultipleRequestHeader header, ReadOnlySpan<bool> values)
+    Result<int> IWriteMultipleCodec.EncodeCoilsRequest(Span<byte> destination, in WriteMultipleRequestHeader header, ReadOnlySpan<bool> values)
+    {
+        return EncodeCoilsRequest(destination, header, values);
+    }
+    Result<int> IWriteMultipleCodec.EncodeRegistersRequest(Span<byte> destination, in WriteMultipleRequestHeader header, ReadOnlySpan<ushort> values)
+    {
+        return EncodeRegistersRequest(destination, header, values);
+    }
+    Result<WriteMultipleResponseHeader> IWriteMultipleCodec.DecodeCoilsResponse(ReadOnlySpan<byte> source)
+    {
+        return DecodeCoilsResponse(source).Map(x => (WriteMultipleResponseHeader)x);
+    }
+    Result<WriteMultipleResponseHeader> IWriteMultipleCodec.DecodeRegistersResponse(ReadOnlySpan<byte> source)
+    {
+        return DecodeRegistersResponse(source).Map(x => (WriteMultipleResponseHeader)x);
+    }
+
+
+
+
+    public static Result<int> EncodeCoilsRequest(Span<byte> destination, in WriteMultipleRequestHeader header, ReadOnlySpan<bool> values)
     {
         var layout_result = WriteCoilsQuantity.Create(values.Length)
-            .Bind(RtuWriteMultipleRequestLayout.FromCoilsQuantity);
+            .Bind(RtuWriteMultipleRequestLayout.FromQuantity);
         if (!layout_result) return layout_result.PropagateError<int>();
 
         return EncodeCoilsRequest(destination, header, values, layout_result.Value).Then(layout_result.Value.TotalLength);
     }
-    public Result<int> EncodeRegistersRequest(Span<byte> destination, in WriteMultipleRequestHeader header, ReadOnlySpan<ushort> values)
-    {
-        var layout_result = WriteRegistersQuantity.Create(values.Length)
-            .Bind(RtuWriteMultipleRequestLayout.FromRegistersQuantity);
-        if (!layout_result) return layout_result.PropagateError<int>();
-
-        return EncodeRegistersRequest(destination, header, values, layout_result.Value).Then(layout_result.Value.TotalLength);
-    }
-
-    public Result<WriteMultipleResponseHeader> DecodeCoilsResponse(ReadOnlySpan<byte> source)
-    {
-        var layout = RtuWriteMultipleResponseLayout.Instance;
-        return DecodeCoilsResponse(source, layout).Map(x => (WriteMultipleResponseHeader)x);
-    }
-    public Result<WriteMultipleResponseHeader> DecodeRegistersResponse(ReadOnlySpan<byte> source)
-    {
-        var layout = RtuWriteMultipleResponseLayout.Instance;
-        return DecodeRegistersResponse(source, layout).Map(x => (WriteMultipleResponseHeader)x);
-    }
-
-
-
     public static Result EncodeCoilsRequest(Span<byte> destination, in WriteMultipleRequestHeader header, ReadOnlySpan<bool> values, in RtuWriteMultipleRequestLayout layout)
     {
         // 协议布局无效
@@ -100,18 +98,28 @@ public sealed class RtuWriteMultipleCodec : IWriteMultipleCodec
         buffer.CopyTo(destination);
         return true;
     }
+
+
+    public static Result<int> EncodeRegistersRequest(Span<byte> destination, in WriteMultipleRequestHeader header, ReadOnlySpan<ushort> values)
+    {
+        var layout_result = WriteRegistersQuantity.Create(values.Length)
+            .Bind(RtuWriteMultipleRequestLayout.FromQuantity);
+        if (!layout_result) return layout_result.PropagateError<int>();
+
+        return EncodeRegistersRequest(destination, header, values, layout_result.Value).Then(layout_result.Value.TotalLength);
+    }
     public static Result EncodeRegistersRequest(Span<byte> destination, in WriteMultipleRequestHeader header, ReadOnlySpan<ushort> values, in RtuWriteMultipleRequestLayout layout)
     {
         // 数据数量
         var data_quantity = (ushort)values.Length;
 
         // 协议布局无效
-        if (layout == WriteMultipleRequestLayout.Empty)
-            return MissingRequestLayout(nameof(EncodeRegistersRequest), nameof(WriteMultipleRequestLayout));
+        if (layout == RtuWriteMultipleRequestLayout.Empty)
+            return Result.InvalidParameter($"写多个寄存器帧布局不可为空");
 
         // 缺少请求头
-        if (header == WriteMultipleResponseHeader.Empty)
-            return MissingRequestHeader(nameof(EncodeRegistersRequest));
+        if (header == WriteMultipleRequestHeader.Empty)
+            return Result.InvalidParameter($"写多个寄存器请求头不可为空");
 
         // 构建缓冲区长度不足
         if (destination.Length < layout.TotalLength)
@@ -151,6 +159,12 @@ public sealed class RtuWriteMultipleCodec : IWriteMultipleCodec
     }
 
 
+
+    public static Result<RtuWriteMultipleResponseHeader> DecodeCoilsResponse(ReadOnlySpan<byte> source)
+    {
+        var layout = RtuWriteMultipleResponseLayout.Instance;
+        return DecodeCoilsResponse(source, layout);
+    }
     public static Result<RtuWriteMultipleResponseHeader> DecodeCoilsResponse(ReadOnlySpan<byte> source, in RtuWriteMultipleResponseLayout layout)
     {
         // 功能码创建结果
@@ -179,13 +193,19 @@ public sealed class RtuWriteMultipleCodec : IWriteMultipleCodec
             .ToWord(Endianness.BigEndian);
         if (!quantity_result) return quantity_result.PropagateError<RtuWriteMultipleResponseHeader>();
 
-        // 拷贝数据
-        return new RtuWriteMultipleResponseHeader(
+        // 构建
+        return RtuWriteMultipleResponseHeader.Coils(
             slaveId: slave_id,
-            functionCode: function_code_result.Value,
             address: address_result.Value,
             quantity: quantity_result.Value,
             crc: crc_result.Value);
+    }
+
+
+    public static Result<RtuWriteMultipleResponseHeader> DecodeRegistersResponse(ReadOnlySpan<byte> source)
+    {
+        var layout = RtuWriteMultipleResponseLayout.Instance;
+        return DecodeRegistersResponse(source, layout);
     }
     public static Result<RtuWriteMultipleResponseHeader> DecodeRegistersResponse(ReadOnlySpan<byte> source, in RtuWriteMultipleResponseLayout layout)
     {
@@ -215,10 +235,9 @@ public sealed class RtuWriteMultipleCodec : IWriteMultipleCodec
             .ToWord(Endianness.BigEndian);
         if (!quantity_result) return quantity_result.PropagateError<RtuWriteMultipleResponseHeader>();
 
-        // 拷贝数据
-        return new RtuWriteMultipleResponseHeader(
+        // 构建
+        return RtuWriteMultipleResponseHeader.Registers(
             slaveId: slave_id,
-            functionCode: function_code_result.Value,
             address: address_result.Value,
             quantity: quantity_result.Value,
             crc: crc_result.Value);

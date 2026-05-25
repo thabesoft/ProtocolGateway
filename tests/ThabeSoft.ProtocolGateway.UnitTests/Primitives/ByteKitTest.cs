@@ -1,11 +1,11 @@
 ﻿using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Primitives;
 
-namespace ThabeSoft.ProtocolGateway.Conversion;
+namespace ThabeSoft.ProtocolGateway.Primitives;
 
 
 [TestClass]
-public class ByteExtensionsTest
+public class ByteKitTest
 {
 
     [DataRow((byte)0b0000_1111, (byte)0b1111_0000, Endianness.LittleEndian, (ushort)0b1111_0000_0000_1111, DisplayName = "小端序：低字节0x0F,高字节0xF0 → 0xF00F")]
@@ -19,7 +19,7 @@ public class ByteExtensionsTest
     [DataRow((byte)0x00, (byte)0xFF, Endianness.LittleEndian, (ushort)0xFF00, DisplayName = "小端序：0x00,0xFF → 0xFF00")]
     [DataRow((byte)0x00, (byte)0xFF, Endianness.BigEndian, (ushort)0x00FF, DisplayName = "大端序：0x00,0xFF → 0x00FF")]
     [TestMethod(DisplayName = "字节转ushort测试")]
-    public void TryToUInt16(byte first, byte second, Endianness endianness, ushort expected)
+    public void Bytes_ToWord(byte first, byte second, Endianness endianness, ushort expected)
     {
         byte[] source = [first, second];
 

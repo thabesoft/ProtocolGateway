@@ -4,6 +4,7 @@ using ThabeSoft.Primitives;
 
 namespace ThabeSoft.Modbus.Encoding;
 
+
 /// <summary>
 /// 主站编解码器（主站请求编码 + 从站响应解码）
 /// </summary>

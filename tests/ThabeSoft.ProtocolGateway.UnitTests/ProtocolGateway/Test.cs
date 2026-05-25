@@ -1,9 +1,7 @@
 ﻿using ThabeSoft.Primitives;
-using ThabeSoft.ProtocolGateway.Builders;
-using ThabeSoft.ProtocolGateway.Primitives;
 using ThabeSoft.ProtocolGateway.Tags;
 
-namespace ThabeSoft.ProtocolGateway;
+namespace ThabeSoft.ProtocolGateway.ProtocolGateway;
 
 internal static class Test
 {

@@ -1,5 +1,6 @@
 ﻿using ThabeSoft.Modbus.Helpers;
 using ThabeSoft.Modbus.Primitives;
+using ThabeSoft.Primitives;
 
 namespace ThabeSoft.Modbus.Encoding.WriteMultiple;
 
@@ -60,7 +61,7 @@ public readonly record struct RtuWriteMultipleRequestLayout
     /// <summary>
     /// 从线圈数量
     /// </summary>
-    public static RtuWriteMultipleRequestLayout FromCoilsQuantity(WriteCoilsQuantity quantity)
+    public static RtuWriteMultipleRequestLayout FromQuantity(WriteCoilsQuantity quantity)
     {
         // Data
         var data_byte_length = ModbusHelper.GetColisToByteLength(quantity);
@@ -84,11 +85,16 @@ public readonly record struct RtuWriteMultipleRequestLayout
             fullByteLength: crc_end,
             dataMaxQuantity: quantity);
     }
+    public static Result<RtuWriteMultipleRequestLayout> FromCoilsQuantity(int quantity)
+    {
+        return WriteCoilsQuantity.Create(quantity).Bind(FromQuantity);
+    }
+
 
     /// <summary>
     /// 从寄存器数量创建
     /// </summary>
-    public static RtuWriteMultipleRequestLayout FromRegistersQuantity(WriteRegistersQuantity quantity)
+    public static RtuWriteMultipleRequestLayout FromQuantity(WriteRegistersQuantity quantity)
     {
         // Data
         var data_byte_length = ModbusHelper.GetRegistersToByteLength(quantity);
@@ -111,6 +117,10 @@ public readonly record struct RtuWriteMultipleRequestLayout
             dataByteLength: data_byte_length,
             fullByteLength: crc_end,
             dataMaxQuantity: quantity);
+    }
+    public static Result<RtuWriteMultipleRequestLayout> FromRegistersQuantity(int quantity)
+    {
+        return WriteRegistersQuantity.Create(quantity).Bind(FromQuantity);
     }
 
     public override string ToString()

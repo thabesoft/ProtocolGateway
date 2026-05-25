@@ -48,7 +48,7 @@ public static class ByteExtensions
         /// </summary>
         /// <param name="bitOrder">位序</param>
         /// <returns>是否转换成功</returns>
-        public Result<byte> ToByte(BitOrder bitOrder = default)
+        public Result<byte> ToByte(BitOrder bitOrder = BitOrder.LSB0)
         {
             var bit_count = Math.Min(8, source.Length);
             byte byte_value = 0;
@@ -67,7 +67,7 @@ public static class ByteExtensions
                     bitIndex = 7 - i;
                 }
 
-                bit_count |= (byte)(1 << bitIndex);
+                byte_value |= (byte)(1 << bitIndex);
             }
 
             return byte_value;

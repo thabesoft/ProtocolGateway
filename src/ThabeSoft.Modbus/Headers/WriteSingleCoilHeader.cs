@@ -25,6 +25,11 @@ public readonly record struct WriteSingleCoilHeader : IWriteSingleCoilHeader
         Value = value;
     }
 
+    public static WriteSingleCoilHeader Create(byte slaveId, ushort address, bool value)
+    {
+        return new WriteSingleCoilHeader(slaveId, address, value);
+    }
+
 
     public override string ToString()
     {

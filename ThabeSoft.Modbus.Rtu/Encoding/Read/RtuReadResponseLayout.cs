@@ -1,4 +1,7 @@
-﻿namespace ThabeSoft.Modbus.Encoding.Read;
+﻿using ThabeSoft.Modbus.Helpers;
+using ThabeSoft.Modbus.Primitives;
+
+namespace ThabeSoft.Modbus.Encoding.Read;
 
 public readonly record struct RtuReadResponseLayout
 {
@@ -68,7 +71,17 @@ public readonly record struct RtuReadResponseLayout
            totalLength: crc_end);
     }
 
-    
+    public static RtuReadResponseLayout FromQuantity(ReadCoilsQuantity quantity)
+    {
+        var length = ModbusHelper.GetColisToByteLength(quantity);
+        return FromDataLength(length);
+    }
+    public static RtuReadResponseLayout FromQuantity(ReadRegistersQuantity quantity)
+    {
+        var length = ModbusHelper.GetRegistersToByteLength(quantity);
+        return FromDataLength(length);
+    }
+
     public static Range CalculateDataRange(byte dataLength)
     {
         return 3..dataLength;
