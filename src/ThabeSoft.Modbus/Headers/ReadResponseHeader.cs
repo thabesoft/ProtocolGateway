@@ -11,13 +11,13 @@ public readonly struct ReadResponseHeader
 
     public byte SlaveId { get; }
     public FunctionCode FunctionCode { get; }
-    public ushort DataLength { get; }
+    public int DataLength { get; }
 
 
 
     [Obsolete("禁止调用构造, 请使用工厂方法")]
     public ReadResponseHeader() { }
-    public ReadResponseHeader(byte slaveId, FunctionCode functionCode, ushort dataLength)
+    public ReadResponseHeader(byte slaveId, FunctionCode functionCode, int dataLength)
     {
         SlaveId = slaveId;
         FunctionCode = functionCode;

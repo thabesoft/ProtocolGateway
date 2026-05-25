@@ -30,6 +30,33 @@ public readonly record struct ReadRequestHeader
     }
 
 
+    public static Result<ReadRequestHeader> AnyCoils(byte slaveId, FunctionCode functionCode, ushort address, ReadCoilsQuantity quantity)
+    {
+        if (functionCode.IsReadCoils) return Result.InvalidParameter<ReadRequestHeader>("无效功能码");
+        return new ReadRequestHeader(slaveId, functionCode, address, quantity);
+    }
+    public static Result<ReadRequestHeader> AnyCoils(byte slaveId, FunctionCode functionCode, ushort address, int quantity)
+    {
+        var quantity_result = ReadCoilsQuantity.Create(quantity);
+        if (!quantity_result) return quantity_result.PropagateError<ReadRequestHeader>();
+
+        return AnyCoils(slaveId, functionCode, address, quantity_result.Value);
+    }
+
+    public static Result<ReadRequestHeader> AnyRegisters(byte slaveId, FunctionCode functionCode, ushort address, ReadCoilsQuantity quantity)
+    {
+        if (functionCode.IsReadRegisters) return Result.InvalidParameter<ReadRequestHeader>("无效功能码");
+        return new ReadRequestHeader(slaveId, functionCode, address, quantity);
+    }
+    public static Result<ReadRequestHeader> AnyRegisters(byte slaveId, FunctionCode functionCode, ushort address, int quantity)
+    {
+        var quantity_result = ReadRegistersQuantity.Create(quantity);
+        if (!quantity_result) return quantity_result.PropagateError<ReadRequestHeader>();
+
+        return AnyCoils(slaveId, functionCode, address, quantity_result.Value);
+    }
+
+
 
     public static Result<ReadRequestHeader> Coils(byte slaveId, ushort address, int quantity)
     {
@@ -42,7 +69,6 @@ public readonly record struct ReadRequestHeader
     {
         return new ReadRequestHeader(slaveId, FunctionCode.ReadCoils, address, quantity);
     }
-
 
     public static Result<ReadRequestHeader> DiscreteInputs(byte slaveId, ushort address, int quantity)
     {

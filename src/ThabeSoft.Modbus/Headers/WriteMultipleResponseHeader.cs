@@ -21,7 +21,7 @@ public readonly record struct WriteMultipleResponseHeader
 
     [Obsolete("禁止调用构造, 请使用工厂方法")]
     public WriteMultipleResponseHeader() { }
-    private WriteMultipleResponseHeader(byte slaveId, FunctionCode functionCode, ushort addrsss, ushort quantity)
+    internal WriteMultipleResponseHeader(byte slaveId, FunctionCode functionCode, ushort addrsss, ushort quantity)
     {
         SlaveId = slaveId;
         FunctionCode = functionCode;

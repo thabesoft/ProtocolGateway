@@ -5,14 +5,14 @@
 		<LangVersion>preview</LangVersion>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<RootNamespace>ThabeSoft.Modbus</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\..\ThabeSoft.Modbus.Rtu.Abstractions\ThabeSoft.Modbus.Rtu.Abstractions.csproj" />
 	  <ProjectReference Include="..\..\ThabeSoft.Ports.Abstractions\ThabeSoft.Ports.Abstractions.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Encoding\" />
+	  <ProjectReference Include="..\..\ThabeSoft.Primitives.ByteKit\ThabeSoft.Primitives.ByteKit.csproj" />
+	  <ProjectReference Include="..\ThabeSoft.Modbus\ThabeSoft.Modbus.Abstractions.csproj" />
 	</ItemGroup>
 
 </Project>

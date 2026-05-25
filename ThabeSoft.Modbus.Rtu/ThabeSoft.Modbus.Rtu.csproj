@@ -9,13 +9,14 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <None Remove="vua2xprl.0yv~" />
+		<ProjectReference Include="..\src\ThabeSoft.Modbus\ThabeSoft.Modbus.Abstractions.csproj" />
+		<ProjectReference Include="..\ThabeSoft.Modbus.Rtu.Abstractions\ThabeSoft.Modbus.Rtu.Abstractions.csproj" />
+		<ProjectReference Include="..\ThabeSoft.Ports.Abstractions\ThabeSoft.Ports.Abstractions.csproj" />
+		<ProjectReference Include="..\ThabeSoft.Primitives.ByteKit\ThabeSoft.Primitives.ByteKit.csproj" />
 	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\src\ThabeSoft.Modbus\ThabeSoft.Modbus.Abstractions.csproj" />
-    <ProjectReference Include="..\ThabeSoft.Ports.Abstractions\ThabeSoft.Ports.Abstractions.csproj" />
-    <ProjectReference Include="..\ThabeSoft.Primitives.ByteKit\ThabeSoft.Primitives.ByteKit.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Headers\" />
+	</ItemGroup>
 
 </Project>

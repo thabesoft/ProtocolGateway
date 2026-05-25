@@ -4,4 +4,4 @@
 /// <summary>
 /// 主站编码器
 /// </summary>
-public interface IMasterCodec : IReadCodec, IWriteSingleCodec, IWriteMultipleCodec;
+public interface IMasterCodec : IMasterReadCodec, IMasterWriteSingleCodec, IMasterWriteMultipleCodec;

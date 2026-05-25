@@ -21,6 +21,7 @@
 		<ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.SerialPort\ThabeSoft.Ports.SerialPort.csproj" />
 		<ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway\ThabeSoft.ProtocolGateway.csproj" />
 		<ProjectReference Include="..\..\ThabeSoft.Modbus.Rtu\ThabeSoft.Modbus.Rtu.csproj" />
+		<ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.Modbus.Rtu\ThabeSoft.Modbus.Rtu.Slave.csproj" />
 	</ItemGroup>
 
 </Project>

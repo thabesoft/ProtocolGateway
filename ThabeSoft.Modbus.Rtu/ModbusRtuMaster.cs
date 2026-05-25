@@ -21,7 +21,7 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
         var request_header_result = ReadRequestHeader.Coils(slaveId, address, destination.Length);
         if (!request_header_result) return request_header_result;
 
-        IReadCodec readCodec = RtuReadCodec.Instance;
+        IMasterReadCodec readCodec = RtuMasterReadCodec.Instance;
 
         return await ReadCoilsAsync(
             destination: destination,
@@ -36,7 +36,7 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
         var request_header_result = ReadRequestHeader.DiscreteInputs(slaveId, address, destination.Length);
         if (!request_header_result) return request_header_result;
 
-        IReadCodec readCodec = RtuReadCodec.Instance;
+        IMasterReadCodec readCodec = RtuMasterReadCodec.Instance;
 
         return await ReadCoilsAsync(
             destination: destination,
@@ -50,7 +50,7 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
         var header_result = ReadRequestHeader.HoldingRegisters(slaveId, address, destination.Length);
         if (!header_result) return header_result;
 
-        IReadCodec readCodec = RtuReadCodec.Instance;
+        IMasterReadCodec readCodec = RtuMasterReadCodec.Instance;
 
         return await ReadRegistersAsync(
             destination: destination,
@@ -64,7 +64,7 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
         var header_result = ReadRequestHeader.InputRegisters(slaveId, address, destination.Length);
         if (!header_result) return header_result;
 
-        IReadCodec readCodec = RtuReadCodec.Instance;
+        IMasterReadCodec readCodec = RtuMasterReadCodec.Instance;
 
         return await ReadRegistersAsync(
             destination: destination,
@@ -87,7 +87,7 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
             // 请求编码
             var span = buffer.AsSpan(0, layout.TotalLength);
             var header = new WriteSingleCoilHeader(slaveId, address, value);
-            var encode_result = RtuWriteSingleCodec.EncodeCoilRequest(span, header, layout);
+            var encode_result = RtuMasterWriteSingleCodec.EncodeCoilRequest(span, header, layout);
             if (!encode_result) return encode_result.PropagateError<WriteSingleCoilHeader>();
 
             // 发送请求
@@ -102,7 +102,7 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
             if (!receive_result) return receive_result.PropagateError<WriteSingleCoilHeader>();
 
             // 响应解码
-            return RtuWriteSingleCodec.DecodeCoilResponse(receive_mem.Span, layout);
+            return RtuMasterWriteSingleCodec.DecodeCoilResponse(receive_mem.Span, layout);
         }
         finally
         {
@@ -121,7 +121,7 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
             // 请求编码
             var span = buffer.AsSpan(0, layout.TotalLength);
             var header = new WriteSingleRegisterHeader(slaveId, address, value);
-            var encode_result = RtuWriteSingleCodec.EncodeRegisterRequest(span, header, layout);
+            var encode_result = RtuMasterWriteSingleCodec.EncodeRegisterRequest(span, header, layout);
             if (!encode_result) return encode_result;
 
             // 发送请求
@@ -136,7 +136,7 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
             if (!receive_result) return receive_result;
 
             // 响应解码
-            return RtuWriteSingleCodec.DecodeRegisterResponse(receive_mem.Span, layout);
+            return RtuMasterWriteSingleCodec.DecodeRegisterResponse(receive_mem.Span, layout);
         }
         finally
         {
@@ -161,7 +161,7 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
             // 请求编码
             var span = buffer.AsSpan(0, send_layout.TotalLength);
             var header = WriteMultipleRequestHeader.Coils(slaveId, address);
-            var encode_result = RtuWriteMultipleCodec.EncodeCoilsRequest(span, header, values.Span, send_layout);
+            var encode_result = RtuMasterWriteMultipleCodec.EncodeCoilsRequest(span, header, values.Span, send_layout);
             if (!encode_result) return encode_result;
 
             // 发送请求
@@ -176,7 +176,7 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
             if (!receive_result) return receive_result;
 
             // 响应解码
-            return RtuWriteMultipleCodec.DecodeCoilsResponse(receive_mem.Span, receive_layout);
+            return RtuMasterWriteMultipleCodec.DecodeCoilsResponse(receive_mem.Span, receive_layout);
         }
         finally
         {
@@ -201,7 +201,7 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
             // 请求编码
             var span = buffer.AsSpan(0, send_layout.TotalLength);
             var header = WriteMultipleRequestHeader.Coils(slaveId, address);
-            var encode_result = RtuWriteMultipleCodec.EncodeRegistersRequest(span, header, values.Span, send_layout);
+            var encode_result = RtuMasterWriteMultipleCodec.EncodeRegistersRequest(span, header, values.Span, send_layout);
             if (!encode_result) return encode_result;
 
             // 发送请求
@@ -216,7 +216,7 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
             if (!receive_result) return receive_result;
 
             // 响应解码
-            return RtuWriteMultipleCodec.DecodeCoilsResponse(receive_mem.Span, receive_layout);
+            return RtuMasterWriteMultipleCodec.DecodeCoilsResponse(receive_mem.Span, receive_layout);
         }
         finally
         {

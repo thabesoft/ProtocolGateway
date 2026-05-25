@@ -22,10 +22,13 @@ public sealed class RtuWriteMultipleCodecTest
         // 值
         Span<bool> values = [value1, value2];
         // 编码
-        RtuWriteMultipleCodec.EncodeCoilsRequest(buffer, header, values, layout_result.Value);
+        RtuMasterWriteMultipleCodec.EncodeCoilsRequest(buffer, header, values, layout_result.Value);
 
         // 打印
         Console.WriteLine(ToString(buffer.ToArray()));
+
+
+        RtuSlaveReadCodec.
     }
 
 
@@ -44,7 +47,7 @@ public sealed class RtuWriteMultipleCodecTest
         // 值
         Span<ushort> values = [value1, value2];
         // 编码
-        RtuWriteMultipleCodec.EncodeRegistersRequest(buffer, header, values, layout_result.Value);
+        RtuMasterWriteMultipleCodec.EncodeRegistersRequest(buffer, header, values, layout_result.Value);
 
         // 打印
         Console.WriteLine(ToString(buffer.ToArray()));
