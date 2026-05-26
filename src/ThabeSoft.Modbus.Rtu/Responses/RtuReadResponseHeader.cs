@@ -16,7 +16,7 @@ public readonly struct RtuReadResponseHeader
 
     public byte SlaveId { get; }
     public FunctionCode FunctionCode { get; }
-    public int DataLength { get; }
+    public byte DataLength { get; }
     public ushort Crc { get; }
     public ushort Quantity { get; }
 
@@ -24,7 +24,7 @@ public readonly struct RtuReadResponseHeader
 
     [Obsolete("禁止调用构造, 请使用工厂方法")]
     public RtuReadResponseHeader() { }
-    internal RtuReadResponseHeader(byte slaveId, FunctionCode functionCode, ushort quantity, int dataLength, ushort crc)
+    internal RtuReadResponseHeader(byte slaveId, FunctionCode functionCode, ushort quantity, byte dataLength, ushort crc)
     {
         SlaveId = slaveId;
         FunctionCode = functionCode;

@@ -357,16 +357,18 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
     /// </summary>
     private async ValueTask<Result> GetResponseAsync(Memory<byte> destination, CancellationToken cancellationToken)
     {
-        const int MinReadBytes = 5;
+        int current_length = 0;
+        const int crc_length = 2;
 
         // 有两种情况, Rtu异常共5字节, 其他数据都大于5字节, 所以先读取5个
-        var resp_header = destination[..MinReadBytes];
-        await port.ReadExactAsync(resp_header, cancellationToken);
+        var resp_header = destination[..RtuErrorResponseLayout.TotalLength];
+        // 读取
+        var read_result = await port.ReadExactAsync(resp_header, cancellationToken);
+        if (!read_result) return read_result;
+        current_length += read_result.Value;
 
-        var error_layout = RtuErrorResponseLayout.Instance;
-        var slave_id = resp_header.Span[error_layout.SlaveIdIndex];
-        var function_code = resp_header.Span[error_layout.FunctionCodeIndex];
-
+        // 功能码
+        var function_code = resp_header.Span[RtuErrorResponseLayout.FunctionCodeIndex];
         var function_code_result = FunctionCode.FromCode(function_code);
 
         // 看是不是异常响应
@@ -377,12 +379,12 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
             if (!err_func_result) return Result.InvalidData("无法识别的响应");
 
             // 错误码
-            var error_code = destination.Span[error_layout.ErrorCodeIndex];
+            var error_code = destination.Span[RtuErrorResponseLayout.ErrorCodeIndex];
             // 校验码
-            var crc_result = destination.Span[error_layout.CrcRange].ToWord(Endianness.LittleEndian);
+            var crc_result = destination.Span[RtuErrorResponseLayout.CrcRange].ToWord(Endianness.LittleEndian);
             if (!crc_result) return crc_result;
             // 校验异常
-            if (!Crc16.Validate(destination.Span[error_layout.PayloadRange], crc_result.Value)) return Result.InvalidData("响应Crc校验失败");
+            if (!Crc16.Validate(destination.Span[RtuErrorResponseLayout.PayloadRange], crc_result.Value)) return Result.InvalidData("响应Crc校验失败");
 
             return Result.InvalidData($"从站响应错误, 功能码:{err_func_result.Value.FunctionCode}, 异常码: {error_code}");
         }
@@ -391,17 +393,17 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
         if (function_code_result.Value.IsRead)
         {
             // 数据长度
-            var data_length = resp_header.Span[2];
+            var data_length = resp_header.Span[RtuReadResponseLayout.DataLengthIndex];
             // 剩余长度 (因为提前读了5个, 数据长度在第三个, 所以减去两个) 但是还有个Crc 数据2字节, 所以没变了
-            var tail_length = data_length - 2 + 2;
+            var tail_length = RtuReadResponseLayout.DataLengthIndex - data_length;
 
-            var tail_span = destination.Slice(5, tail_length);
+            var tail_span = destination.Slice(current_length, tail_length);
             return await port.ReadExactAsync(tail_span, cancellationToken);
         }
         else
         {
             // 写单个和写多个都是固定长度8
-            var tail_span = destination.Slice(5, 3);
+            var tail_span = destination.Slice(current_length, 3);
             return await port.ReadExactAsync(tail_span, cancellationToken);
         }
     }

@@ -24,6 +24,26 @@ public readonly struct ReadResponseHeader
         DataLength = dataLength;
     }
 
+
+    public static ReadResponseHeader Coils(byte slaveId, int dataLength)
+    {
+        return new(slaveId, FunctionCode.ReadCoils, dataLength);
+    }
+    public static ReadResponseHeader ReadDiscreteInputs(byte slaveId, int dataLength)
+    {
+        return new(slaveId, FunctionCode.ReadDiscreteInputs, dataLength);
+    }
+    public static ReadResponseHeader HoldingRegisters(byte slaveId, int dataLength)
+    {
+        return new(slaveId, FunctionCode.ReadHoldingRegisters, dataLength);
+    }
+    public static ReadResponseHeader ReadInputRegisters(byte slaveId, int dataLength)
+    {
+        return new(slaveId, FunctionCode.ReadInputRegisters, dataLength);
+    }
+
+
+
     public override string ToString()
     {
         return $"从站={SlaveId}, 功能码={FunctionCode}, 数据长度(字节)={DataLength}, 数量={DataLength}";

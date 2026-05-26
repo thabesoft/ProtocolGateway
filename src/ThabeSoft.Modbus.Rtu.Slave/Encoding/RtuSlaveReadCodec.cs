@@ -32,12 +32,17 @@ public sealed class RtuSlaveReadCodec : ISlaveReadCodec
     }
 
 
-
+    /// <summary>
+    /// 解码主站的读请求
+    /// </summary>
     public static Result<RtuReadRequesteHeader> DecodeRequest(ReadOnlySpan<byte> source)
     {
         var layout = RtuReadRequestLayout.Instance;
         return DecodeRequest(source, layout);
     }
+    /// <summary>
+    /// 解码主站的读请求
+    /// </summary>
     public static Result<RtuReadRequesteHeader> DecodeRequest(ReadOnlySpan<byte> source, in RtuReadRequestLayout layout)
     {
         // 验证
@@ -71,109 +76,101 @@ public sealed class RtuSlaveReadCodec : ISlaveReadCodec
     }
 
 
-    public static Result<int> DecodeCoilsResponse(ReadOnlySpan<byte> source, Span<bool> destination)
+    public static Result<int> EncodeCoilsResponse(Span<byte> destination, in ReadResponseHeader header, ReadOnlySpan<bool> values)
     {
         // 根据数量创建布局
-        var quantity_result = ReadCoilsQuantity.Create(destination.Length);
+        var quantity_result = ReadCoilsQuantity.Create(values.Length);
         if (!quantity_result) return quantity_result.PropagateError<int>();
 
         var layout  = RtuReadResponseLayout.FromQuantity(quantity_result.Value);
-        return DecodeCoilsResponse(source, destination, layout).Then(layout.TotalLength);
+        return EncodeCoilsResponse(destination, header, values, layout).Then(layout.TotalLength);
     }
-    public static Result DecodeCoilsResponse(ReadOnlySpan<byte> source, Span<bool> destination, in RtuReadResponseLayout layout)
+    public static Result EncodeCoilsResponse(Span<byte> destination, in ReadResponseHeader header, ReadOnlySpan<bool> values, in RtuReadResponseLayout layout)
     {
         // 缺少请求头
         if (layout == RtuReadResponseLayout.Empty)
-            return Result.InvalidParameter<RtuReadResponseHeader>("请求头不可为空");
-
-        // 校验包长度
-        if (source.Length < layout.TotalLength)
-            return BufferTooSmall<RtuReadResponseHeader>( layout.TotalLength, source.Length);
+            return Result.InvalidParameter("请求头不可为空");
 
         // 缓冲区不足
-        if (destination.Length < layout.DataQuantity)
-            return BufferTooSmall<RtuReadResponseHeader>( layout.TotalLength, source.Length);
+        if (destination.Length < layout.TotalLength)
+            return BufferTooSmall( layout.TotalLength, destination.Length);
+
+        // 数据区不足
+        if (values.Length < layout.DataQuantity)
+            return BufferTooSmall( layout.TotalLength, values.Length);
+
+
+        Span<byte> buffer = stackalloc byte[layout.TotalLength];
 
         // 从站Id
-        var slave_id = source[layout.SlaveIdIndex];
-        // 功能码
-        var function_code = FunctionCode.WriteMultipleCoils;
-        // 数据长度
-        var data_length = source[layout.DataLengthIndex];
-        if (data_length != layout.DataLength)
-            return Result.Error<RtuReadResponseHeader>(ErrorType.InvalidData, "数据长度不匹配");
-        // Crc
-        var crc_result = source[layout.CrcRange].ToWord(Endianness.LittleEndian);
-        if (!crc_result) return crc_result.PropagateError<RtuReadResponseHeader>();
-        // 验证
-        if (!Crc16.Validate(source[layout.PayloadRange], crc_result.Value))
-            return Result.Error<RtuReadResponseHeader>(ErrorType.InvalidData, "Crc校验失败");
+        buffer[RtuReadResponseLayout.SlaveIdIndex] = header.SlaveId;
 
+        // 功能码
+        buffer[RtuReadResponseLayout.FunctionCodeIndex] = header.FunctionCode;
+
+        // 数据长度
+        buffer[RtuReadResponseLayout.DataLengthIndex] = (byte)values.Length;
 
         // 数据
-        Span<bool> buffer = stackalloc bool[layout.DataQuantity];
-        var value_result = source[layout.DataRange].ToBits(buffer, BitOrder.LSB0);
-        if (!value_result) return value_result.PropagateError<RtuReadResponseHeader>();
+        var data_result = values.ToBytes(buffer[layout.DataRange], BitOrder.LSB0);
+        if (!data_result) return data_result;
 
+        // Crc
+        var crc = Crc16.Validate(buffer[layout.PayloadRange]);
+        crc.ToBytes(buffer[layout.CrcRange], Endianness.LittleEndian);
+
+        // 构建
         buffer.CopyTo(destination);
-        return RtuReadResponseHeader.AnyCoils(
-            slaveId: slave_id,
-            functionCode: FunctionCode.WriteMultipleCoils,
-            quantity: destination.Length,
-            crc: crc_result.Value);
+        return true;
     }
 
 
-    public static Result<int> DecodeRegistersResponse(ReadOnlySpan<byte> source, Span<ushort> destination)
+    public static Result<int> EncodeRegistersResponse(Span<byte> destination, in ReadResponseHeader header, ReadOnlySpan<ushort> values)
     {
         // 根据数量创建布局
-        var quantity_result = ReadRegistersQuantity.Create(destination.Length);
+        var quantity_result = ReadCoilsQuantity.Create(values.Length);
         if (!quantity_result) return quantity_result.PropagateError<int>();
 
         var layout = RtuReadResponseLayout.FromQuantity(quantity_result.Value);
-        return DecodeRegistersResponse(source, destination, layout).Then(layout.TotalLength);
+        return EncodeRegistersResponse(destination, header, values, layout).Then(layout.TotalLength);
     }
-    public static Result DecodeRegistersResponse(ReadOnlySpan<byte> source, Span<ushort> destination, in RtuReadResponseLayout layout)
+    public static Result EncodeRegistersResponse(Span<byte> destination, in ReadResponseHeader header, ReadOnlySpan<ushort> values, in RtuReadResponseLayout layout)
     {
         // 缺少请求头
         if (layout == RtuReadResponseLayout.Empty)
-            return Result.InvalidParameter<RtuReadResponseHeader>("请求头不可为空");
-
-        // 校验包长度
-        if (source.Length < layout.TotalLength)
-            return BufferTooSmall<RtuReadResponseHeader>(layout.TotalLength, source.Length);
+            return Result.InvalidParameter("请求头不可为空");
 
         // 缓冲区不足
-        if (destination.Length < layout.DataQuantity)
-            return BufferTooSmall<RtuReadResponseHeader>(layout.TotalLength, source.Length);
+        if (destination.Length < layout.TotalLength)
+            return BufferTooSmall(layout.TotalLength, destination.Length);
+
+        // 数据区不足
+        if (values.Length < layout.DataQuantity)
+            return BufferTooSmall(layout.TotalLength, values.Length);
+
+
+        Span<byte> buffer = stackalloc byte[layout.TotalLength];
 
         // 从站Id
-        var slave_id = source[layout.SlaveIdIndex];
-        // 功能码
-        var function_code = FunctionCode.WriteMultipleCoils;
-        // 数据长度
-        var data_length = source[layout.DataLengthIndex];
-        if (data_length != layout.DataLength)
-            return Result.Error<RtuReadResponseHeader>(ErrorType.InvalidData, "数据长度不匹配");
-        // Crc
-        var crc_result = source[layout.CrcRange].ToWord(Endianness.LittleEndian);
-        if (!crc_result) return crc_result.PropagateError<RtuReadResponseHeader>();
-        // 验证
-        if (!Crc16.Validate(source[layout.PayloadRange], crc_result.Value))
-            return Result.Error<RtuReadResponseHeader>(ErrorType.InvalidData, "Crc校验失败");
+        buffer[RtuReadResponseLayout.SlaveIdIndex] = header.SlaveId;
 
+        // 功能码
+        buffer[RtuReadResponseLayout.FunctionCodeIndex] = header.FunctionCode;
+
+        // 数据长度
+        buffer[RtuReadResponseLayout.DataLengthIndex] = (byte)values.Length;
 
         // 数据
-        Span<ushort> buffer = stackalloc ushort[layout.DataQuantity];
-        var value_result = source[layout.DataRange].ToWords(buffer, Endianness.BigEndian);
-        if (!value_result) return value_result.PropagateError<RtuReadResponseHeader>();
+        var data_result = values.ToBytes(buffer[layout.DataRange], Endianness.BigEndian);
+        if (!data_result) return data_result;
 
+        // Crc
+        var crc = Crc16.Validate(buffer[layout.PayloadRange]);
+        crc.ToBytes(buffer[layout.CrcRange], Endianness.LittleEndian);
+
+        // 构建
         buffer.CopyTo(destination);
-        return RtuReadResponseHeader.AnyRegister(
-            slaveId: slave_id,
-            functionCode: FunctionCode.WriteMultipleCoils,
-            quantity: destination.Length,
-            crc: crc_result.Value);
+        return true;
     }
 
 

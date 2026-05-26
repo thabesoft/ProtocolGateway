@@ -20,8 +20,8 @@ public readonly record struct ReadRegistersQuantity
     /// <summary>
     /// 所占用字节长度
     /// </summary>
-    public int ByteLength => GetByteLength(_value);
-    public static int GetByteLength(int quantity) => quantity * 2;
+    public byte ByteLength => GetByteLength(_value);
+    public static byte GetByteLength(int quantity) => (byte)(quantity * 2);
 
 
     /// <summary>

@@ -84,7 +84,7 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
     public static Result<RtuReadResponseHeader> DecodeCoilsResponse(ReadOnlySpan<byte> source, Span<bool> destination, in RtuReadResponseLayout layout)
     {
         // 结果校验
-        var result = DecodeResponse(source, layout);
+        var result = DecodeResponse(source, destination.Length, layout);
         if (!result) return result;
 
         // 功能码校验
@@ -110,7 +110,7 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
     public static Result<RtuReadResponseHeader> DecodeRegistersResponse(ReadOnlySpan<byte> source, Span<ushort> destination, in RtuReadResponseLayout layout)
     {
         // 结果校验
-        var result = DecodeResponse(source, layout);
+        var result = DecodeResponse(source, destination.Length, layout);
         if (!result) return result;
 
         // 功能码校验
@@ -126,7 +126,7 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
     }
 
 
-    private static Result<RtuReadResponseHeader> DecodeResponse(ReadOnlySpan<byte> source, in RtuReadResponseLayout layout)
+    private static Result<RtuReadResponseHeader> DecodeResponse(ReadOnlySpan<byte> source, int quantity, in RtuReadResponseLayout layout)
     {
         // 数据不足
         if (source.Length < layout.TotalLength)
@@ -143,21 +143,21 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
 
 
         // 从站
-        var slave_id = source[layout.SlaveIdIndex];
+        var slave_id = source[RtuReadResponseLayout.SlaveIdIndex];
 
         // 功能码
-        var function_code_result = FunctionCode.FromCode(source[layout.FunctionCodeIndex]).Where(x => x.IsRead);
+        var function_code_result = FunctionCode.FromCode(source[RtuReadResponseLayout.FunctionCodeIndex]).Where(x => x.IsRead);
         if (!function_code_result) return function_code_result.PropagateError<RtuReadResponseHeader>();
 
         // 数据长度
-        var data_length = source[layout.DataLengthIndex];
+        var data_length = source[RtuReadResponseLayout.DataLengthIndex];
 
 
         //TODO: 有问题
         return RtuReadResponseHeader.Create(
            slaveId: slave_id,
            functionCode: function_code_result.Value,
-           0,
+           quantity,
            crc: crc_result.Value);
     }
 

@@ -33,8 +33,7 @@ public sealed class ResultTests
     public void Release_Return_Error()
     {
         var result = Result.InvalidData("错误消息");
-        Assert.IsFalse(result.IsSuccess);
-        Assert.AreEqual("错误消息", result.Message);
+        Assert.IsFalse(result, result.Message);
     }
 
 

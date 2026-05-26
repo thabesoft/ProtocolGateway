@@ -1,18 +1,24 @@
 ﻿using ThabeSoft.Modbus.Primitives;
+using ThabeSoft.Primitives;
 
 namespace ThabeSoft.Modbus.Layouts;
 
 public readonly record struct RtuReadResponseLayout : IReadResponseLayout, IPayloadRangeable
 {
+    public static int SlaveIdIndex => 0;
+    public static int FunctionCodeIndex => 1;
+    public static int DataLengthIndex => 2;
+
+
     public static RtuReadResponseLayout Empty => default;
 
 
     /// <summary>从站Id索引</summary>
-    public int SlaveIdIndex => 0;
+    int ILayout.SlaveIdIndex => 0;
     /// <summary>功能码索引</summary>
-    public int FunctionCodeIndex => 1;
+    int ILayout.FunctionCodeIndex => 1;
     /// <summary>地址范围</summary>
-    public int DataLengthIndex => 2;
+    int IReadResponseLayout.DataLengthIndex => 2;
     /// <summary>参数数量</summary>
     public Range DataRange { get; }
     /// <summary>Crc范围</summary>
@@ -53,7 +59,7 @@ public readonly record struct RtuReadResponseLayout : IReadResponseLayout, IPayl
     {
         // 数据范围
         const int data_start = 3;
-        var data_end = dataLength;
+        var data_end = data_start + dataLength;
         var data_range = data_start..data_end;
 
         // Crc范围
@@ -74,6 +80,17 @@ public readonly record struct RtuReadResponseLayout : IReadResponseLayout, IPayl
            dataQuantity: dataQuantity,
            totalLength: crc_end);
     }
+
+
+    public static Result<RtuReadResponseLayout> FromCoilQuantity(int quantity)
+    {
+        return ReadCoilsQuantity.Create(quantity).Bind(FromQuantity);
+    }
+    public static Result<RtuReadResponseLayout> FromRegisterQuantity(int quantity)
+    {
+        return ReadRegistersQuantity.Create(quantity).Bind(FromQuantity);
+    }
+
 
     public static RtuReadResponseLayout FromQuantity(ReadCoilsQuantity quantity)
     {

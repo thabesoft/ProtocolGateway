@@ -50,7 +50,7 @@ public readonly struct RtuReadRequesteHeader : IReadRequestHeader, ICrcable
     }
     public static Result<RtuReadRequesteHeader> AnyRegister(byte slaveId, FunctionCode functionCode, ushort address, int quantity, ushort crc)
     {
-        if (!functionCode.IsReadCoils) return Result.InvalidParameter<RtuReadRequesteHeader>("无效功能吗");
+        if (!functionCode.IsReadRegisters) return Result.InvalidParameter<RtuReadRequesteHeader>("无效功能吗");
 
         var quantity_result = ReadCoilsQuantity.Create(quantity);
         if (!quantity_result) return quantity_result.PropagateError<RtuReadRequesteHeader>();
@@ -65,8 +65,8 @@ public readonly struct RtuReadRequesteHeader : IReadRequestHeader, ICrcable
 
     public static Result<RtuReadRequesteHeader> Create(byte slaveId, FunctionCode functionCode, ushort address, int quantity, ushort crc)
     {
-        if (functionCode.IsReadCoils) AnyCoils(slaveId, functionCode, address, quantity, crc);
-        if (functionCode.IsReadRegisters) AnyRegister(slaveId, functionCode, address, quantity, crc);
+        if (functionCode.IsReadCoils) return AnyCoils(slaveId, functionCode, address, quantity, crc);
+        if (functionCode.IsReadRegisters) return AnyRegister(slaveId, functionCode, address, quantity, crc);
 
         return Result.InvalidOperation<RtuReadRequesteHeader>("无效的功能码, 无法创建");
     }

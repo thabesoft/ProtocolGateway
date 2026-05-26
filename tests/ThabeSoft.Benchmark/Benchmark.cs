@@ -3,7 +3,7 @@ using BenchmarkDotNet.Jobs;
 using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Primitives;
 
-namespace ThabeSoft.ProtocolGateway.Benchmark;
+namespace ThabeSoft.Benchmark;
 
 
 

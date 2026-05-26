@@ -13,6 +13,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\..\src\ThabeSoft.Modbus.Rtu.Master\ThabeSoft.Modbus.Rtu.Master.csproj" />
+	  <ProjectReference Include="..\..\src\ThabeSoft.Modbus.Rtu.Slave\ThabeSoft.Modbus.Rtu.Slave.csproj" />
+	  <ProjectReference Include="..\..\src\ThabeSoft.Modbus.Rtu\ThabeSoft.Modbus.Rtu.csproj" />
 	  <ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.Abstractions\ThabeSoft.ProtocolGateway.Abstractions.csproj" />
 	</ItemGroup>
 
