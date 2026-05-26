@@ -20,5 +20,5 @@ public interface ITag<TValue>
     /// <summary>
     /// 值转换器
     /// </summary>
-    IByteConverter<TValue> Converter { get; }
+    IValueConverter<TValue> Converter { get; }
 }

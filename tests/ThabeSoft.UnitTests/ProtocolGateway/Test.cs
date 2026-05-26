@@ -1,4 +1,5 @@
 ﻿using ThabeSoft.Primitives;
+using ThabeSoft.ProtocolGateway.Modbus;
 using ThabeSoft.ProtocolGateway.Tags;
 
 namespace ThabeSoft.ProtocolGateway.ProtocolGateway;
@@ -7,6 +8,17 @@ internal static class Test
 {
     public static async Task Process()
     {
+        IProtocolGateway gateway = default!;
+
+
+
+        var result = await gateway.ReadAsync(ModbusTag.ReadInputRegistersQWord(01, 10))
+            .Where(x => x > 0 && x < 100)
+            .MapAsync(x => (float)x);
+
+        Console.Write(result.Value);
+
+
         // 构建标签
         ITagBuilder<int> builder = null!;
         var tag = builder

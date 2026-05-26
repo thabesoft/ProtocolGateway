@@ -1,11 +1,12 @@
 <Solution>
   <Folder Name="/Core/">
     <Project Path="src/ThabeSoft.ProtocolGateway.Abstractions/ThabeSoft.ProtocolGateway.Abstractions.csproj" />
+    <Project Path="src/ThabeSoft.ProtocolGateway.Converters/ThabeSoft.ProtocolGateway.Converters.csproj" />
     <Project Path="src/ThabeSoft.ProtocolGateway.Modbus/ThabeSoft.ProtocolGateway.Modbus.csproj" />
     <Project Path="src/ThabeSoft.ProtocolGateway/ThabeSoft.ProtocolGateway.csproj" />
   </Folder>
   <Folder Name="/Modules/">
-    <Project Path="src/ThabeSoft.Primitives.ByteKit/ThabeSoft.Primitives.ByteKit.csproj"  />
+    <Project Path="src/ThabeSoft.Primitives.ByteKit/ThabeSoft.Primitives.ByteKit.csproj" />
     <Project Path="src/ThabeSoft.Primitives.Result/ThabeSoft.Primitives.Result.csproj" />
   </Folder>
   <Folder Name="/Modules/Modbus/">
@@ -15,7 +16,7 @@
     <Project Path="src/ThabeSoft.Modbus.Rtu/ThabeSoft.Modbus.Rtu.csproj" />
   </Folder>
   <Folder Name="/Modules/Ports/">
-    <Project Path="src/ThabeSoft.Ports.Abstractions/ThabeSoft.Ports.Abstractions.csproj"  />
+    <Project Path="src/ThabeSoft.Ports.Abstractions/ThabeSoft.Ports.Abstractions.csproj" />
     <Project Path="src/ThabeSoft.Ports.SerialPort/ThabeSoft.Ports.SerialPort.csproj" />
   </Folder>
   <Folder Name="/Test/">

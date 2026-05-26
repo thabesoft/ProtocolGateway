@@ -8,7 +8,7 @@ public interface ITagBuilder<TValue>
 {
     ITagBuilder<TValue> Name(string name);
     ITagBuilder<TValue> Address(IAddress address);
-    ITagBuilder<TValue> Converter(IByteConverter<TValue> bytesConverter);
+    ITagBuilder<TValue> Converter(IValueConverter<TValue> bytesConverter);
 
     ITag<TValue> Build();
 }

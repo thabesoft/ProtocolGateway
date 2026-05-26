@@ -1,15 +1,9 @@
-﻿using ThabeSoft.ProtocolGateway.Builders;
-
-namespace ThabeSoft.ProtocolGateway;
+﻿namespace ThabeSoft.ProtocolGateway;
 
 
-public interface IProtocolGateway
+/// <summary>
+/// 网关
+/// </summary>
+public interface IProtocolGateway : IReader, IWriter, ISubscriber
 {
-    void AddDeviceContext<TDevice>(Action<IDeviceOptionsBuilders<TDevice>> optionActinos);
-
-    IReader GetReader<TDevice>();
-    IWriter GetWriter<TDevice>();
-
-    ISubscriber GetSubscriber();
-    ISubscriber GetSubscriber<TDevice>();
 }

@@ -1,16 +1,16 @@
 ﻿using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Primitives;
 
-namespace ThabeSoft.ProtocolGateway.Builders;
+namespace ThabeSoft.ProtocolGateway.Converters;
 
 
 /// <summary>
 /// 32 位数据转换
 /// </summary>
 public sealed class DWordConverter(DWordLayout layout) :
-    IByteConverter<uint>,
-    IByteConverter<int>,
-    IByteConverter<float>
+    IValueConverter<uint>,
+    IValueConverter<int>,
+    IValueConverter<float>
 {
     public static DWordConverter BigEndian { get; } = new(DWordLayout.BigEndian);
     public static DWordConverter LittleEndian { get; } = new(DWordLayout.LittleEndian);
@@ -31,12 +31,12 @@ public sealed class DWordConverter(DWordLayout layout) :
 
 
 
-    Result<uint> IByteConverter<uint>.From(ReadOnlySpan<byte> source) => Convert(source);
-    Result<int> IByteConverter<int>.From(ReadOnlySpan<byte> source) => Convert(source).Map(x => (int)x);
-    Result<float> IByteConverter<float>.From(ReadOnlySpan<byte> source) => Convert(source).Map(x => (float)x);
+    Result<uint> IValueConverter<uint>.From(ReadOnlySpan<byte> source) => Convert(source);
+    Result<int> IValueConverter<int>.From(ReadOnlySpan<byte> source) => Convert(source).Map(x => (int)x);
+    Result<float> IValueConverter<float>.From(ReadOnlySpan<byte> source) => Convert(source).Map(x => (float)x);
 
 
-    Result IByteConverter<uint>.To(uint source, Span<byte> destination) => Convert(source, destination);
-    Result IByteConverter<int>.To(int source, Span<byte> destination) => Convert((ushort)source, destination);
-    Result IByteConverter<float>.To(float source, Span<byte> destination) => Convert((ushort)source, destination);
+    Result IValueConverter<uint>.To(uint source, Span<byte> destination) => Convert(source, destination);
+    Result IValueConverter<int>.To(int source, Span<byte> destination) => Convert((ushort)source, destination);
+    Result IValueConverter<float>.To(float source, Span<byte> destination) => Convert((ushort)source, destination);
 }

@@ -1,15 +1,15 @@
 ﻿using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Primitives;
 
-namespace ThabeSoft.ProtocolGateway.Builders;
+namespace ThabeSoft.ProtocolGateway.Converters;
 
 /// <summary>
 /// 16 位数据转换
 /// </summary>
 public sealed class WordConverter :
-    IByteConverter<ushort>,
-    IByteConverter<short>,
-    IByteConverter<char>
+    IValueConverter<ushort>,
+    IValueConverter<short>,
+    IValueConverter<char>
 {
     private readonly Endianness _endianness;
     private WordConverter(Endianness endianness) => _endianness = endianness;
@@ -36,11 +36,11 @@ public sealed class WordConverter :
     }
 
 
-    Result<ushort> IByteConverter<ushort>.From(ReadOnlySpan<byte> source) => Convert(source);
-    Result<short> IByteConverter<short>.From(ReadOnlySpan<byte> source) => Convert(source).Map(x => (short)x);
-    Result<char> IByteConverter<char>.From(ReadOnlySpan<byte> source) => Convert(source).Map(x => (char)x);
+    Result<ushort> IValueConverter<ushort>.From(ReadOnlySpan<byte> source) => Convert(source);
+    Result<short> IValueConverter<short>.From(ReadOnlySpan<byte> source) => Convert(source).Map(x => (short)x);
+    Result<char> IValueConverter<char>.From(ReadOnlySpan<byte> source) => Convert(source).Map(x => (char)x);
 
-    Result IByteConverter<ushort>.To(ushort source, Span<byte> destination) => Convert(source, destination);
-    Result IByteConverter<short>.To(short source, Span<byte> destination) => Convert((ushort)source, destination);
-    Result IByteConverter<char>.To(char source, Span<byte> destination) => Convert(source, destination);
+    Result IValueConverter<ushort>.To(ushort source, Span<byte> destination) => Convert(source, destination);
+    Result IValueConverter<short>.To(short source, Span<byte> destination) => Convert((ushort)source, destination);
+    Result IValueConverter<char>.To(char source, Span<byte> destination) => Convert(source, destination);
 }

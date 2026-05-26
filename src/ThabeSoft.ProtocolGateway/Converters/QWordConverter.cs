@@ -1,15 +1,15 @@
 ﻿using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Primitives;
 
-namespace ThabeSoft.ProtocolGateway.Builders;
+namespace ThabeSoft.ProtocolGateway.Converters;
 
 /// <summary>
 /// 64 位数据转换
 /// </summary>
 public sealed class QWordConverter(QWordLayout layout) :
-    IByteConverter<ulong>,
-    IByteConverter<long>,
-    IByteConverter<double>
+    IValueConverter<ulong>,
+    IValueConverter<long>,
+    IValueConverter<double>
 {
     public static QWordConverter BigEndian { get; } = new(QWordLayout.BigEndian);
     public static QWordConverter LittleEndian { get; } = new(QWordLayout.LittleEndian);
@@ -30,11 +30,11 @@ public sealed class QWordConverter(QWordLayout layout) :
     }
 
 
-    Result<ulong> IByteConverter<ulong>.From(ReadOnlySpan<byte> source) => Convert(source);
-    Result<long> IByteConverter<long>.From(ReadOnlySpan<byte> source) => Convert(source).Map(x => (long)x);
-    Result<double> IByteConverter<double>.From(ReadOnlySpan<byte> source) => Convert(source).Map(x => (double)x);
+    Result<ulong> IValueConverter<ulong>.From(ReadOnlySpan<byte> source) => Convert(source);
+    Result<long> IValueConverter<long>.From(ReadOnlySpan<byte> source) => Convert(source).Map(x => (long)x);
+    Result<double> IValueConverter<double>.From(ReadOnlySpan<byte> source) => Convert(source).Map(x => (double)x);
 
-    Result IByteConverter<ulong>.To(ulong source, Span<byte> destination) => Convert(source, destination);
-    Result IByteConverter<long>.To(long source, Span<byte> destination) => Convert((ulong)source, destination);
-    Result IByteConverter<double>.To(double source, Span<byte> destination) => Convert((ulong)source, destination);
+    Result IValueConverter<ulong>.To(ulong source, Span<byte> destination) => Convert(source, destination);
+    Result IValueConverter<long>.To(long source, Span<byte> destination) => Convert((ulong)source, destination);
+    Result IValueConverter<double>.To(double source, Span<byte> destination) => Convert((ulong)source, destination);
 }

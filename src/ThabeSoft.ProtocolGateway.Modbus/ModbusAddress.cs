@@ -28,6 +28,7 @@ public sealed class ModbusAddress(byte slaveId, ushort address, FunctionCode fun
     public static ModbusAddress ReadHoldingRegisters(byte slaveId, ushort address) => new(slaveId, address, FunctionCode.ReadHoldingRegisters);
     public static ModbusAddress ReadInputRegisters(byte slaveId, ushort address) => new(slaveId, address, FunctionCode.ReadInputRegisters);
 
+
     public static ModbusAddress WriteSingleCoil(byte slaveId, ushort address) => new(slaveId, address, FunctionCode.WriteSingleCoil);
     public static ModbusAddress WriteSingleRegister(byte slaveId, ushort address) => new(slaveId, address, FunctionCode.WriteSingleRegister);
     public static ModbusAddress WriteMultipleCoils(byte slaveId, ushort address) => new(slaveId, address, FunctionCode.WriteMultipleCoils);

@@ -1,5 +1,5 @@
 ﻿using ThabeSoft.Primitives;
-using ThabeSoft.ProtocolGateway.Builders;
+using ThabeSoft.ProtocolGateway.Converters;
 
 namespace ThabeSoft.ProtocolGateway;
 
@@ -12,9 +12,9 @@ public sealed class Tag<TValue> : ITag<TValue>
 {
     public IAddress Address { get; }
     public int Length { get; }
-    public IByteConverter<TValue> Converter { get; }
+    public IValueConverter<TValue> Converter { get; }
 
-    internal Tag(IAddress address, int length, IByteConverter<TValue> converter)
+    internal Tag(IAddress address, int length, IValueConverter<TValue> converter)
     {
         Address = address;
         Length = length;
