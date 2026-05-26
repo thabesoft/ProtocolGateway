@@ -84,11 +84,11 @@ public readonly record struct RtuReadResponseLayout : IReadResponseLayout, IPayl
 
     public static Result<RtuReadResponseLayout> FromCoilQuantity(int quantity)
     {
-        return ReadCoilsQuantity.Create(quantity).Bind(FromQuantity);
+        return ReadCoilsQuantity.Create(quantity).Map(FromQuantity);
     }
     public static Result<RtuReadResponseLayout> FromRegisterQuantity(int quantity)
     {
-        return ReadRegistersQuantity.Create(quantity).Bind(FromQuantity);
+        return ReadRegistersQuantity.Create(quantity).Map(FromQuantity);
     }
 
 

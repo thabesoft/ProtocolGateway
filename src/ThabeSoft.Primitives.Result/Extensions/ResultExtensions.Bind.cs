@@ -6,12 +6,11 @@ public static partial class ResultExtensions
     // 有值
     extension<T>(Result<T> result)
     {
-        public Result<U> Bind<U>(Func<T, U> handler)
+        public Result<U> Bind<U>(Func<T, Result<U>> handler)
         {
             if (!result.IsSuccess) result.PropagateError<U>();
             return handler(result.Value);
         }
-
 
         public async Task<Result<U>> BindAsync<U>(Func<T, Task<Result<U>>> handler)
         {

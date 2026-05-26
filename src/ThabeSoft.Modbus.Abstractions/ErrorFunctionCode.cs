@@ -27,7 +27,7 @@ public readonly record struct ErrorFunctionCode : IEquatable<ErrorFunctionCode>
         }
 
         return FunctionCode.FromCode((byte)(code & 0x7F))
-            .Bind(x => new ErrorFunctionCode(x));
+            .Map(x => new ErrorFunctionCode(x));
     }
 
     [Obsolete]

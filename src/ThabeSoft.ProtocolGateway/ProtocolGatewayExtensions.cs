@@ -1,6 +1,4 @@
-﻿using ThabeSoft.Primitives;
-
-namespace ThabeSoft.ProtocolGateway;
+﻿namespace ThabeSoft.ProtocolGateway;
 
 
 public static class ProtocolGatewayExtensions

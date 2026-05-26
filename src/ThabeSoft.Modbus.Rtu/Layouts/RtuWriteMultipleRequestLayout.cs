@@ -86,7 +86,7 @@ public readonly record struct RtuWriteMultipleRequestLayout : IRtuWriteMultipleR
     }
     public static Result<RtuWriteMultipleRequestLayout> FromCoilsQuantity(int quantity)
     {
-        return WriteCoilsQuantity.Create(quantity).Bind(FromQuantity);
+        return WriteCoilsQuantity.Create(quantity).Map(FromQuantity);
     }
 
 
@@ -119,7 +119,7 @@ public readonly record struct RtuWriteMultipleRequestLayout : IRtuWriteMultipleR
     }
     public static Result<RtuWriteMultipleRequestLayout> FromRegistersQuantity(int quantity)
     {
-        return WriteRegistersQuantity.Create(quantity).Bind(FromQuantity);
+        return WriteRegistersQuantity.Create(quantity).Map(FromQuantity);
     }
 
     public override string ToString()

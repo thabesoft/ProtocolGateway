@@ -7,12 +7,53 @@ namespace ThabeSoft.ProtocolGateway;
 /// <summary>
 /// 标签
 /// </summary>
-public sealed class Tag<TValue> : ITag<TValue>
+
+
+/// <summary>
+/// 预设Tag
+/// </summary>
+public static class Tag
+{
+    public static ITag<bool> Bool(IAddress address)
+      => new Tag<bool>(address, 1, BoolConverter.Instance);
+    public static ITag<byte> Byte(IAddress address, BitOrder bitOrder = BitOrder.MSB0)
+        => new Tag<byte>(address, 1, ByteConverter.From(bitOrder));
+
+
+    public static ITag<short> Int16(IAddress address, Endianness endianness = Endianness.BigEndian)
+        => new Tag<short>(address, 2, WordConverter.From(endianness));
+    public static ITag<ushort> UInt16(IAddress address, Endianness endianness = Endianness.BigEndian)
+        => new Tag<ushort>(address, 2, WordConverter.From(endianness));
+    public static ITag<char> Char(IAddress address, Endianness endianness = Endianness.BigEndian)
+        => new Tag<char>(address, 2, WordConverter.From(endianness));
+
+
+    public static ITag<int> Int32(IAddress address, DWordLayout layout = default)
+        => new Tag<int>(address, 4, new DWordConverter(layout));
+    public static ITag<uint> UInt32(IAddress address, DWordLayout layout = default)
+        => new Tag<uint>(address, 4, new DWordConverter(layout));
+    public static ITag<float> Float(IAddress address, DWordLayout layout = default)
+        => new Tag<float>(address, 4, new DWordConverter(layout));
+
+
+    public static ITag<long> Int64(IAddress address, QWordLayout layout = default)
+        => new Tag<long>(address, 8, new QWordConverter(layout));
+    public static ITag<ulong> UInt64(IAddress address, QWordLayout layout = default)
+        => new Tag<ulong>(address, 8, new QWordConverter(layout));
+    public static ITag<double> Double(IAddress address, QWordLayout layout = default)
+        => new Tag<double>(address, 8, new QWordConverter(layout));
+}
+
+
+
+internal sealed class Tag<TValue> : IRoutableTag<TValue>
     where TValue : unmanaged
 {
+    public ChannelName ChannelName { get; }
     public IAddress Address { get; }
     public int Length { get; }
     public IValueConverter<TValue> Converter { get; }
+
 
     internal Tag(IAddress address, int length, IValueConverter<TValue> converter)
     {
@@ -20,37 +61,4 @@ public sealed class Tag<TValue> : ITag<TValue>
         Length = length;
         Converter = converter;
     }
-}
-
-/// <summary>
-/// 预设Tag
-/// </summary>
-public static class Tag
-{
-    public static Tag<bool> Bool(IAddress address)
-        => new(address, 1, BoolConverter.Instance);
-    public static Tag<byte> Byte(IAddress address, BitOrder bitOrder = BitOrder.MSB0)
-        => new(address, 1, ByteConverter.From(bitOrder));
-
-    public static Tag<short> Int16(IAddress address, Endianness endianness = Endianness.BigEndian)
-        => new(address, 2, WordConverter.From(endianness));
-    public static Tag<ushort> UInt16(IAddress address, Endianness endianness = Endianness.BigEndian)
-        => new(address, 2, WordConverter.From(endianness));
-    public static Tag<char> Char(IAddress address, Endianness endianness = Endianness.BigEndian)
-        => new(address, 2, WordConverter.From(endianness));
-
-
-    public static Tag<int> Int32(IAddress address, DWordLayout layout = default)
-        => new(address, 4, new DWordConverter(layout));
-    public static Tag<uint> UInt32(IAddress address, DWordLayout layout = default)
-        => new(address, 4, new DWordConverter(layout));
-    public static Tag<float> Float(IAddress address, DWordLayout layout = default)
-        => new(address, 4, new DWordConverter(layout));
-
-    public static Tag<long> Int64(IAddress address, QWordLayout layout = default)
-        => new(address, 8, new QWordConverter(layout));
-    public static Tag<ulong> UInt64(IAddress address, QWordLayout layout = default)
-        => new(address, 8, new QWordConverter(layout));
-    public static Tag<double> Double(IAddress address, QWordLayout layout = default)
-        => new(address, 8, new QWordConverter(layout));
 }

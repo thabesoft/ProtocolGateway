@@ -1,17 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;netstandard2.1;net7.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<LangVersion>preview</LangVersion>
 	</PropertyGroup>
 
-	<!-- std2.0 包 引入 ValueTask 和 Memory 相关的包-->
-	<ItemGroup Condition="'$(TargetFramework)' != 'net7.0'">
-		<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
-	</ItemGroup>
-	
 	<ItemGroup>
 	  <ProjectReference Include="..\ThabeSoft.Primitives.ByteKit\ThabeSoft.Primitives.ByteKit.csproj" />
 	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.Abstractions\ThabeSoft.ProtocolGateway.Abstractions.csproj" />

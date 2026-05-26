@@ -76,7 +76,7 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
 
     public static Result<RtuReadResponseHeader> DecodeCoilsResponse(ReadOnlySpan<byte> source, Span<bool> destination)
     {
-        var layout_result = ReadCoilsQuantity.Create(destination.Length).Bind(RtuReadResponseLayout.FromQuantity);
+        var layout_result = ReadCoilsQuantity.Create(destination.Length).Map(RtuReadResponseLayout.FromQuantity);
         if (!layout_result) return layout_result.PropagateError<RtuReadResponseHeader>();
 
         return DecodeCoilsResponse(source, destination, layout_result.Value);
@@ -102,7 +102,7 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
 
     public static Result<RtuReadResponseHeader> DecodeRegistersResponse(ReadOnlySpan<byte> source, Span<ushort> destination)
     {
-        var layout_result = ReadRegistersQuantity.Create(destination.Length).Bind(RtuReadResponseLayout.FromQuantity);
+        var layout_result = ReadRegistersQuantity.Create(destination.Length).Map(RtuReadResponseLayout.FromQuantity);
         if (!layout_result) return layout_result.PropagateError<RtuReadResponseHeader>();
 
         return DecodeRegistersResponse(source, destination, layout_result.Value);

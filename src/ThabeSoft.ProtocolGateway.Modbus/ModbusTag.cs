@@ -1,5 +1,4 @@
-﻿using ThabeSoft.Modbus;
-using ThabeSoft.ProtocolGateway.Converters;
+﻿using ThabeSoft.ProtocolGateway.Converters;
 
 namespace ThabeSoft.ProtocolGateway.Modbus;
 
@@ -43,7 +42,7 @@ public static class ModbusTag
 
     public static ITag<ushort> ReadInputRegistersWord(byte slaveId, ushort address)
         => new ModbusTag<ushort>(
-            address:  ModbusAddress.ReadInputRegisters(slaveId, address),
+            address: ModbusAddress.ReadInputRegisters(slaveId, address),
             length: 2,
             converter: WordConverter.BigEndian);
 

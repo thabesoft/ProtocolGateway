@@ -1,4 +1,4 @@
-﻿namespace ThabeSoft.ProtocolGateway;
+﻿namespace ThabeSoft.ProtocolGateway.Builders;
 
 /// <summary>
 /// 设备配置

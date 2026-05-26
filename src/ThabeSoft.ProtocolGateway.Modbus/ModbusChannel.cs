@@ -52,7 +52,6 @@ public sealed class ModbusChannel(IModbusMaster master) : IChannel
 
         return Result.NotSupported<TValue>("Modbus 无法识别的读取操作");
     }
-
     public async ValueTask<Result> WriteAsync<TValue>(ITag<TValue> tag, TValue value, CancellationToken cancellationToken = default) where TValue : unmanaged
     {
         if (tag.Address is not ModbusAddress address) return Result.InvalidOperation("无效地址");
@@ -90,15 +89,14 @@ public sealed class ModbusChannel(IModbusMaster master) : IChannel
     }
 
 
-
-   /// <summary>
-   /// 读取n个字节的线圈, 1个字节=8个线圈
-   /// </summary>
-   /// <param name="destination">需要多少个字节的线圈</param>
-   /// <param name="slaveId">从站Id</param>
-   /// <param name="address">起始地址</param>
-   /// <param name="readHandler">读取请求委托</param>
-   /// <param name="bitOrder">位序</param>
+    /// <summary>
+    /// 读取n个字节的线圈, 1个字节=8个线圈
+    /// </summary>
+    /// <param name="destination">需要多少个字节的线圈</param>
+    /// <param name="slaveId">从站Id</param>
+    /// <param name="address">起始地址</param>
+    /// <param name="readHandler">读取请求委托</param>
+    /// <param name="bitOrder">位序</param>
     private async ValueTask<Result> ReadCoilsToByteAsync(Memory<byte> destination, byte slaveId, ushort address, ReadCoilsHandler readHandler, BitOrder bitOrder= BitOrder.LSB0, CancellationToken ct =default)
     {
         var bits_count = destination.Length * 8;
