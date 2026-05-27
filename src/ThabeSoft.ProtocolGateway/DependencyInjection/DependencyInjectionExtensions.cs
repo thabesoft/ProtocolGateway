@@ -12,7 +12,7 @@ public static class DependencyInjectionExtensions
     {
         public void AddProtocolGateway()
         {
-            services.AddSingleton<IProtocolGateway, ProtocolGateway>();
+            services.AddSingleton<IGateway, Gateway>();
         }
     }
 }

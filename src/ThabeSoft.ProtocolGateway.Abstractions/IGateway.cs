@@ -6,7 +6,7 @@ namespace ThabeSoft.ProtocolGateway;
 /// <summary>
 /// 网关
 /// </summary>
-public interface IProtocolGateway : IDisposable
+public interface IGateway : IDisposable
 {
     /// <summary>
     /// 添加通道

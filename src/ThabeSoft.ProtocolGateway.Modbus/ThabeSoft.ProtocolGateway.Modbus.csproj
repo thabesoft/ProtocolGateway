@@ -5,6 +5,7 @@
 		<LangVersion>preview</LangVersion>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<RootNamespace>ThabeSoft.ProtocolGateway</RootNamespace>
 	</PropertyGroup>
 
 	<!--引入-->
@@ -18,6 +19,7 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\ThabeSoft.Modbus.Abstractions\ThabeSoft.Modbus.Abstractions.csproj" />
+	  <ProjectReference Include="..\ThabeSoft.Modbus.Rtu.Master\ThabeSoft.Modbus.Rtu.Master.csproj" />
 	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.Abstractions\ThabeSoft.ProtocolGateway.Abstractions.csproj" />
 	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.Converters\ThabeSoft.ProtocolGateway.Converters.csproj" />
 	</ItemGroup>

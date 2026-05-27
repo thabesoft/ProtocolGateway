@@ -4,7 +4,7 @@
 /// <summary>
 /// 通道管理器
 /// </summary>
-internal sealed class ChannelManager(ProtocolGateway gateway, ChannelName name) : IChannelManager
+internal sealed class ChannelManager(Gateway gateway, ChannelName name) : IChannelManager
 {
     public void Enable()
     {

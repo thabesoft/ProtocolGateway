@@ -1,13 +1,11 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
-using ThabeSoft.Ports;
+using System.IO.Ports;
 using ThabeSoft.Ports.Options;
 using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Primitives;
 
-using SystemSerialPort = System.IO.Ports.SerialPort;
-
-namespace ThabeSoft.ProtocolGateway.SerialPort;
+namespace ThabeSoft.Ports;
 
 
 /// <summary>
@@ -19,7 +17,7 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
 
 
     private ISerialOptions? _options;
-    private SystemSerialPort? port;
+    private SerialPort? port;
 
     private readonly SemaphoreSlim _lock = new(1, 1);
     private readonly SemaphoreSlim _readLock = new(1, 1);
@@ -245,11 +243,11 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
     }
 
 
-    private static Result<SystemSerialPort> CreateSerialPort(ISerialOptions options)
+    private static Result<SerialPort> CreateSerialPort(ISerialOptions options)
     {
         try
         {
-            return new SystemSerialPort(options.PortName, options.BaudRate, options.Parity, options.DataBits, options.StopBits)
+            return new SerialPort(options.PortName, options.BaudRate, options.Parity, options.DataBits, options.StopBits)
             {
                 ReadTimeout = (int)options.ReadTimeout.TotalMilliseconds,
                 WriteTimeout = (int)options.WriteTimeout.TotalMilliseconds
@@ -257,7 +255,7 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
         }
         catch (IOException ex)
         {
-            return Result.Error<SystemSerialPort>(ErrorType.InvalidOperation, $"无法创建串口: {ex.Message}");
+            return Result.Error<SerialPort>(ErrorType.InvalidOperation, $"无法创建串口: {ex.Message}");
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using ThabeSoft.Modbus;
 
-namespace ThabeSoft.ProtocolGateway.Modbus;
+namespace ThabeSoft.ProtocolGateway;
 
 
 /// <summary>
@@ -23,14 +23,22 @@ public sealed class ModbusAddress(byte slaveId, ushort address, FunctionCode fun
 
 
 
-    public static ModbusAddress ReadCoils(byte slaveId, ushort address) => new(slaveId, address, FunctionCode.ReadCoils);
-    public static ModbusAddress ReadDiscreteInputs(byte slaveId, ushort address) => new(slaveId, address, FunctionCode.ReadDiscreteInputs);
-    public static ModbusAddress ReadHoldingRegisters(byte slaveId, ushort address) => new(slaveId, address, FunctionCode.ReadHoldingRegisters);
-    public static ModbusAddress ReadInputRegisters(byte slaveId, ushort address) => new(slaveId, address, FunctionCode.ReadInputRegisters);
+    public static ModbusAddress ReadCoils(byte slaveId, ushort address)
+        => new(slaveId, address, FunctionCode.ReadCoils);
+    public static ModbusAddress ReadDiscreteInputs(byte slaveId, ushort address)
+        => new(slaveId, address, FunctionCode.ReadDiscreteInputs);
+    public static ModbusAddress ReadHoldingRegisters(byte slaveId, ushort address)
+        => new(slaveId, address, FunctionCode.ReadHoldingRegisters);
+    public static ModbusAddress ReadInputRegisters(byte slaveId, ushort address)
+        => new(slaveId, address, FunctionCode.ReadInputRegisters);
 
 
-    public static ModbusAddress WriteSingleCoil(byte slaveId, ushort address) => new(slaveId, address, FunctionCode.WriteSingleCoil);
-    public static ModbusAddress WriteSingleRegister(byte slaveId, ushort address) => new(slaveId, address, FunctionCode.WriteSingleRegister);
-    public static ModbusAddress WriteMultipleCoils(byte slaveId, ushort address) => new(slaveId, address, FunctionCode.WriteMultipleCoils);
-    public static ModbusAddress WriteMultipleRegisters(byte slaveId, ushort address) => new(slaveId, address, FunctionCode.WriteMultipleRegisters);
+    public static ModbusAddress WriteSingleCoil(byte slaveId, ushort address)
+        => new(slaveId, address, FunctionCode.WriteSingleCoil);
+    public static ModbusAddress WriteSingleRegister(byte slaveId, ushort address)
+        => new(slaveId, address, FunctionCode.WriteSingleRegister);
+    public static ModbusAddress WriteMultipleCoils(byte slaveId, ushort address)
+        => new(slaveId, address, FunctionCode.WriteMultipleCoils);
+    public static ModbusAddress WriteMultipleRegisters(byte slaveId, ushort address)
+        => new(slaveId, address, FunctionCode.WriteMultipleRegisters);
 }

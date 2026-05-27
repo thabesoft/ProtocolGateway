@@ -1,14 +1,13 @@
 ﻿using System.Collections.Concurrent;
-using System.Xml.Linq;
 using ThabeSoft.Primitives;
 
 namespace ThabeSoft.ProtocolGateway;
 
 
 /// <summary>
-/// 协议网关
+/// 网关
 /// </summary>
-public sealed class ProtocolGateway : IProtocolGateway
+public sealed class Gateway : IGateway
 {
     // 所有通道
     private readonly ConcurrentDictionary<ChannelName, IChannel> _channels = new();
@@ -57,7 +56,7 @@ public sealed class ProtocolGateway : IProtocolGateway
         return Result.Ok(manager);
     }
     // 读取
-    public ValueTask<Result<TValue>> ReadAsync<TValue>(IRoutableTag<TValue> tag, CancellationToken cancellationToken)
+    public ValueTask<Result<TValue>> ReadAsync<TValue>(IRoutableTag<TValue> tag, CancellationToken cancellationToken = default)
         where TValue : unmanaged
     {
         // 是否启用
@@ -84,7 +83,7 @@ public sealed class ProtocolGateway : IProtocolGateway
         return readable.ReadAsync(tag, cancellationToken);
     }
     // 写入
-    public ValueTask<Result> WriteAsync<TValue>(IRoutableTag<TValue> tag, TValue value, CancellationToken cancellationToken)
+    public ValueTask<Result> WriteAsync<TValue>(IRoutableTag<TValue> tag, TValue value, CancellationToken cancellationToken = default)
         where TValue : unmanaged
     {
         // 是否启用

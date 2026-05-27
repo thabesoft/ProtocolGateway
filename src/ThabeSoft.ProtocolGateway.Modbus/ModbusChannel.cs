@@ -2,11 +2,18 @@
 using ThabeSoft.Modbus;
 using ThabeSoft.Primitives;
 
-namespace ThabeSoft.ProtocolGateway.Modbus;
+namespace ThabeSoft.ProtocolGateway;
 
 
-public sealed class ModbusChannel(IModbusMaster master) : IChannel
+/// <summary>
+/// Modbus 通道
+/// </summary>
+/// <param name="master">Modbus主站</param>
+public sealed class ModbusChannel(IModbusMaster master) : IReadWriteChannel
 {
+    /// <summary>
+    /// 读取
+    /// </summary>
     public async ValueTask<Result<TValue>> ReadAsync<TValue>(ITag<TValue> tag, CancellationToken cancellationToken = default) where TValue : unmanaged
     {
         if (tag.Address is not ModbusAddress address) return Result.Error<TValue>(ErrorType.InvalidOperation, "无效地址");
@@ -52,6 +59,9 @@ public sealed class ModbusChannel(IModbusMaster master) : IChannel
 
         return Result.NotSupported<TValue>("Modbus 无法识别的读取操作");
     }
+    /// <summary>
+    /// 写入
+    /// </summary>
     public async ValueTask<Result> WriteAsync<TValue>(ITag<TValue> tag, TValue value, CancellationToken cancellationToken = default) where TValue : unmanaged
     {
         if (tag.Address is not ModbusAddress address) return Result.InvalidOperation("无效地址");

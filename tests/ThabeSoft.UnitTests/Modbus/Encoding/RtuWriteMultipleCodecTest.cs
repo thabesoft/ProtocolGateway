@@ -22,7 +22,7 @@ public sealed class RtuCodecTest
 
         // 编码
         var encode_result = RtuMasterReadCodec.EncodeRequest(encode_buffer, request_header_result.Value, layout);
-        Console.WriteLine($"编码: {ToString(encode_buffer.ToArray())}");
+        Console.WriteLine($"编码: {encode_buffer.ToHexString()}");
         Assert.IsTrue(encode_result, encode_result.Message);
 
         // 解码
@@ -42,7 +42,7 @@ public sealed class RtuCodecTest
         Console.WriteLine($"从站: {response_header.SlaveId}");
         Console.WriteLine($"地址: {response_header.Address}");
         Console.WriteLine($"数量: {response_header.Quantity}");
-        Console.WriteLine($"Crc: {ToString(response_header.Crc)}");
+        Console.WriteLine($"Crc: {response_header.Crc.ToHexString()}");
     }
 
 
@@ -61,7 +61,7 @@ public sealed class RtuCodecTest
 
         // 编码
         var encode_result = RtuMasterReadCodec.EncodeRequest(encode_buffer, request_header_result.Value, layout);
-        Console.WriteLine($"编码: {ToString(encode_buffer.ToArray())}");
+        Console.WriteLine($"编码: {encode_buffer.ToHexString()}");
         Assert.IsTrue(encode_result, encode_result.Message);
 
         // 解码
@@ -81,7 +81,7 @@ public sealed class RtuCodecTest
         Console.WriteLine($"从站: {response_header.SlaveId}");
         Console.WriteLine($"地址: {response_header.Address}");
         Console.WriteLine($"数量: {response_header.Quantity}");
-        Console.WriteLine($"Crc: {ToString(response_header.Crc)}");
+        Console.WriteLine($"Crc: {response_header.Crc.ToHexString()}");
     }
 
 
@@ -103,7 +103,7 @@ public sealed class RtuCodecTest
         RtuMasterWriteMultipleCodec.EncodeCoilsRequest(buffer, header, values, layout_result.Value);
 
         // 打印
-        Console.WriteLine(ToString(buffer.ToArray()));
+        Console.WriteLine(buffer.ToHexString());
 
 
     }
@@ -127,37 +127,10 @@ public sealed class RtuCodecTest
         RtuMasterWriteMultipleCodec.EncodeRegistersRequest(buffer, header, values, layout_result.Value);
 
         // 打印
-        Console.WriteLine(ToString(buffer.ToArray()));
+        Console.WriteLine(buffer.ToHexString());
     }
 
 
 
-    // 转为字节字符串
-    private static string ToString(IEnumerable<byte> items)
-    {
-        return string.Join(' ', items.Select(x => x.ToString("X2")));
-    }
-    private static string ToString(ushort value)
-    {
-        return $"{value >> 8:X2} {(byte)value:X2}";
-    }
-    private static string ToString(IEnumerable<bool> items)
-    {
-        return string.Join(' ', items);
-    }
-    private static string ToString(IEnumerable<ushort> items)
-    {
-        var bytes = items.SelectMany<ushort, byte>(x => [(byte)(x >> 8), (byte)x]);
-        return ToString(bytes);
-    }
-    // 随机填充数据
-    private static void RandomFill(Span<ushort> values, int min, int max)
-    {
-        for (int i = 0; i < values.Length; i++) values[i] = (ushort)Random.Shared.Next(min, max);
-    }
-    // 随机填充数据
-    private static void RandomFill(Span<bool> values)
-    {
-        for (int i = 0; i < values.Length; i++) values[i] = Random.Shared.NextDouble() < 0.6;
-    }
+    
 }

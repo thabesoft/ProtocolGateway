@@ -29,7 +29,7 @@ public readonly struct ReadResponseHeader
     {
         return new(slaveId, FunctionCode.ReadCoils, dataLength);
     }
-    public static ReadResponseHeader ReadDiscreteInputs(byte slaveId, int dataLength)
+    public static ReadResponseHeader DiscreteInputs(byte slaveId, int dataLength)
     {
         return new(slaveId, FunctionCode.ReadDiscreteInputs, dataLength);
     }
@@ -37,7 +37,7 @@ public readonly struct ReadResponseHeader
     {
         return new(slaveId, FunctionCode.ReadHoldingRegisters, dataLength);
     }
-    public static ReadResponseHeader ReadInputRegisters(byte slaveId, int dataLength)
+    public static ReadResponseHeader InputRegisters(byte slaveId, int dataLength)
     {
         return new(slaveId, FunctionCode.ReadInputRegisters, dataLength);
     }

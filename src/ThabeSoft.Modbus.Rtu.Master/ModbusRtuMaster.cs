@@ -278,9 +278,8 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
     /// 通用读寄存器
     /// </summary>
     /// <param name="destination">寄存器缓冲区</param>
-    /// <param name="slaveId">从站Id</param>
-    /// <param name="address">起始地址</param>
-    /// <param name="headerHandler">请求头构建处理器</param>
+    /// <param name="requestHeader">请求头</param>
+    /// <param name="encoderHandler">编码处理器</param>
     /// <param name="decoderHandler">解码处理器</param>
     private async ValueTask<Result<ReadResponseHeader>> ReadRegistersAsync(
         Memory<ushort> destination,
@@ -328,18 +327,16 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
     }
 
     /// <summary>
-    /// 读请求头处理器
+    /// 读请求头编码处理器
     /// </summary>
-    /// <param name="slaveId">从站Id</param>
-    /// <param name="address">起始地址</param>
-    /// <param name="quantity">线圈数量</param>
+    /// <param name="destination">编码缓冲区</param>
+    /// <param name="header">请求头</param>
     private delegate Result<int> ReadRegisterRequestEncodeHandler(Span<byte> destination, in ReadRequestHeader header);
     /// <summary>
     /// 读取响应解码处理器
     /// </summary>
     /// <param name="source">源数据</param>
     /// <param name="values">解析到的值</param>
-    /// <param name="layout">帧布局</param>
     private delegate Result<ReadResponseHeader> ReadRegisterResponseDecodeHandler(ReadOnlySpan<byte> source, Span<ushort> values);
     /// <summary>
     /// 读线圈响应解码器
@@ -358,7 +355,6 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
     private async ValueTask<Result> GetResponseAsync(Memory<byte> destination, CancellationToken cancellationToken)
     {
         int current_length = 0;
-        const int crc_length = 2;
 
         // 有两种情况, Rtu异常共5字节, 其他数据都大于5字节, 所以先读取5个
         var resp_header = destination[..RtuErrorResponseLayout.TotalLength];
