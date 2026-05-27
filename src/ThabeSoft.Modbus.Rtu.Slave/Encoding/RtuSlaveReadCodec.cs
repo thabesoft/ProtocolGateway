@@ -83,7 +83,7 @@ public sealed class RtuSlaveReadCodec : ISlaveReadCodec
         if (!quantity_result.IsSuccess) return quantity_result.PropagateError<int>();
 
         var layout  = RtuReadResponseLayout.FromQuantity(quantity_result.Value);
-        return EncodeCoilsResponse(destination, header, values, layout).ThenReturn(layout.TotalLength);
+        return EncodeCoilsResponse(destination, header, values, layout).Then(layout.TotalLength);
     }
     public static Result EncodeCoilsResponse(Span<byte> destination, in ReadResponseHeader header, ReadOnlySpan<bool> values, in RtuReadResponseLayout layout)
     {
@@ -132,7 +132,7 @@ public sealed class RtuSlaveReadCodec : ISlaveReadCodec
         if (!quantity_result.IsSuccess) return quantity_result.PropagateError<int>();
 
         var layout = RtuReadResponseLayout.FromQuantity(quantity_result.Value);
-        return EncodeRegistersResponse(destination, header, values, layout).ThenReturn(layout.TotalLength);
+        return EncodeRegistersResponse(destination, header, values, layout).Then(layout.TotalLength);
     }
     public static Result EncodeRegistersResponse(Span<byte> destination, in ReadResponseHeader header, ReadOnlySpan<ushort> values, in RtuReadResponseLayout layout)
     {

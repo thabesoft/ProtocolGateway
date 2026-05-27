@@ -35,7 +35,7 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
     public static Result<int> EncodeRequest(Span<byte> destination, in ReadRequestHeader header)
     {
         var layout = RtuReadRequestLayout.Instance;
-        return EncodeRequest(destination, header, layout).ThenReturn(layout.TotalLength);
+        return EncodeRequest(destination, header, layout).Then(layout.TotalLength);
     }
     public static Result EncodeRequest(Span<byte> destination, in ReadRequestHeader header, in RtuReadRequestLayout layout)
     {

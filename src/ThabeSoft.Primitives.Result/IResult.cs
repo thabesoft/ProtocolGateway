@@ -12,6 +12,11 @@ public interface IResult
     ErrorType ErrorType { get; }
     /// <summary> 消息 </summary>
     string? Message { get; }
+
+    /// <summary>
+    /// 传播错误到指定类型
+    /// </summary>
+    Result<U> PropagateError<U>();
 }
 
 /// <summary>

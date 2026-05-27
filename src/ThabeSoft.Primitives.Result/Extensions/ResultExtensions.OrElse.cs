@@ -30,7 +30,7 @@ public static partial class ResultExtensions
         public Result<T> OrElse(Func<Result<T>> resultGetter)
         {
             if (result.IsSuccess) return result;
-            
+
             return resultGetter();
         }
         public Result<T> OrElse(Func<ErrorType, Result<T>> resultGetter)

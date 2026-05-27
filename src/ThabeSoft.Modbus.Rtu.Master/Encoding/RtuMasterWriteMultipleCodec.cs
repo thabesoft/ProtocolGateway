@@ -44,7 +44,7 @@ public sealed class RtuMasterWriteMultipleCodec : IMasterWriteMultipleCodec
             .Map(RtuWriteMultipleRequestLayout.FromQuantity);
         if (!layout_result.IsSuccess) return layout_result.PropagateError<int>();
 
-        return EncodeCoilsRequest(destination, header, values, layout_result.Value).ThenReturn(layout_result.Value.TotalLength);
+        return EncodeCoilsRequest(destination, header, values, layout_result.Value).Then(layout_result.Value.TotalLength);
     }
     public static Result EncodeCoilsRequest(Span<byte> destination, in WriteMultipleRequestHeader header, ReadOnlySpan<bool> values, in RtuWriteMultipleRequestLayout layout)
     {
@@ -107,7 +107,7 @@ public sealed class RtuMasterWriteMultipleCodec : IMasterWriteMultipleCodec
             .Map(RtuWriteMultipleRequestLayout.FromQuantity);
         if (!layout_result.IsSuccess) return layout_result.PropagateError<int>();
 
-        return EncodeRegistersRequest(destination, header, values, layout_result.Value).ThenReturn(layout_result.Value.TotalLength);
+        return EncodeRegistersRequest(destination, header, values, layout_result.Value).Then(layout_result.Value.TotalLength);
     }
     public static Result EncodeRegistersRequest(Span<byte> destination, in WriteMultipleRequestHeader header, ReadOnlySpan<ushort> values, in RtuWriteMultipleRequestLayout layout)
     {

@@ -20,12 +20,12 @@ public sealed class RtuMasterWriteSingleCodec : IMasterWriteSingleCodec
     public Result<int> EncodeCoilRequest(Span<byte> destination, in WriteSingleCoilHeader header)
     {
         var layout = RtuWriteSingleLayout.Instance;
-        return EncodeCoilRequest(destination, header, layout).ThenReturn(layout.TotalLength);
+        return EncodeCoilRequest(destination, header, layout).Then(layout.TotalLength);
     }
     public Result<int> EncodeRegisterRequest(Span<byte> destination, in WriteSingleRegisterHeader header)
     {
         var layout = RtuWriteSingleLayout.Instance;
-        return EncodeRegisterRequest(destination, header, layout).ThenReturn(layout.TotalLength);
+        return EncodeRegisterRequest(destination, header, layout).Then(layout.TotalLength);
     }
 
     public Result<WriteSingleCoilHeader> DecodeCoilResponse(ReadOnlySpan<byte> source)
