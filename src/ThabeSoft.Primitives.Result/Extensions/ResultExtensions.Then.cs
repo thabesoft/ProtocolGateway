@@ -1,6 +1,9 @@
 ﻿namespace ThabeSoft.Primitives;
 
-// Then
+
+/// <summary>
+/// Then
+/// </summary>
 public static partial class ResultExtensions
 {
     // Sync

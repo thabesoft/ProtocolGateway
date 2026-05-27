@@ -6,63 +6,498 @@
 /// </summary>
 public static partial class ResultExtensions
 {
-    // 无值版本
-    extension(Result result)
+    // Value
+    extension<T>(T result) where T : IResult
     {
+        public Result<U> OrElse<U>(U returnValue)
+        {
+            if (!result.IsSuccess) return Result.Ok(returnValue);
+            return Result.Error<U>(result.ErrorType, result.Message!);
+        }
+        public Result<U> OrElse<U>(Func<U> returnValueGetter)
+        {
+            if (!result.IsSuccess) return Result.Ok(returnValueGetter());
+            return result.PropagateError<U>();
+        }
+        public async ValueTask<Result<U>> OrElseAsync<U>(Func<Task<U>> returnValueGetterTask)
+        {
+            if (!result.IsSuccess) return Result.Ok(await returnValueGetterTask());
+            return result.PropagateError<U>();
+        }
+        public async ValueTask<Result<U>> OrElseAsync<U>(Func<CancellationToken, Task<U>> returnValueGetterTask, CancellationToken cancellationToken = default)
+        {
+            if (!result.IsSuccess) return Result.Ok(await returnValueGetterTask(cancellationToken));
+            return result.PropagateError<U>();
+        }
+        public async ValueTask<Result<U>> OrElseAsync<U>(Func<ValueTask<U>> returnValueGetterTask)
+        {
+            if (!result.IsSuccess) return Result.Ok(await returnValueGetterTask());
+            return result.PropagateError<U>();
+        }
+        public async ValueTask<Result<U>> OrElseAsync<U>(Func<CancellationToken, ValueTask<U>> returnValueGetterTask, CancellationToken cancellationToken = default)
+        {
+            if (!result.IsSuccess) return Result.Ok(await returnValueGetterTask(cancellationToken));
+            return result.PropagateError<U>();
+        }
 
+
+        public Result<U> OrElse<U>(Result<U> returnResult)
+        {
+            if (!result.IsSuccess) return returnResult;
+            return result.PropagateError<U>();
+        }
+        public Result<U> OrElse<U>(Func<Result<U>> returnResultGetter)
+        {
+            if (!result.IsSuccess) return returnResultGetter();
+            return result.PropagateError<U>();
+        }
+        public async ValueTask<Result<U>> OrElseAsync<U>(Func<Task<Result<U>>> returnResultGetterTask)
+        {
+            if (!result.IsSuccess) return await returnResultGetterTask();
+            return result.PropagateError<U>();
+        }
+        public async ValueTask<Result<U>> OrElseAsync<U>(Func<CancellationToken, Task<Result<U>>> returnResultGetterTask, CancellationToken cancellationToken = default)
+        {
+            if (!result.IsSuccess) return await returnResultGetterTask(cancellationToken);
+            return result.PropagateError<U>();
+        }
+        public async ValueTask<Result<U>> OrElseAsync<U>(Func<ValueTask<Result<U>>> returnResultGetterTask)
+        {
+            if (!result.IsSuccess) return await returnResultGetterTask();
+            return result.PropagateError<U>();
+        }
+        public async ValueTask<Result<U>> OrElseAsync<U>(Func<CancellationToken, ValueTask<Result<U>>> returnResultGetterTask, CancellationToken cancellationToken = default)
+        {
+            if (!result.IsSuccess) return await returnResultGetterTask(cancellationToken);
+            return result.PropagateError<U>();
+        }
     }
-    // 无值 ValueTask
-    extension(ValueTask<Result> task)
-    {
-
-    }
-
-    // 无值 Task
+    // Task
     extension(Task<Result> task)
     {
+        public async Task<Result<U>> OrElseAsync<U>(U returnValue)
+        {
+            var result = await task;
 
+            if (!result.IsSuccess) return Result.Ok(returnValue);
+            return Result.Error<U>(result.ErrorType, result.Message!);
+        }
+        public async Task<Result<U>> OrElseAsync<U>(Func<U> returnValueGetter)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return Result.Ok(returnValueGetter());
+            return result.PropagateError<U>();
+        }
+        public async ValueTask<Result<U>> OrElseAsync<U>(Func<Task<U>> returnValueGetterTask)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return Result.Ok(await returnValueGetterTask());
+            return result.PropagateError<U>();
+        }
+        public async ValueTask<Result<U>> OrElseAsync<U>(Func<CancellationToken, Task<U>> returnValueGetterTask, CancellationToken cancellationToken = default)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return Result.Ok(await returnValueGetterTask(cancellationToken));
+            return result.PropagateError<U>();
+        }
+        public async ValueTask<Result<U>> OrElseAsync<U>(Func<ValueTask<U>> returnValueGetterTask)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return Result.Ok(await returnValueGetterTask());
+            return result.PropagateError<U>();
+        }
+        public async ValueTask<Result<U>> OrElseAsync<U>(Func<CancellationToken, ValueTask<U>> returnValueGetterTask, CancellationToken cancellationToken = default)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return Result.Ok(await returnValueGetterTask(cancellationToken));
+            return result.PropagateError<U>();
+        }
+
+
+        public async Task<Result<U>> OrElse<U>(Result<U> returnResult)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return returnResult;
+            return result.PropagateError<U>();
+        }
+        public async Task<Result<U>> OrElse<U>(Func<Result<U>> returnResultGetter)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return returnResultGetter();
+            return result.PropagateError<U>();
+        }
+        public async ValueTask<Result<U>> OrElseAsync<U>(Func<Task<Result<U>>> returnResultGetterTask)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return await returnResultGetterTask();
+            return result.PropagateError<U>();
+        }
+        public async ValueTask<Result<U>> OrElseAsync<U>(Func<CancellationToken, Task<Result<U>>> returnResultGetterTask, CancellationToken cancellationToken = default)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return await returnResultGetterTask(cancellationToken);
+            return result.PropagateError<U>();
+        }
+        public async ValueTask<Result<U>> OrElseAsync<U>(Func<ValueTask<Result<U>>> returnResultGetterTask)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return await returnResultGetterTask();
+            return result.PropagateError<U>();
+        }
+        public async ValueTask<Result<U>> OrElseAsync<U>(Func<CancellationToken, ValueTask<Result<U>>> returnResultGetterTask, CancellationToken cancellationToken = default)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return await returnResultGetterTask(cancellationToken);
+            return result.PropagateError<U>();
+        }
+    }
+    // 无值 ValueTask
+    extension<T>(ValueTask<T> task) where T : IResult
+    {
+        public async Task<Result<U>> OrElseAsync<U>(U returnValue)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return Result.Ok(returnValue);
+            return Result.Error<U>(result.ErrorType, result.Message!);
+        }
+        public async Task<Result<U>> OrElseAsync<U>(Func<U> returnValueGetter)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return Result.Ok(returnValueGetter());
+            return result.PropagateError<U>();
+        }
+        public async ValueTask<Result<U>> OrElseAsync<U>(Func<Task<U>> returnValueGetterTask)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return Result.Ok(await returnValueGetterTask());
+            return result.PropagateError<U>();
+        }
+        public async ValueTask<Result<U>> OrElseAsync<U>(Func<CancellationToken, Task<U>> returnValueGetterTask, CancellationToken cancellationToken = default)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return Result.Ok(await returnValueGetterTask(cancellationToken));
+            return result.PropagateError<U>();
+        }
+        public async ValueTask<Result<U>> OrElseAsync<U>(Func<ValueTask<U>> returnValueGetterTask)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return Result.Ok(await returnValueGetterTask());
+            return result.PropagateError<U>();
+        }
+        public async ValueTask<Result<U>> OrElseAsync<U>(Func<CancellationToken, ValueTask<U>> returnValueGetterTask, CancellationToken cancellationToken = default)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return Result.Ok(await returnValueGetterTask(cancellationToken));
+            return result.PropagateError<U>();
+        }
+
+
+        public async Task<Result<U>> OrElse<U>(Result<U> returnResult)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return returnResult;
+            return result.PropagateError<U>();
+        }
+        public async Task<Result<U>> OrElse<U>(Func<Result<U>> returnResultGetter)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return returnResultGetter();
+            return result.PropagateError<U>();
+        }
+        public async ValueTask<Result<U>> OrElseAsync<U>(Func<Task<Result<U>>> returnResultGetterTask)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return await returnResultGetterTask();
+            return result.PropagateError<U>();
+        }
+        public async ValueTask<Result<U>> OrElseAsync<U>(Func<CancellationToken, Task<Result<U>>> returnResultGetterTask, CancellationToken cancellationToken = default)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return await returnResultGetterTask(cancellationToken);
+            return result.PropagateError<U>();
+        }
+        public async ValueTask<Result<U>> OrElseAsync<U>(Func<ValueTask<Result<U>>> returnResultGetterTask)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return await returnResultGetterTask();
+            return result.PropagateError<U>();
+        }
+        public async ValueTask<Result<U>> OrElseAsync<U>(Func<CancellationToken, ValueTask<Result<U>>> returnResultGetterTask, CancellationToken cancellationToken = default)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return await returnResultGetterTask(cancellationToken);
+            return result.PropagateError<U>();
+        }
     }
 
 
-    // 有值
+    // Value
     extension<T>(Result<T> result)
     {
-        public Result<T> OrElse(Func<Result<T>> resultGetter)
+        public Result<T> OrElse(T returnValue)
         {
-            if (result.IsSuccess) return result;
-
-            return resultGetter();
+            if (!result.IsSuccess) return Result.Ok(returnValue);
+            return Result.Error<T>(result.ErrorType, result.Message!);
         }
-        public Result<T> OrElse(Func<ErrorType, Result<T>> resultGetter)
+        public Result<T> OrElse(Func<T> returnValueGetter)
         {
-            if (result.IsSuccess) return result;
-
-            return resultGetter(result.ErrorType);
+            if (!result.IsSuccess) return Result.Ok(returnValueGetter());
+            return result.PropagateError<T>();
+        }
+        public async ValueTask<Result<T>> OrElseAsync(Func<Task<T>> returnValueGetterTask)
+        {
+            if (!result.IsSuccess) return Result.Ok(await returnValueGetterTask());
+            return result.PropagateError<T>();
+        }
+        public async ValueTask<Result<T>> OrElseAsync(Func<CancellationToken, Task<T>> returnValueGetterTask, CancellationToken cancellationToken = default)
+        {
+            if (!result.IsSuccess) return Result.Ok(await returnValueGetterTask(cancellationToken));
+            return result.PropagateError<T>();
+        }
+        public async ValueTask<Result<T>> OrElseAsync(Func<ValueTask<T>> returnValueGetterTask)
+        {
+            if (!result.IsSuccess) return Result.Ok(await returnValueGetterTask());
+            return result.PropagateError<T>();
+        }
+        public async ValueTask<Result<T>> OrElseAsync(Func<CancellationToken, ValueTask<T>> returnValueGetterTask, CancellationToken cancellationToken = default)
+        {
+            if (!result.IsSuccess) return Result.Ok(await returnValueGetterTask(cancellationToken));
+            return result.PropagateError<T>();
         }
 
 
-        public Result<T> OrElse(Result<T> newResult)
+        public Result<T> OrElse(Result<T> returnResult)
         {
-            if (result.IsSuccess) return result;
-
-            return newResult;
+            if (!result.IsSuccess) return returnResult;
+            return result.PropagateError<T>();
         }
-
-        public Result<T> OrElse(T newValue)
+        public Result<T> OrElse(Func<Result<T>> returnResultGetter)
         {
-            if (result.IsSuccess) return result;
-
-            return Result.Ok(newValue);
+            if (!result.IsSuccess) return returnResultGetter();
+            return result.PropagateError<T>();
+        }
+        public async ValueTask<Result<T>> OrElseAsync(Func<Task<Result<T>>> returnResultGetterTask)
+        {
+            if (!result.IsSuccess) return await returnResultGetterTask();
+            return result.PropagateError<T>();
+        }
+        public async ValueTask<Result<T>> OrElseAsync(Func<CancellationToken, Task<Result<T>>> returnResultGetterTask, CancellationToken cancellationToken = default)
+        {
+            if (!result.IsSuccess) return await returnResultGetterTask(cancellationToken);
+            return result.PropagateError<T>();
+        }
+        public async ValueTask<Result<T>> OrElseAsync(Func<ValueTask<Result<T>>> returnResultGetterTask)
+        {
+            if (!result.IsSuccess) return await returnResultGetterTask();
+            return result.PropagateError<T>();
+        }
+        public async ValueTask<Result<T>> OrElseAsync(Func<CancellationToken, ValueTask<Result<T>>> returnResultGetterTask, CancellationToken cancellationToken = default)
+        {
+            if (!result.IsSuccess) return await returnResultGetterTask(cancellationToken);
+            return result.PropagateError<T>();
         }
     }
-    // 有值 ValueTask
-    extension<T>(ValueTask<Result<T>> task)
-    {
-
-    }
-    // 有值 ValueTask
+    // Task
     extension<T>(Task<Result<T>> task)
     {
+        public async Task<Result<T>> OrElse(T returnValue)
+        {
+            var result = await task;
 
+            if (!result.IsSuccess) return Result.Ok(returnValue);
+            return Result.Error<T>(result.ErrorType, result.Message!);
+        }
+        public async Task<Result<T>> OrElse(Func<T> returnValueGetter)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return Result.Ok(returnValueGetter());
+            return result.PropagateError<T>();
+        }
+        public async ValueTask<Result<T>> OrElseAsync(Func<Task<T>> returnValueGetterTask)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return Result.Ok(await returnValueGetterTask());
+            return result.PropagateError<T>();
+        }
+        public async ValueTask<Result<T>> OrElseAsync(Func<CancellationToken, Task<T>> returnValueGetterTask, CancellationToken cancellationToken = default)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return Result.Ok(await returnValueGetterTask(cancellationToken));
+            return result.PropagateError<T>();
+        }
+        public async ValueTask<Result<T>> OrElseAsync(Func<ValueTask<T>> returnValueGetterTask)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return Result.Ok(await returnValueGetterTask());
+            return result.PropagateError<T>();
+        }
+        public async ValueTask<Result<T>> OrElseAsync(Func<CancellationToken, ValueTask<T>> returnValueGetterTask, CancellationToken cancellationToken = default)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return Result.Ok(await returnValueGetterTask(cancellationToken));
+            return result.PropagateError<T>();
+        }
+
+
+        public async Task<Result<T>> OrElse(Result<T> returnResult)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return returnResult;
+            return result.PropagateError<T>();
+        }
+        public async Task<Result<T>> OrElse(Func<Result<T>> returnResultGetter)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return returnResultGetter();
+            return result.PropagateError<T>();
+        }
+        public async ValueTask<Result<T>> OrElseAsync(Func<Task<Result<T>>> returnResultGetterTask)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return await returnResultGetterTask();
+            return result.PropagateError<T>();
+        }
+        public async ValueTask<Result<T>> OrElseAsync(Func<CancellationToken, Task<Result<T>>> returnResultGetterTask, CancellationToken cancellationToken = default)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return await returnResultGetterTask(cancellationToken);
+            return result.PropagateError<T>();
+        }
+        public async ValueTask<Result<T>> OrElseAsync(Func<ValueTask<Result<T>>> returnResultGetterTask)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return await returnResultGetterTask();
+            return result.PropagateError<T>();
+        }
+        public async ValueTask<Result<T>> OrElseAsync(Func<CancellationToken, ValueTask<Result<T>>> returnResultGetterTask, CancellationToken cancellationToken = default)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return await returnResultGetterTask(cancellationToken);
+            return result.PropagateError<T>();
+        }
+    }
+    // ValueTask
+    extension<T>(ValueTask<Result<T>> task)
+    {
+        public async Task<Result<T>> OrElse(T returnValue)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return Result.Ok(returnValue);
+            return Result.Error<T>(result.ErrorType, result.Message!);
+        }
+        public async Task<Result<T>> OrElse(Func<T> returnValueGetter)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return Result.Ok(returnValueGetter());
+            return result.PropagateError<T>();
+        }
+        public async ValueTask<Result<T>> OrElseAsync(Func<Task<T>> returnValueGetterTask)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return Result.Ok(await returnValueGetterTask());
+            return result.PropagateError<T>();
+        }
+        public async ValueTask<Result<T>> OrElseAsync(Func<CancellationToken, Task<T>> returnValueGetterTask, CancellationToken cancellationToken = default)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return Result.Ok(await returnValueGetterTask(cancellationToken));
+            return result.PropagateError<T>();
+        }
+        public async ValueTask<Result<T>> OrElseAsync(Func<ValueTask<T>> returnValueGetterTask)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return Result.Ok(await returnValueGetterTask());
+            return result.PropagateError<T>();
+        }
+        public async ValueTask<Result<T>> OrElseAsync(Func<CancellationToken, ValueTask<T>> returnValueGetterTask, CancellationToken cancellationToken = default)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return Result.Ok(await returnValueGetterTask(cancellationToken));
+            return result.PropagateError<T>();
+        }
+
+
+        public async Task<Result<T>> OrElse(Result<T> returnResult)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return returnResult;
+            return result.PropagateError<T>();
+        }
+        public async Task<Result<T>> OrElse(Func<Result<T>> returnResultGetter)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return returnResultGetter();
+            return result.PropagateError<T>();
+        }
+        public async ValueTask<Result<T>> OrElseAsync(Func<Task<Result<T>>> returnResultGetterTask)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return await returnResultGetterTask();
+            return result.PropagateError<T>();
+        }
+        public async ValueTask<Result<T>> OrElseAsync(Func<CancellationToken, Task<Result<T>>> returnResultGetterTask, CancellationToken cancellationToken = default)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return await returnResultGetterTask(cancellationToken);
+            return result.PropagateError<T>();
+        }
+        public async ValueTask<Result<T>> OrElseAsync(Func<ValueTask<Result<T>>> returnResultGetterTask)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return await returnResultGetterTask();
+            return result.PropagateError<T>();
+        }
+        public async ValueTask<Result<T>> OrElseAsync(Func<CancellationToken, ValueTask<Result<T>>> returnResultGetterTask, CancellationToken cancellationToken = default)
+        {
+            var result = await task;
+
+            if (!result.IsSuccess) return await returnResultGetterTask(cancellationToken);
+            return result.PropagateError<T>();
+        }
     }
 }

@@ -3,7 +3,7 @@
 // Bind
 public static partial class ResultExtensions
 {
-    // 有值
+    // Value
     extension<T>(Result<T> result)
     {
         public Result<U> Bind<U>(Func<T, U> valueGetter)
@@ -60,8 +60,8 @@ public static partial class ResultExtensions
             return result.PropagateError<U>();
         }
     }
-    // 有值 ValueTask
-    extension<T>(ValueTask<Result<T>> task)
+    // Task
+    extension<T>(Task<Result<T>> task)
     {
         public async Task<Result<U>> BindAsync<U>(Func<T, U> valueGetter)
         {
@@ -137,8 +137,8 @@ public static partial class ResultExtensions
             return result.PropagateError<U>();
         }
     }
-    // 有值 ValueTask
-    extension<T>(Task<Result<T>> task)
+    // ValueTask
+    extension<T>(ValueTask<Result<T>> task)
     {
         public async Task<Result<U>> BindAsync<U>(Func<T, U> valueGetter)
         {

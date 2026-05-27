@@ -1,9 +1,12 @@
 ﻿namespace ThabeSoft.Primitives;
 
-// Then
+
+/// <summary>
+/// Map
+/// </summary>
 public static partial class ResultExtensions
 {
-    // 有值
+    // Value
     extension<T>(Result<T> result)
     {
         public Result<U> Map<U>(Func<T, U> valueMapper)
@@ -13,10 +16,10 @@ public static partial class ResultExtensions
             return Result.Error<U>(result.ErrorType, result.Message!);
         }
     }
-    // 有值 ValueTask
-    extension<T>(ValueTask<Result<T>> task)
+    // Task
+    extension<T>(Task<Result<T>> task)
     {
-        public async ValueTask<Result<U>> MapAsync<U>(Func<T, U> valueMapper)
+        public async Task<Result<U>> MapAsync<U>(Func<T, U> valueMapper)
         {
             var result = await task;
             if (result.IsSuccess) return Result.Ok(valueMapper(result.Value));
@@ -24,10 +27,10 @@ public static partial class ResultExtensions
             return Result.Error<U>(result.ErrorType, result.Message!);
         }
     }
-    // 有值 ValueTask
-    extension<T>(Task<Result<T>> task)
+    // ValueTask
+    extension<T>(ValueTask<Result<T>> task)
     {
-        public async Task<Result<U>> MapAsync<U>(Func<T, U> valueMapper)
+        public async ValueTask<Result<U>> MapAsync<U>(Func<T, U> valueMapper)
         {
             var result = await task;
             if (result.IsSuccess) return Result.Ok(valueMapper(result.Value));

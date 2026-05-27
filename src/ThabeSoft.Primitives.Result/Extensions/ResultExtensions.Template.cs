@@ -1,38 +1,40 @@
 ﻿namespace ThabeSoft.Primitives;
 
-// Then
+
+/// <summary>
+/// Template
+/// </summary>
 public static partial class ResultExtensions
 {
-    // 无值版本
+    // Value
     extension(Result result)
     {
 
     }
-    // 无值 ValueTask
+    // Task
+    extension(Task<Result> task)
+    {
+
+    }
+    // ValueTask
     extension(ValueTask<Result> task)
     {
 
     }
 
-    // 无值 Task
-    extension(Task<Result> task)
-    {
 
-    }
-
-
-    // 有值
+    // Value
     extension<T>(Result<T> result)
     {
 
     }
-    // 有值 ValueTask
-    extension<T>(ValueTask<Result<T>> task)
+    // Task
+    extension<T>(Task<Result<T>> task)
     {
 
     }
-    // 有值 ValueTask
-    extension<T>(Task<Result<T>> task)
+    // ValueTask
+    extension<T>(ValueTask<Result<T>> task)
     {
 
     }

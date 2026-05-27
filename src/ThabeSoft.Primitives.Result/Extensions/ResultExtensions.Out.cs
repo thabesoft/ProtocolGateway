@@ -2,7 +2,7 @@
 
 
 /// <summary>
-/// 用于解决
+/// Out
 /// </summary>
 public static partial class ResultExtensions
 {

@@ -1,9 +1,12 @@
 ﻿namespace ThabeSoft.Primitives;
 
-// Then
+
+/// <summary>
+/// Tap
+/// </summary>
 public static partial class ResultExtensions
 {
-    // 无值版本
+    // Value
     extension(Result result)
     {
         public Result Tap(Action handler)
@@ -22,32 +25,7 @@ public static partial class ResultExtensions
             return result;
         }
     }
-    // 无值 ValueTask
-    extension(ValueTask<Result> task)
-    {
-        public async Task<Result> TapAsync(Action handler)
-        {
-            var result = await task;
-
-            if (result.IsSuccess) handler();
-            return result;
-        }
-        public async ValueTask<Result> TapAsync(Func<ValueTask> handler)
-        {
-            var result = await task;
-
-            if (result.IsSuccess) await handler();
-            return result;
-        }
-        public async ValueTask<Result> TapAsync(Func<CancellationToken, ValueTask> handler, CancellationToken cancellationToken = default)
-        {
-            var result = await task;
-
-            if (result.IsSuccess) await handler(cancellationToken);
-            return result;
-        }
-    }
-    // 无值 Task
+    // Task
     extension(Task<Result> task)
     {
         public async Task<Result> TapAsync(Action handler)
@@ -72,9 +50,34 @@ public static partial class ResultExtensions
             return result;
         }
     }
+    // ValueTask
+    extension(ValueTask<Result> task)
+    {
+        public async Task<Result> TapAsync(Action handler)
+        {
+            var result = await task;
+
+            if (result.IsSuccess) handler();
+            return result;
+        }
+        public async ValueTask<Result> TapAsync(Func<ValueTask> handler)
+        {
+            var result = await task;
+
+            if (result.IsSuccess) await handler();
+            return result;
+        }
+        public async ValueTask<Result> TapAsync(Func<CancellationToken, ValueTask> handler, CancellationToken cancellationToken = default)
+        {
+            var result = await task;
+
+            if (result.IsSuccess) await handler(cancellationToken);
+            return result;
+        }
+    }
 
 
-    // 有值
+    // Value
     extension<T>(Result<T> result)
     {
         public Result<T> Tap(Action<T> handler)
@@ -93,12 +96,12 @@ public static partial class ResultExtensions
             return result;
         }
     }
-    // 有值 ValueTask
-    extension<T>(ValueTask<Result<T>> task)
+    // Task
+    extension<T>(Task<Result<T>> task)
     {
         public async Task<Result<T>> TapAsync(Action<T> handler)
         {
-            var result= await task;
+            var result = await task;
 
             if (result.IsSuccess) handler(result.Value);
             return result;
@@ -118,12 +121,12 @@ public static partial class ResultExtensions
             return result;
         }
     }
-    // 有值 ValueTask
-    extension<T>(Task<Result<T>> task)
+    // ValueTask
+    extension<T>(ValueTask<Result<T>> task)
     {
         public async Task<Result<T>> TapAsync(Action<T> handler)
         {
-            var result = await task;
+            var result= await task;
 
             if (result.IsSuccess) handler(result.Value);
             return result;
