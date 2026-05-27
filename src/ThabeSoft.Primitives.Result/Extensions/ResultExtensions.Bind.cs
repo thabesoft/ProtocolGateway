@@ -194,17 +194,32 @@ public static partial class ResultExtensions
         }
         public async ValueTask<Result<U>> BindAsync<U>(Func<T, CancellationToken, Task<Result<U>>> handler, CancellationToken cancellationToken = default)
         {
-            var result = await task;
+            if (task.IsCompletedSuccessfully)
+            {
+                var result = task.Result;
 
-            if (result.IsSuccess) return await handler(result.Value, cancellationToken);
-            return result.PropagateError<U>();
+                if (result.IsSuccess) return await handler(result.Value, cancellationToken);
+                return result.PropagateError<U>();
+            }
+            else
+            {
+                var result = await task;
+
+                if (result.IsSuccess) return await handler(result.Value, cancellationToken);
+                return result.PropagateError<U>();
+            }
         }
-        public async ValueTask<Result<U>> BindAsync<U>(Func<T, ValueTask<Result<U>>> resultGetter)
+        public ValueTask<Result<U>> BindAsync<U>(Func<T, ValueTask<Result<U>>> resultGetter)
         {
-            var result = await task;
+            if (task.IsCompletedSuccessfully)
+            {
+                var result = task.Result;
 
-            if (result.IsSuccess) return await resultGetter(result.Value);
-            return result.PropagateError<U>();
+                if (result.IsSuccess) return resultGetter(result.Value);
+                return new ValueTask<Result<U>>(result.PropagateError<U>());
+            }
+
+            return AwaitSlowPath(task, resultGetter);
         }
         public async ValueTask<Result<U>> BindAsync<U>(Func<T, CancellationToken, ValueTask<Result<U>>> handler, CancellationToken cancellationToken = default)
         {
@@ -213,5 +228,15 @@ public static partial class ResultExtensions
             if (result.IsSuccess) return await handler(result.Value, cancellationToken);
             return result.PropagateError<U>();
         }
+    }
+
+
+    private static async ValueTask<Result<U>> AwaitSlowPath<T, U>(ValueTask<Result<T>> task, Func<T, ValueTask<Result<U>>> resultGetter)
+    {
+        var result = await task;
+
+        if (!result.IsSuccess) return result.PropagateError<U>();
+
+        return await resultGetter(result.Value);
     }
 }

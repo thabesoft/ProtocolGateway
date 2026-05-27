@@ -4,4 +4,4 @@ using ThabeSoft.Benchmark.Modbus.Encoding;
 
 //BenchmarkRunner.Run<Benchmark>();
 
-BenchmarkRunner.Run<RtuCodecBenchmark>();
+BenchmarkRunner.Run<Benchmark>();

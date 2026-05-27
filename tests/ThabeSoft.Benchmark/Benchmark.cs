@@ -1,7 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using ThabeSoft.Primitives;
-using ThabeSoft.ProtocolGateway.Primitives;
 
 namespace ThabeSoft.Benchmark;
 
@@ -11,125 +10,128 @@ namespace ThabeSoft.Benchmark;
 [SimpleJob(RuntimeMoniker.Net10_0)]
 public class Benchmark
 {
-    private readonly byte[] buffer = new byte[1000];
-
-
     [Benchmark(Baseline = true)]
     public void Call()
     {
-        var result = Result.Ok(10);
+        var result = TestResult1();
         if (!result.IsSuccess) return;
 
-        var result1 = Result.Ok<string>($"输入了: {result.Value}");
+        var result1 = TestResult2(result.Value);
         if (!result1.IsSuccess) return;
 
-        var result2 = Result.Ok(result1.Value.GetHashCode());
+        var result2 = TestResult3(result1.Value);
         if (!result2.IsSuccess) return;
 
-        var result3 = result2.ToString();
+        var result3 = TestResult4(result2.Value);
+        if (!result3.IsSuccess) return;
+
+        var result4 = TestResult5(result3.Value);
+        if (!result4.IsSuccess) return;
     }
 
     [Benchmark]
     public async Task CallAsync()
     {
-        var result = await GetIntResultAsync();
+        var result = await TestResult1Async();
         if (!result.IsSuccess) return;
 
-        var result1 = await GetStringResultAsync(result.Value);
+        var result1 = await TestResult2Async(result.Value);
         if (!result1.IsSuccess) return;
 
-        var result2 = await GetHashCodeResultAsync(result1.Value);
+        var result2 = await TestResult3Async(result1.Value);
         if (!result2.IsSuccess) return;
 
-        var result3 = await GetHashCodeStringResultAsync(result2.Value);
+        var result3 = await TestResult4Async(result2.Value);
+        if (!result3.IsSuccess) return;
+
+        var result4 = await TestResult5Async(result3.Value);
+        if (!result4.IsSuccess) return;
     }
 
 
     [Benchmark]
+    public void PipeDelegate()
+    {
+        var result = TestResult1()
+            .Bind(TestResult2)
+            .Bind(TestResult3)
+            .Bind(TestResult4)
+            .Bind(TestResult5);
+    }
+
+    [Benchmark]
+    public async Task PipeDelegateAsync()
+    {
+        var result = await TestResult1Async()
+            .BindAsync(TestResult2Async)
+            .BindAsync(TestResult3Async)
+            .BindAsync(TestResult4Async)
+            .BindAsync(TestResult5Async);
+    }
+
+    [Benchmark]
     public void Pipe()
     {
-        var result = ResultPipeExtensions.Pipe(Result.Ok(10))
-            .Then(x => Result.Ok($"输入了: {x}"))
-            .Then(x => Result.Ok(x.GetHashCode()))
-            .Map(x => x.ToString())
-            .Execute();
+        var result = Result.Ok(10)
+            .Bind(x => Result.Ok<double>(x))
+            .Bind(x => Result.Ok(x.ToString()))
+            .Bind(x => Result.Ok(x.Length))
+            .Bind(x => Result.Ok());
     }
 
     [Benchmark]
     public async Task PipeAsync()
     {
-        //var result = await ResultPipeExtensions.AsyncPipe(await GetIntResultAsync())
-        //    .Then(x => GetStringResultAsync(x))
-        //    .Then(GetHashCodeResultAsync)
-        //    .Then(GetHashCodeStringResultAsync)
-        //    .ExecuteAsync();
+        var result = TestResult1Async()
+            .BindAsync(x => ValueTask.FromResult(Result.Ok<double>(x)))
+            .BindAsync(x => ValueTask.FromResult(Result.Ok(x.ToString())))
+            .BindAsync(x => ValueTask.FromResult(Result.Ok(x.Length)))
+            .BindAsync(x => ValueTask.FromResult(Result.Ok()));
     }
 
 
-    private async ValueTask<Result<int>> GetIntResultAsync()
+    private static ValueTask<Result<int>> TestResult1Async()
     {
-        await Task.Yield();
+        return ValueTask.FromResult(Result.Ok(10));
+    }
+    private static ValueTask<Result<double>> TestResult2Async(int x)
+    {
+        return ValueTask.FromResult(Result.Ok<double>(x));
+    }
+    private static ValueTask<Result<string>> TestResult3Async(double x)
+    {
+        return ValueTask.FromResult(Result.Ok(x.ToString()));
+    }
+    private static ValueTask<Result<int>> TestResult4Async(string x)
+    {
+        return ValueTask.FromResult(Result.Ok(x.Length));
+    }
+    private static ValueTask<Result> TestResult5Async(int _)
+    {
+        return ValueTask.FromResult(Result.Ok());
+    }
+
+
+
+
+    private static Result<int> TestResult1()
+    {
         return Result.Ok(10);
     }
-    private async ValueTask<Result<string>> GetStringResultAsync(int x)
+    private static Result<double> TestResult2(int x)
     {
-        await Task.Yield();
-        return Result.Ok($"输入了: {x}");
+        return Result.Ok<double>(x);
     }
-    private async ValueTask<Result<int>> GetHashCodeResultAsync(string x)
+    private static Result<string> TestResult3(double x)
     {
-        await Task.Yield();
-        return Result.Ok(x.GetHashCode());
-    }
-    private async ValueTask<Result<string>> GetHashCodeStringResultAsync(int x)
-    {
-        await Task.Yield();
         return Result.Ok(x.ToString());
     }
-
-
-    //[Benchmark]
-    //public void ReadCoilsPack()
-    //{
-    //    ModbusRtuRequest.ReadCoils.TryPack(buffer, 1, 100, 100);
-    //}
-    //[Benchmark]
-    //public void ReadDiscreteInputs()
-    //{
-    //    ModbusRtuRequest.ReadDiscreteInputsSerializer.TryPack(buffer, 1, 100, 100);
-    //}
-    //[Benchmark]
-    //public void ReadInputRegisters()
-    //{
-    //    ModbusRtuRequest.ReadInputRegistersSerializer.TryPack(buffer, 1, 100, 100);
-    //}
-    //[Benchmark]
-    //public void ReadHoldingRegisters()
-    //{
-    //    ModbusRtuRequest.ReadHoldingRegisters.TryPack(buffer, 1, 100, 100);
-    //}
-
-
-    //[Benchmark]
-    //public void WriteSingleCoil()
-    //{
-    //    ModbusRtuRequest.WriteSingleCoilSerializer.TryPack(buffer, 1, 100, true);
-    //}
-    //[Benchmark]
-    //public void WriteSingleRegister()
-    //{
-    //    ModbusRtuRequest.WriteSingleRegisterSerializer.TryPack(buffer, 1, 100, 0xFF);
-    //}
-    //[Benchmark]
-    //public void WriteMultipleCoils()
-    //{
-    //    Span<bool> values = [false, false, true];
-    //    ModbusRtuRequest.WriteMultipleCoilsSerializer.TryPack(buffer, 1, 100, values);
-    //}
-    //[Benchmark]
-    //public void WriteMultipleRegisters()
-    //{
-    //    Span<ushort> values = [0xFF, 0xEE, 0xCC];
-    //    ModbusRtuRequest.WriteMultipleRegisters.TryPack(buffer, 1, 100, values);
-    //}
+    private static Result<int> TestResult4(string x)
+    {
+        return Result.Ok(x.Length);
+    }
+    private static Result TestResult5(int _)
+    {
+        return Result.Ok();
+    }
 }

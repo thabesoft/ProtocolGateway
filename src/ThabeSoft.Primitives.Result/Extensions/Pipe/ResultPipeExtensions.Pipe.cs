@@ -70,6 +70,8 @@ public static partial class ResultPipeExtensions
     {
         public IAsyncResultPipe<T> AsyncPipe()
         {
+            
+
             return new ValueAsyncResultPipe<T>(task);
         }
     }

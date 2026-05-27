@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.IO.Ports;
 using ThabeSoft.Ports.Options;
 using ThabeSoft.Primitives;
-using ThabeSoft.ProtocolGateway.Primitives;
 
 namespace ThabeSoft.Ports;
 

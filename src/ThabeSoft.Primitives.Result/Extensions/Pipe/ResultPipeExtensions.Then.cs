@@ -1,10 +1,38 @@
 ﻿using ThabeSoft.Primitives;
+using ThabeSoft.Primitives.Pipes;
 
 namespace ThabeSoft.ProtocolGateway.Primitives;
 
 
 public static partial class ResultPipeExtensions
 {
+    extension<T>(ValueTask<T> task) where T : IResult
+    {
+        //public DelegateResultPipe<(IResultPipe<Result<T>>, Func<Result<U>>), Result> BindAsync<U>(Func<U, ValueTask<Result<U>>> next)
+        //{
+        //    static Result Handler((IResultPipe<Result<T>>, Func<Result>) data)
+        //    {
+        //        var (pipe, next) = data;
+
+        //        var result = pipe.Execute();
+        //        if (!result.IsSuccess) return next.Invoke();
+
+        //        return result.PropagateError<U>();
+        //    }
+
+
+        //    var pipe = new ValueAsyncResultPipe<T>(task);
+        //    //pipe.ExecuteAsync()
+
+        //    return Create((pipe, next), Handler);
+        //}
+    }
+
+
+
+
+
+
     /// <summary>
     /// 无值同步管道
     /// </summary>
@@ -31,9 +59,9 @@ public static partial class ResultPipeExtensions
                 var (pipe, next) = data;
 
                 var result = pipe.Execute();
-                if (!result.IsSuccess) return Result.Error<T>(result.ErrorType, result.Message);
+                if (!result.IsSuccess) return next.Invoke();
 
-                return next.Invoke();
+                return result.PropagateError<U>();
             }
 
             return Create((pipe, next), Handler);
@@ -45,16 +73,16 @@ public static partial class ResultPipeExtensions
     /// </summary>
     extension<T>(IResultPipe<Result<T>> pipe)
     {
-        public IResultPipe<Result> Then(Func<Result> next)
+        public DelegateResultPipe<(IResultPipe<Result<T>>, Func<Result>), Result> Then<U>(Func<Result> next)
         {
             static Result Handler((IResultPipe<Result<T>>, Func<Result>) data)
             {
                 var (pipe, next) = data;
 
                 var result = pipe.Execute();
-                if (!result.IsSuccess) return Result.Error(result.ErrorType, result.Message);
+                if (!result.IsSuccess) return next.Invoke();
 
-                return next.Invoke();
+                return result.PropagateError<U>();
             }
 
             return Create((pipe, next), Handler);
@@ -66,9 +94,9 @@ public static partial class ResultPipeExtensions
                 var (pipe, next) = data;
 
                 var result = pipe.Execute();
-                if (!result.IsSuccess) return Result.Error<U>(result.ErrorType, result.Message);
+                if (!result.IsSuccess) return next.Invoke();
 
-                return next.Invoke();
+                return result.PropagateError<U>();
             }
 
             return Create((pipe, next), Handler);
@@ -120,9 +148,9 @@ public static partial class ResultPipeExtensions
                 var (pipe, next) = data;
 
                 var result = await pipe.ExecuteAsync(ct);
-                if (!result.IsSuccess) return Result<T>.Error(result.ErrorType, result.Message);
+                if (!result.IsSuccess) return next.Invoke();
 
-                return next.Invoke();
+                return result;
             }
 
             return Create((pipe, next), Handler);
@@ -152,9 +180,9 @@ public static partial class ResultPipeExtensions
                 var (pipe, next) = data;
 
                 var result = await pipe.ExecuteAsync(ct);
-                if (!result.IsSuccess) return Result.Error(result.ErrorType, result.Message);
+                if (!result.IsSuccess) return await next.Invoke(ct);
 
-                return await next.Invoke(ct);
+                return result;
             }
 
             return Create((pipe, next), Handler);
@@ -168,9 +196,9 @@ public static partial class ResultPipeExtensions
                 var (pipe, next) = data;
 
                 var result = await pipe.ExecuteAsync(ct);
-                if (!result.IsSuccess) return Result.Error<U>(result.ErrorType, result.Message);
+                if (!result.IsSuccess) return await next.Invoke(ct);
 
-                return await next.Invoke(ct);
+                return result.PropagateError<U>();
             }
 
             return Create((pipe, next), Handler);

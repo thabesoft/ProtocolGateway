@@ -33,7 +33,7 @@ internal readonly struct DelegateResultPipe<TResult> : IResultPipe<TResult>
 /// </summary>
 /// <typeparam name="TParams">参数</typeparam>
 /// <typeparam name="TResult">结果</typeparam>
-internal readonly struct DelegateResultPipe<TParams, TResult> : IResultPipe<TResult>
+public readonly struct DelegateResultPipe<TParams, TResult> : IResultPipe<TResult>
     where TResult : IResult
 {
     private readonly TParams _params = default!;
