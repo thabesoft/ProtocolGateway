@@ -33,7 +33,7 @@ public class ByteKitTest
         bool[] destination = new bool[8];
 
         var result = source.ToBits(destination, BitOrder.LSB0);
-        Assert.IsTrue(result, result.Message);
+        Assert.IsTrue(result.IsSuccess, result.Message);
 
         bool[] expected = [false, true, false, true, false, true, false, true];
         CollectionAssert.AreEqual(expected, destination);
@@ -46,7 +46,7 @@ public class ByteKitTest
         bool[] destination = new bool[8];
 
         var result = source.ToBits(destination, BitOrder.MSB0);
-        Assert.IsTrue(result, result.Message);
+        Assert.IsTrue(result.IsSuccess, result.Message);
 
         bool[] expected = [true, false, true, false, true, false, true, false];
         CollectionAssert.AreEqual(expected, destination);

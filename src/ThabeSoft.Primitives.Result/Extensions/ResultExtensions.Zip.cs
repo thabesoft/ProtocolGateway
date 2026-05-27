@@ -32,7 +32,7 @@ public static partial class ResultExtensions
             if (!other.IsSuccess)
                 return other.PropagateError<(T, U)>();
 
-            return (result.Value, other.Value);
+            return Result.Ok((result.Value, other.Value));
         }
     }
     // 有值 ValueTask
@@ -47,7 +47,7 @@ public static partial class ResultExtensions
             if (!other.IsSuccess)
                 return other.PropagateError<(T, U)>();
 
-            return (result.Value, other.Value);
+            return Result.Ok((result.Value, other.Value));
         }
     }
     // 有值 ValueTask

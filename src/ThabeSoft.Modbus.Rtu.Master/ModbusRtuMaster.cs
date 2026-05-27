@@ -19,7 +19,7 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
     {
         // 请求头
         var request_header_result = ReadRequestHeader.Coils(slaveId, address, destination.Length);
-        if (!request_header_result) return request_header_result;
+        if (!request_header_result.IsSuccess) return request_header_result;
 
         IMasterReadCodec readCodec = RtuMasterReadCodec.Instance;
 
@@ -34,7 +34,7 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
     {
         // 请求头
         var request_header_result = ReadRequestHeader.DiscreteInputs(slaveId, address, destination.Length);
-        if (!request_header_result) return request_header_result;
+        if (!request_header_result.IsSuccess) return request_header_result;
 
         IMasterReadCodec readCodec = RtuMasterReadCodec.Instance;
 
@@ -48,7 +48,7 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
     public async ValueTask<Result> ReadHoldingRegistersAsync(Memory<ushort> destination, byte slaveId, ushort address, CancellationToken cancellationToken = default)
     {
         var header_result = ReadRequestHeader.HoldingRegisters(slaveId, address, destination.Length);
-        if (!header_result) return header_result;
+        if (!header_result.IsSuccess) return header_result;
 
         IMasterReadCodec readCodec = RtuMasterReadCodec.Instance;
 
@@ -62,7 +62,7 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
     public async ValueTask<Result> ReadInputRegistersAsync(Memory<ushort> destination, byte slaveId, ushort address, CancellationToken cancellationToken = default)
     {
         var header_result = ReadRequestHeader.InputRegisters(slaveId, address, destination.Length);
-        if (!header_result) return header_result;
+        if (!header_result.IsSuccess) return header_result;
 
         IMasterReadCodec readCodec = RtuMasterReadCodec.Instance;
 
@@ -88,18 +88,18 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
             var span = buffer.AsSpan(0, layout.TotalLength);
             var header = new WriteSingleCoilHeader(slaveId, address, value);
             var encode_result = RtuMasterWriteSingleCodec.EncodeCoilRequest(span, header, layout);
-            if (!encode_result) return encode_result.PropagateError<WriteSingleCoilHeader>();
+            if (!encode_result.IsSuccess) return encode_result.PropagateError<WriteSingleCoilHeader>();
 
             // 发送请求
             var send_mem = buffer.AsMemory(0, layout.TotalLength);
             var request_result = await port.WriteAsync(send_mem, cancellationToken);
-            if (!request_result) return request_result.PropagateError<WriteSingleCoilHeader>();
+            if (!request_result.IsSuccess) return request_result.PropagateError<WriteSingleCoilHeader>();
 
 
             // 读取响应
             var receive_mem = buffer.AsMemory(layout.TotalLength, layout.TotalLength);
             var receive_result = await GetResponseAsync(receive_mem, cancellationToken);
-            if (!receive_result) return receive_result.PropagateError<WriteSingleCoilHeader>();
+            if (!receive_result.IsSuccess) return receive_result.PropagateError<WriteSingleCoilHeader>();
 
             // 响应解码
             return RtuMasterWriteSingleCodec.DecodeCoilResponse(receive_mem.Span, layout);
@@ -122,18 +122,18 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
             var span = buffer.AsSpan(0, layout.TotalLength);
             var header = new WriteSingleRegisterHeader(slaveId, address, value);
             var encode_result = RtuMasterWriteSingleCodec.EncodeRegisterRequest(span, header, layout);
-            if (!encode_result) return encode_result;
+            if (!encode_result.IsSuccess) return encode_result;
 
             // 发送请求
             var send_mem = buffer.AsMemory(0, layout.TotalLength);
             var request_result = await port.WriteAsync(send_mem, cancellationToken);
-            if (!request_result) return request_result;
+            if (!request_result.IsSuccess) return request_result;
 
 
             // 读取响应
             var receive_mem = buffer.AsMemory(layout.TotalLength, layout.TotalLength);
             var receive_result = await GetResponseAsync(receive_mem, cancellationToken);
-            if (!receive_result) return receive_result;
+            if (!receive_result.IsSuccess) return receive_result;
 
             // 响应解码
             return RtuMasterWriteSingleCodec.DecodeRegisterResponse(receive_mem.Span, layout);
@@ -147,7 +147,7 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
     {
         // 数据量
         var quantity_result = WriteCoilsQuantity.Create(values.Length);
-        if (!quantity_result) return quantity_result;
+        if (!quantity_result.IsSuccess) return quantity_result;
 
         // 帧布局
         var send_layout = RtuWriteMultipleRequestLayout.FromQuantity(quantity_result.Value);
@@ -162,18 +162,18 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
             var span = buffer.AsSpan(0, send_layout.TotalLength);
             var header = WriteMultipleRequestHeader.Coils(slaveId, address);
             var encode_result = RtuMasterWriteMultipleCodec.EncodeCoilsRequest(span, header, values.Span, send_layout);
-            if (!encode_result) return encode_result;
+            if (!encode_result.IsSuccess) return encode_result;
 
             // 发送请求
             var send_mem = buffer.AsMemory(0, send_layout.TotalLength);
             var request_result = await port.WriteAsync(send_mem, cancellationToken);
-            if (!request_result) return request_result;
+            if (!request_result.IsSuccess) return request_result;
 
 
             // 读取响应
             var receive_mem = buffer.AsMemory(send_layout.TotalLength, send_layout.TotalLength);
             var receive_result = await GetResponseAsync(receive_mem, cancellationToken);
-            if (!receive_result) return receive_result;
+            if (!receive_result.IsSuccess) return receive_result;
 
             // 响应解码
             return RtuMasterWriteMultipleCodec.DecodeCoilsResponse(receive_mem.Span, receive_layout);
@@ -187,7 +187,7 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
     {
         // 数据量
         var quantity_result = WriteRegistersQuantity.Create(values.Length);
-        if (!quantity_result) return quantity_result;
+        if (!quantity_result.IsSuccess) return quantity_result;
 
         // 帧布局
         var send_layout = RtuWriteMultipleRequestLayout.FromQuantity(quantity_result.Value);
@@ -202,18 +202,18 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
             var span = buffer.AsSpan(0, send_layout.TotalLength);
             var header = WriteMultipleRequestHeader.Coils(slaveId, address);
             var encode_result = RtuMasterWriteMultipleCodec.EncodeRegistersRequest(span, header, values.Span, send_layout);
-            if (!encode_result) return encode_result;
+            if (!encode_result.IsSuccess) return encode_result;
 
             // 发送请求
             var send_mem = buffer.AsMemory(0, send_layout.TotalLength);
             var request_result = await port.WriteAsync(send_mem, cancellationToken);
-            if (!request_result) return request_result;
+            if (!request_result.IsSuccess) return request_result;
 
 
             // 读取响应
             var receive_mem = buffer.AsMemory(send_layout.TotalLength, send_layout.TotalLength);
             var receive_result = await GetResponseAsync(receive_mem, cancellationToken);
-            if (!receive_result) return receive_result;
+            if (!receive_result.IsSuccess) return receive_result;
 
             // 响应解码
             return RtuMasterWriteMultipleCodec.DecodeCoilsResponse(receive_mem.Span, receive_layout);
@@ -239,7 +239,7 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
     {
         // 线圈数量
         var quantity_result = ReadCoilsQuantity.Create(destination.Length);
-        if (!quantity_result) return quantity_result;
+        if (!quantity_result.IsSuccess) return quantity_result;
 
         // 帧布局
         var request_layout = RtuReadRequestLayout.Instance;
@@ -253,18 +253,18 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
             // 请求编码
             var span = buffer.AsSpan(0, request_layout.TotalLength);
             var encode_result = encoderHandler(span, requestHeader);
-            if (!encode_result) return encode_result;
+            if (!encode_result.IsSuccess) return encode_result;
 
             // 发送请求
             var send_mem = buffer.AsMemory(0, request_layout.TotalLength);
             var request_result = await port.WriteAsync(send_mem, cancellationToken);
-            if (!request_result) return request_result;
+            if (!request_result.IsSuccess) return request_result;
 
 
             // 读取响应
             var receive_mem = buffer.AsMemory(request_layout.TotalLength, response_layout.TotalLength);
             var receive_result = await GetResponseAsync(receive_mem, cancellationToken);
-            if (!receive_result) return receive_result;
+            if (!receive_result.IsSuccess) return receive_result;
 
             // 响应解码
             return decoderHandler(receive_mem.Span, destination.Span);
@@ -290,7 +290,7 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
     {
         // 线圈数量
         var quantity_result = ReadRegistersQuantity.Create(destination.Length);
-        if (!quantity_result) return quantity_result.PropagateError<ReadResponseHeader>();
+        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<ReadResponseHeader>();
 
         // 帧布局
         var request_layout = RtuReadRequestLayout.Instance;
@@ -304,18 +304,18 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
             // 请求编码
             var span = buffer.AsSpan(0, request_layout.TotalLength);
             var encode_result = encoderHandler(span, requestHeader);
-            if (!encode_result) return encode_result.PropagateError<ReadResponseHeader>();
+            if (!encode_result.IsSuccess) return encode_result.PropagateError<ReadResponseHeader>();
 
             // 发送请求
             var send_mem = buffer.AsMemory(0, request_layout.TotalLength);
             var request_result = await port.WriteAsync(send_mem, cancellationToken);
-            if (!request_result) return request_result.PropagateError<ReadResponseHeader>();
+            if (!request_result.IsSuccess) return request_result.PropagateError<ReadResponseHeader>();
 
 
             // 读取响应
             var receive_mem = buffer.AsMemory(request_layout.TotalLength, response_layout.TotalLength);
             var receive_result = await GetResponseAsync(receive_mem, cancellationToken);
-            if (!receive_result) return receive_result.PropagateError<ReadResponseHeader>();
+            if (!receive_result.IsSuccess) return receive_result.PropagateError<ReadResponseHeader>();
 
             // 响应解码
             return decoderHandler(receive_mem.Span, destination.Span);
@@ -360,27 +360,27 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
         var resp_header = destination[..RtuErrorResponseLayout.TotalLength];
         // 读取
         var read_result = await port.ReadExactAsync(resp_header, cancellationToken);
-        if (!read_result) return read_result;
-        current_length += read_result.Value;
+        if (!read_result.IsSuccess) return read_result;
+        current_length += RtuErrorResponseLayout.TotalLength;
 
         // 功能码
         var function_code = resp_header.Span[RtuErrorResponseLayout.FunctionCodeIndex];
         var function_code_result = FunctionCode.FromCode(function_code);
 
         // 看是不是异常响应
-        if (!function_code_result)
+        if (!function_code_result.IsSuccess)
         {
             // 不是异常
             var err_func_result = ErrorFunctionCode.FromCode(function_code);
-            if (!err_func_result) return Result.InvalidData("无法识别的响应");
+            if (!err_func_result.IsSuccess) return Result.InvalidData("无法识别的响应");
 
             // 错误码
             var error_code = destination.Span[RtuErrorResponseLayout.ErrorCodeIndex];
             // 校验码
             var crc_result = destination.Span[RtuErrorResponseLayout.CrcRange].ToWord(Endianness.LittleEndian);
-            if (!crc_result) return crc_result;
+            if (!crc_result.IsSuccess) return crc_result;
             // 校验异常
-            if (!Crc16.Validate(destination.Span[RtuErrorResponseLayout.PayloadRange], crc_result.Value)) return Result.InvalidData("响应Crc校验失败");
+            if (!Crc16.Validate(destination.Span[RtuErrorResponseLayout.PayloadRange], crc_result.Value).IsSuccess) return Result.InvalidData("响应Crc校验失败");
 
             return Result.InvalidData($"从站响应错误, 功能码:{err_func_result.Value.FunctionCode}, 异常码: {error_code}");
         }

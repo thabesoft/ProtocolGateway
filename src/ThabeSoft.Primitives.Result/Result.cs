@@ -5,9 +5,6 @@
 /// </summary>
 public readonly struct Result : IResult
 {
-    public static readonly Result Success = new(true, ErrorType.None, null);
-
-
     /// <summary> 是否成功 </summary>
     public bool IsSuccess { get; }
     /// <summary> 错误类型 </summary>
@@ -27,25 +24,27 @@ public readonly struct Result : IResult
 #endif
     }
 
-    /// <summary>
-    /// 将是否成功转为bool
-    /// </summary>
-    public static implicit operator bool(Result result) => result.IsSuccess;
-    /// <summary>
-    /// 从bool创建是否成功
-    /// </summary>
-    public static implicit operator Result(bool result) => result ? Success : Error(ErrorType.Unspecified);
-    /// <summary>
-    /// 从错误类型创建错误结果
-    /// </summary>
-    public static implicit operator Result(ErrorType errorType) => Error(errorType);
 
-
-    public static Result OkWithMessage(string? message = null)
+    /// <summary>
+    /// 成功
+    /// </summary>
+    public static Result Ok()
     {
-        return new(true, ErrorType.None, message);
+        return new(true, ErrorType.None, null);
     }
-    public static Result Error(ErrorType type, string? message = null)
+    /// <summary>
+    /// 成功
+    /// </summary>
+    public static Result<TValue> Ok<TValue>(TValue value)
+    {
+        return Result<TValue>.Ok(value);
+    }
+
+    /// <summary>
+    /// 错误
+    /// </summary>
+    /// <param name="message">错误信息</param>
+    public static Result Error(ErrorType type, string message)
     {
         if (type == ErrorType.None || type == ErrorType.Unspecified)
         {
@@ -54,12 +53,15 @@ public readonly struct Result : IResult
 
         return new(false, type, message);
     }
-
-
-    public static Result<TValue> Ok<TValue>(TValue value, string? message = null)
-        => Result<TValue>.Ok(value, message);
-    public static Result<TValue> Error<TValue>(ErrorType type, string? message = null)
-        => Result<TValue>.Error(type, message);
+    /// <summary>
+    /// 错误
+    /// </summary>
+    /// <param name="type">错误类型</param>
+    /// <param name="message">错误信息</param>
+    public static Result<TValue> Error<TValue>(ErrorType type, string message)
+    {
+        return Result<TValue>.Error(type, message);
+    }
 
 
     /// <summary>
@@ -69,19 +71,17 @@ public readonly struct Result : IResult
     /// 如果当前结果成功，此方法不应被调用。
     /// 建议仅在 <c>if (!result.IsSuccess) return result.PropagateError&lt;T&gt;();</c> 场景使用。
     /// </remarks>
+    /// <exception cref="ResultException">但结果为成功时候则抛出</exception>
     public Result<U> PropagateError<U>()
     {
         if (IsSuccess) throw new ResultException("Cannot propagate error from successful result");
-        return Result<U>.Error(ErrorType, Message);
+        return Result<U>.Error(ErrorType, Message!);
     }
+
+
     public override string ToString()
     {
-        if (IsSuccess)
-        {
-            if (Message is not null) return $"{Message}";
-            return $"Ok";
-        }
-
+        if (IsSuccess) return "Ok";
         return $"[{ErrorType}] {Message}";
     }
 }
@@ -115,36 +115,27 @@ public readonly struct Result<TValue> : IResult<TValue>
 
 
     /// <summary>
-    /// 将是否成功转为bool
-    /// </summary>
-    public static implicit operator bool(Result<TValue> result) => result.IsSuccess;
-    /// <summary>
-    /// 从错误类型创建错误结果
-    /// </summary>
-    public static implicit operator Result<TValue>(ErrorType errorType) => Error(errorType);
-    /// <summary>
-    /// 从值创建成功结果
-    /// </summary>
-    public static implicit operator Result<TValue>(TValue value) => Ok(value);
-    /// <summary>
     /// 从有值结果转为无值结果
     /// </summary>
     public static implicit operator Result(Result<TValue> result)
     {
-        if (result.IsSuccess)
-        {
-            if (result.Message is not null) return Result.OkWithMessage(result.Message);
-            return Result.Success;
-        }
-
-        return Result.Error(result.ErrorType, result.Message);
+        if (result.IsSuccess) return Result.Ok();
+        return Result.Error(result.ErrorType, result.Message ?? "未知错误");
     }
 
-    public static Result<TValue> Ok(TValue value, string? message = null)
+
+    /// <summary>
+    /// 成功
+    /// </summary>
+    public static Result<TValue> Ok(TValue value)
     {
-        return new(true, ErrorType.None, message, value);
+        return new(true, ErrorType.None, null, value);
     }
-    public static Result<TValue> Error(ErrorType type, string? message = null)
+    /// <summary>
+    /// 错误
+    /// </summary>
+    /// <param name="message">错误消息</param>
+    public static Result<TValue> Error(ErrorType type, string message)
     {
         if (type == ErrorType.None || type == ErrorType.Unspecified)
         {
@@ -155,7 +146,6 @@ public readonly struct Result<TValue> : IResult<TValue>
     }
 
 
-
     /// <summary>
     /// 将当前结果的错误传播到指定类型的 Result。
     /// </summary>
@@ -163,11 +153,13 @@ public readonly struct Result<TValue> : IResult<TValue>
     /// 如果当前结果成功，此方法不应被调用。
     /// 建议仅在 <c>if (!result.IsSuccess) return result.PropagateError&lt;T&gt;();</c> 场景使用。
     /// </remarks>
+    /// <exception cref="ResultException">但结果为成功时候则抛出</exception>
     public Result<U> PropagateError<U>()
     {
         if (IsSuccess) throw new ResultException(ErrorType.Internal, "Cannot propagate error from successful result");
-        return Result<U>.Error(ErrorType, Message);
+        return Result<U>.Error(ErrorType, Message!);
     }
+
 
     public override string ToString()
     {

@@ -13,10 +13,10 @@ public static partial class ResultExtensions
         {
             foreach (var i in results)
             {
-                if (!i.IsSuccess) return Result.Error(i.ErrorType, i.Message);
+                if (!i.IsSuccess) return Result.Error(i.ErrorType, i.Message!);
             }
 
-            return Result.Success;
+            return Result.Ok();
         }
 
         [Obsolete("实验性")]
@@ -24,10 +24,10 @@ public static partial class ResultExtensions
         {
             foreach (var i in results)
             {
-                if (i.IsSuccess) return Result.Success;
+                if (i.IsSuccess) return Result.Ok();
             }
 
-            return Result.Success;
+            return Result.Ok();
         }
     }
 
@@ -175,7 +175,6 @@ public static partial class ResultExtensions
         /// <para>错误类型: <see cref="ErrorType.NotSupported"/></para>
         /// </remarks>
         /// <param name="message">具体的错误描述，默认为"不支持"</param>
-        /// <typeparam name="T">结果值类型</typeparam>
         /// <returns>包含不支持错误的 Result&lt;T&gt;</returns>
         public static Result NotSupported(string message = "不支持")
         {
@@ -220,7 +219,6 @@ public static partial class ResultExtensions
         /// <para>错误类型: <see cref="ErrorType.Timeout"/></para>
         /// <para>这可能是网络问题、设备负载过高或超时时间设置过短。建议重试或检查网络状况。</para>
         /// </remarks>
-        /// <typeparam name="T">结果值类型</typeparam>
         /// <param name="message">具体的错误描述，默认为"超时"</param>
         /// <returns>包含超时错误的 Result&lt;T&gt;</returns>
         public static Result Timeout(string message = "超时")

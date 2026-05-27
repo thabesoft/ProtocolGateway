@@ -32,7 +32,7 @@ public readonly struct ChannelName : IEquatable<ChannelName>, IEquatable<string>
         }
 
         var trimmed = name.Trim();
-        return new ChannelName(trimmed);
+        return Result.Ok(new ChannelName(trimmed));
     }
 
 

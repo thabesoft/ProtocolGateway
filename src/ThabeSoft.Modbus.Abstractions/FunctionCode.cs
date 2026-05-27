@@ -100,7 +100,7 @@ public readonly record struct FunctionCode : IEquatable<FunctionCode>
     /// </summary>
     public static Result<FunctionCode> FromCode(byte code)
     {
-        return code switch
+        var function_code = code switch
         {
             ReadCoilsValue => ReadCoils,
             ReadDiscreteInputsValue => ReadDiscreteInputs,
@@ -110,8 +110,15 @@ public readonly record struct FunctionCode : IEquatable<FunctionCode>
             WriteSingleRegisterValue => WriteSingleRegister,
             WriteMultipleCoilsValue => WriteMultipleCoils,
             WriteMultipleRegistersValue => WriteMultipleRegisters,
-            _ => Result.Error<FunctionCode>(ErrorType.InvalidParameter, $"无法识别的功能码: {code}")
+            _ => Empty
         };
+
+        if(function_code == Empty)
+        {
+            return Result.InvalidParameter<FunctionCode>($"无法识别的功能码: {code}");
+        }
+
+        return Result.Ok(function_code);
     }
 
     /// <summary>

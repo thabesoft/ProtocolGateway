@@ -8,8 +8,9 @@ public static partial class ResultExtensions
     {
         public Result<T> Where(Func<T, bool> matcher, string? errorMessage = null)
         {
-            if (result && matcher(result.Value)) return result;
-            return Result.InvalidData<T>(errorMessage ?? "条件比较失败");
+            if (result.IsSuccess && matcher(result.Value)) return result;
+
+            return Result.InvalidParameter<T>(errorMessage ?? "条件比较失败");
         }
     }
     // 有值 ValueTask
@@ -18,8 +19,9 @@ public static partial class ResultExtensions
         public async ValueTask<Result<T>> Where(Func<T, bool> matcher, string? errorMessage = null)
         {
             var result = await task;
-            if (result && matcher(result.Value)) return result;
-            return Result.InvalidData<T>(errorMessage ?? "条件比较失败");
+            if (result.IsSuccess && matcher(result.Value)) return result;
+
+            return Result.InvalidParameter<T>(errorMessage ?? "条件比较失败");
         }
     }
     // 有值 ValueTask
@@ -28,8 +30,9 @@ public static partial class ResultExtensions
         public async Task<Result<T>> Where(Func<T, bool> matcher, string? errorMessage = null)
         {
             var result = await task;
-            if (result && matcher(result.Value)) return result;
-            return Result.InvalidData<T>(errorMessage ?? "条件比较失败");
+            if (result.IsSuccess && matcher(result.Value)) return result;
+
+            return Result.InvalidParameter<T>(errorMessage ?? "条件比较失败");
         }
     }
 }

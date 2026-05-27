@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
-using ThabeSoft.Primitives;
 
-namespace ThabeSoft.ProtocolGateway.Primitives;
+namespace ThabeSoft.Primitives;
 
 
 [TestClass]
@@ -33,7 +32,7 @@ public sealed class ResultTests
     public void Release_Return_Error()
     {
         var result = Result.InvalidData("错误消息");
-        Assert.IsFalse(result, result.Message);
+        Assert.IsFalse(result.IsSuccess, result.Message);
     }
 
 
@@ -51,23 +50,26 @@ public sealed class ResultTests
     [TestMethod]
     public async Task Then()
     {
-        Assert.IsTrue(await Result.Success
+        Assert.IsTrue((await Result.Ok()
             .Then(() => Result.Ok(10))
             .ThenAsync(() => ValueTaskResult(Result.Ok("HelloWorld"))
-            .ThenAsync(() => TaskResult(Result.Ok(10000))))
+            .ThenAsync(() => TaskResult(Result.Ok(10000)))))
+            .IsSuccess
         );
 
-        Assert.IsTrue(await Result.Ok('A')
+        Assert.IsTrue((await Result.Ok('A')
             .Then(() => Result.Ok(0x001))
             .Then(() => Result.Ok(3.14))
             .ThenAsync(() => ValueTaskResult(Result.Ok("HelloWorld")))
-            .ThenAsync(() => TaskResult(Result.Ok(10000)))
+            .ThenAsync(() => TaskResult(Result.Ok(10000))))
+            .IsSuccess
         );
 
-        Assert.IsTrue(await Result.Ok('A')
-            .Map(() => Result.Ok(3.14))
+        Assert.IsTrue((await Result.Ok('A')
+            .Then(() => Result.Ok(3.14))
             .ThenAsync(ct => ValueTaskResult(Result.Ok($"HelloWorld: {ct.GetHashCode()}")))
-            .ThenAsync(ct => TaskResult(Result.Ok(10000 + ct.GetHashCode())))
+            .ThenAsync(ct => TaskResult(Result.Ok(10000 + ct.GetHashCode()))))
+            .IsSuccess
         );
     }
 
@@ -78,14 +80,14 @@ public sealed class ResultTests
             .Bind(x => Result.Ok(x.GetHashCode() + 3.14))
             .BindAsync(x => ValueTaskResult(Result.Ok($"HelloWorld: {x}")))
             .BindAsync(x => TaskResult(Result.Ok(10000 + x.GetHashCode())));
-        Assert.IsTrue(test1, test1.Message);
+        Assert.IsTrue(test1.IsSuccess, test1.Message);
 
 
         var test2 = await Result.Ok('A')
             .Bind(x => Result.Ok(x.GetHashCode() + 3.14))
             .BindAsync((x, ct) => ValueTaskResult(Result.Ok($"HelloWorld: {x}")))
             .BindAsync((x, ct) => TaskResult(Result.Ok(10000 + x.GetHashCode())));
-        Assert.IsTrue(test2, test2.Message);
+        Assert.IsTrue(test2.IsSuccess, test2.Message);
     }
 
     [TestMethod]
@@ -95,21 +97,21 @@ public sealed class ResultTests
             .Bind(x => Result.Ok(x.GetHashCode() + 3.14))
             .BindAsync(x => ValueTaskResult(Result.Ok($"HelloWorld: {x}")))
             .BindAsync(x => TaskResult(Result.Ok(10000 + x.GetHashCode())));
-        Assert.IsTrue(test1, test1.Message);
+        Assert.IsTrue(test1.IsSuccess, test1.Message);
 
 
         var test2 = await Result.Ok('A')
             .Bind(x => Result.Ok(x.GetHashCode() + 3.14))
             .BindAsync((x, ct) => ValueTaskResult(Result.Ok($"HelloWorld: {x}")))
             .BindAsync((x, ct) => TaskResult(Result.Ok(10000 + x.GetHashCode())));
-        Assert.IsTrue(test2, test2.Message);
+        Assert.IsTrue(test2.IsSuccess, test2.Message);
     }
 
     [TestMethod]
     public async Task Where()
     {
-        Assert.IsTrue(Result.Ok(1000).Where(x => x > 50));
-        Assert.IsTrue(Result.Ok(2000).Where(x => x % 2 == 0).Where(x => x < 5000));
+        Assert.IsTrue(Result.Ok(1000).Where(x => x > 50).IsSuccess);
+        Assert.IsTrue(Result.Ok(2000).Where(x => x % 2 == 0).Where(x => x < 5000).IsSuccess);
     }
 
 

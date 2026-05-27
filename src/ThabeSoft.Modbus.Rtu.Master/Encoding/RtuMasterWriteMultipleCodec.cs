@@ -42,9 +42,9 @@ public sealed class RtuMasterWriteMultipleCodec : IMasterWriteMultipleCodec
     {
         var layout_result = WriteCoilsQuantity.Create(values.Length)
             .Map(RtuWriteMultipleRequestLayout.FromQuantity);
-        if (!layout_result) return layout_result.PropagateError<int>();
+        if (!layout_result.IsSuccess) return layout_result.PropagateError<int>();
 
-        return EncodeCoilsRequest(destination, header, values, layout_result.Value).Then(layout_result.Value.TotalLength);
+        return EncodeCoilsRequest(destination, header, values, layout_result.Value).ThenReturn(layout_result.Value.TotalLength);
     }
     public static Result EncodeCoilsRequest(Span<byte> destination, in WriteMultipleRequestHeader header, ReadOnlySpan<bool> values, in RtuWriteMultipleRequestLayout layout)
     {
@@ -77,27 +77,27 @@ public sealed class RtuMasterWriteMultipleCodec : IMasterWriteMultipleCodec
 
         // 起始地址
         var address_result = header.Address.ToBytes(buffer[layout.AddressRange], Endianness.BigEndian);
-        if (!address_result) return address_result;
+        if (!address_result.IsSuccess) return address_result;
 
         // 数量
-        var quantity_result = data_quantity.ToBytes(buffer[layout.QuantityRange], Endianness.BigEndian);
-        if (!quantity_result) return quantity_result;
+            var quantity_result = data_quantity.ToBytes(buffer[layout.QuantityRange], Endianness.BigEndian);
+            if (!quantity_result.IsSuccess) return quantity_result;
 
         // 数据长度
         buffer[layout.DataLengthIndex] = (byte)layout.DataLength;
 
         // 数据
         var value_result = values.ToBytes(buffer[layout.DataRange], BitOrder.LSB0);
-        if (!value_result) return value_result;
+        if (!value_result.IsSuccess) return value_result;
 
         // Crc
         var crc = Crc16.Validate(buffer[layout.PayloadRange]);
         var crc_result = crc.ToBytes(buffer[layout.CrcRange], Endianness.LittleEndian);
-        if (!crc_result) return crc_result;
+        if (!crc_result.IsSuccess) return crc_result;
 
         // 返回数据
         buffer.CopyTo(destination);
-        return true;
+        return Result.Ok();
     }
 
 
@@ -105,9 +105,9 @@ public sealed class RtuMasterWriteMultipleCodec : IMasterWriteMultipleCodec
     {
         var layout_result = WriteRegistersQuantity.Create(values.Length)
             .Map(RtuWriteMultipleRequestLayout.FromQuantity);
-        if (!layout_result) return layout_result.PropagateError<int>();
+        if (!layout_result.IsSuccess) return layout_result.PropagateError<int>();
 
-        return EncodeRegistersRequest(destination, header, values, layout_result.Value).Then(layout_result.Value.TotalLength);
+        return EncodeRegistersRequest(destination, header, values, layout_result.Value).ThenReturn(layout_result.Value.TotalLength);
     }
     public static Result EncodeRegistersRequest(Span<byte> destination, in WriteMultipleRequestHeader header, ReadOnlySpan<ushort> values, in RtuWriteMultipleRequestLayout layout)
     {
@@ -140,23 +140,23 @@ public sealed class RtuMasterWriteMultipleCodec : IMasterWriteMultipleCodec
         buffer[layout.FunctionCodeIndex] = header.FunctionCode;
         // 起始地址
         var address_result = header.Address.ToBytes(buffer[layout.AddressRange], Endianness.BigEndian);
-        if (!address_result) return address_result;
+        if (!address_result.IsSuccess) return address_result;
         // 数量
         var quantity_result = data_quantity.ToBytes(buffer[layout.QuantityRange], Endianness.BigEndian);
-        if (!quantity_result) return quantity_result;
+        if (!quantity_result.IsSuccess) return quantity_result;
         // 数据长度
         buffer[layout.DataLengthIndex] = (byte)layout.DataLength;
         // 数据
         var value_result = values.ToBytes(buffer[layout.DataRange], Endianness.BigEndian);
-        if (!value_result) return value_result;
+        if (!value_result.IsSuccess) return value_result;
         // Crc
         var crc = Crc16.Validate(buffer[layout.PayloadRange]);
         var crc_result = crc.ToBytes(buffer[layout.CrcRange], Endianness.LittleEndian);
-        if (!crc_result) return crc_result;
+        if (!crc_result.IsSuccess) return crc_result;
 
         // 返回数据
         buffer.CopyTo(destination);
-        return true;
+        return Result.Ok();
     }
 
 
@@ -172,27 +172,27 @@ public sealed class RtuMasterWriteMultipleCodec : IMasterWriteMultipleCodec
         var function_code_result = FunctionCode
             .FromCode(source[layout.FunctionCodeIndex])
             .Where(x => FunctionCode.WriteMultipleCoils == x);
-        if (!function_code_result) return function_code_result.PropagateError<RtuWriteMultipleResponseHeader>();
+        if (!function_code_result.IsSuccess) return function_code_result.PropagateError<RtuWriteMultipleResponseHeader>();
 
         // Crc
         var crc_result = source[layout.CrcRange]
             .ToWord(Endianness.LittleEndian);
-        if (!crc_result) return crc_result.PropagateError<RtuWriteMultipleResponseHeader>();
+        if (!crc_result.IsSuccess) return crc_result.PropagateError<RtuWriteMultipleResponseHeader>();
 
         // 验证
         var validate_result = Crc16.Validate(source[layout.PayloadRange], crc_result.Value);
-        if (!validate_result) return validate_result.PropagateError<RtuWriteMultipleResponseHeader>();
+        if (!validate_result.IsSuccess) return validate_result.PropagateError<RtuWriteMultipleResponseHeader>();
 
         // 从站
         var slave_id = source[layout.SlaveIdIndex];
         // 地址
         var address_result = source[layout.AddressRange]
             .ToWord(Endianness.BigEndian);
-        if (!address_result) return address_result.PropagateError<RtuWriteMultipleResponseHeader>();
+        if (!address_result.IsSuccess) return address_result.PropagateError<RtuWriteMultipleResponseHeader>();
         // 数据数量
         var quantity_result = source[layout.QuantityRange]
             .ToWord(Endianness.BigEndian);
-        if (!quantity_result) return quantity_result.PropagateError<RtuWriteMultipleResponseHeader>();
+        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<RtuWriteMultipleResponseHeader>();
 
         // 构建
         return RtuWriteMultipleResponseHeader.Coils(
@@ -214,27 +214,27 @@ public sealed class RtuMasterWriteMultipleCodec : IMasterWriteMultipleCodec
         var function_code_result = FunctionCode
             .FromCode(source[layout.FunctionCodeIndex])
             .Where(x => FunctionCode.WriteMultipleRegisters == x);
-        if (!function_code_result) return function_code_result.PropagateError<RtuWriteMultipleResponseHeader>();
+        if (!function_code_result.IsSuccess) return function_code_result.PropagateError<RtuWriteMultipleResponseHeader>();
 
         // Crc
         var crc_result = source[layout.CrcRange]
             .ToWord(Endianness.LittleEndian);
-        if (!crc_result) return crc_result.PropagateError<RtuWriteMultipleResponseHeader>();
+        if (!crc_result.IsSuccess) return crc_result.PropagateError<RtuWriteMultipleResponseHeader>();
 
         // 验证
         var validate_result = Crc16.Validate(source[layout.PayloadRange], crc_result.Value);
-        if (!validate_result) return validate_result.PropagateError<RtuWriteMultipleResponseHeader>();
+        if (!validate_result.IsSuccess) return validate_result.PropagateError<RtuWriteMultipleResponseHeader>();
 
         // 从站
         var slave_id = source[layout.SlaveIdIndex];
         // 地址
         var address_result = source[layout.AddressRange]
             .ToWord(Endianness.BigEndian);
-        if (!address_result) return address_result.PropagateError<RtuWriteMultipleResponseHeader>();
+        if (!address_result.IsSuccess) return address_result.PropagateError<RtuWriteMultipleResponseHeader>();
         // 数据数量
         var quantity_result = source[layout.QuantityRange]
             .ToWord(Endianness.BigEndian);
-        if (!quantity_result) return quantity_result.PropagateError<RtuWriteMultipleResponseHeader>();
+        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<RtuWriteMultipleResponseHeader>();
 
         // 构建
         return RtuWriteMultipleResponseHeader.Registers(

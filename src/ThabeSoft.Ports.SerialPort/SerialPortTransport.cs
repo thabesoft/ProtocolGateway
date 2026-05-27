@@ -113,7 +113,7 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
         {
             port?.Close();
             State = TransporterState.Disconnected;
-            return Result.Success;
+            return Result.Ok();
         }
         catch(IOException ex)
         {
@@ -127,7 +127,7 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
     }
 
 
-    public async ValueTask<Result<int>> ReadExactAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+    public async ValueTask<Result> ReadExactAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
     {
         if (port?.IsOpen != true || State != TransporterState.Connected)
         {
@@ -135,13 +135,14 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
         }
 
         var result = GetReadLock();
-        if (!result) return Result.Error<int>(result.ErrorType, result.Message);
+        if (!result.IsSuccess) return result.PropagateError<int>();
 
         await result.Value.WaitAsync(cancellationToken);
 
         try
         {
-            return await port.BaseStream.ReadExactAsync(buffer, cancellationToken);
+            await port.BaseStream.ReadExactAsync(buffer, cancellationToken);
+            return Result.Ok();
         }
         catch (InvalidOperationException)
         {
@@ -164,14 +165,14 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
         }
 
         var result = GetWriteLock();
-        if (!result) return result;
+        if (!result.IsSuccess) return result;
 
         await result.Value.WaitAsync(cancellationToken);
 
         try
         {
             await port.BaseStream.WriteAsync(data, cancellationToken);
-            return Result.Success;
+            return Result.Ok();
         }
         catch(InvalidOperationException)
         {
@@ -221,10 +222,10 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
 
         if(_options.DuplexMode == DuplexMode.FullDuplex)
         {
-            return _readLock;
+             return Result.Ok(_readLock);
         }
 
-        return _lock;
+        return Result.Ok(_lock);
     }
 
     private Result<SemaphoreSlim> GetWriteLock()
@@ -236,10 +237,10 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
 
         if (_options.DuplexMode == DuplexMode.FullDuplex)
         {
-            return _writeLock;
+            return Result.Ok(_writeLock);
         }
 
-        return _lock;
+        return Result.Ok(_lock);
     }
 
 
@@ -247,11 +248,13 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
     {
         try
         {
-            return new SerialPort(options.PortName, options.BaudRate, options.Parity, options.DataBits, options.StopBits)
+            var value = new SerialPort(options.PortName, options.BaudRate, options.Parity, options.DataBits, options.StopBits)
             {
                 ReadTimeout = (int)options.ReadTimeout.TotalMilliseconds,
                 WriteTimeout = (int)options.WriteTimeout.TotalMilliseconds
             };
+
+            return Result.Ok(value);
         }
         catch (IOException ex)
         {

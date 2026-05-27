@@ -11,5 +11,5 @@ public interface IPortReader
     /// 读取数据直到填满缓冲区
     /// </summary>
     /// <param name="buffer">字节缓冲区</param>
-    ValueTask<Result<int>> ReadExactAsync(Memory<byte> buffer, CancellationToken cancellationToken = default);
+    ValueTask<Result> ReadExactAsync(Memory<byte> buffer, CancellationToken cancellationToken = default);
 }

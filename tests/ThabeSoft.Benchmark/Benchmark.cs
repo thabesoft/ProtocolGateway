@@ -20,7 +20,7 @@ public class Benchmark
         var result = Result.Ok(10);
         if (!result.IsSuccess) return;
 
-        var result1 = Result.Ok($"输入了: {result.Value}");
+        var result1 = Result.Ok<string>($"输入了: {result.Value}");
         if (!result1.IsSuccess) return;
 
         var result2 = Result.Ok(result1.Value.GetHashCode());
@@ -69,22 +69,22 @@ public class Benchmark
     private async ValueTask<Result<int>> GetIntResultAsync()
     {
         await Task.Yield();
-        return 10;
+        return Result.Ok(10);
     }
     private async ValueTask<Result<string>> GetStringResultAsync(int x)
     {
         await Task.Yield();
-        return $"输入了: {x}";
+        return Result.Ok($"输入了: {x}");
     }
     private async ValueTask<Result<int>> GetHashCodeResultAsync(string x)
     {
         await Task.Yield();
-        return x.GetHashCode();
+        return Result.Ok(x.GetHashCode());
     }
     private async ValueTask<Result<string>> GetHashCodeStringResultAsync(int x)
     {
         await Task.Yield();
-        return x.ToString();
+        return Result.Ok(x.ToString());
     }
 
 

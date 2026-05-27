@@ -29,7 +29,7 @@ public sealed class Gateway : IGateway
         _channelOptions[name] = new();
         _channelManagers[name] = new ChannelManager(this, name);
 
-        return Result.Success;
+        return Result.Ok();
     }
     // 删除
     public Result RemoveChannel(ChannelName name)
@@ -43,7 +43,7 @@ public sealed class Gateway : IGateway
             return Result.InvalidOperation("通道不存在, 删除失败");
         }
 
-        return Result.Success;
+        return Result.Ok();
     }
     // 获取
     public Result<IChannelManager> GetChannel(ChannelName name)
@@ -136,6 +136,6 @@ public sealed class Gateway : IGateway
             return Result.InvalidOperation<ChannelRuntimeOptions>($"未查询到通道配置 [{name}]");
         }
 
-        return options;
+        return Result.Ok(options);
     }
 }

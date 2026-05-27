@@ -39,18 +39,20 @@ public readonly struct RtuReadResponseHeader
         if (!functionCode.IsReadCoils) return Result.InvalidParameter<RtuReadResponseHeader>("无效功能吗");
 
         var quantity_result = ReadCoilsQuantity.Create(quantity);
-        if (!quantity_result) return quantity_result.PropagateError<RtuReadResponseHeader>();
+        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<RtuReadResponseHeader>();
 
-        return new RtuReadResponseHeader(slaveId, functionCode, quantity_result.Value, quantity_result.Value.ByteLength, crc);
+        var value = new RtuReadResponseHeader(slaveId, functionCode, quantity_result.Value, quantity_result.Value.ByteLength, crc);
+        return Result.Ok(value);
     }
     public static Result<RtuReadResponseHeader> AnyRegister(byte slaveId, FunctionCode functionCode, int quantity, ushort crc)
     {
         if (!functionCode.IsReadRegisters) return Result.InvalidParameter<RtuReadResponseHeader>("无效功能吗");
 
         var quantity_result = ReadRegistersQuantity.Create(quantity);
-        if (!quantity_result) return quantity_result.PropagateError<RtuReadResponseHeader>();
+        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<RtuReadResponseHeader>();
 
-        return new RtuReadResponseHeader(slaveId, functionCode, quantity_result.Value, quantity_result.Value.ByteLength, crc);
+        var value =  new RtuReadResponseHeader(slaveId, functionCode, quantity_result.Value, quantity_result.Value.ByteLength, crc);
+        return Result.Ok(value);
     }
     public static Result<RtuReadResponseHeader> Create(byte slaveId, FunctionCode functionCode, int quantity, ushort crc)
     {
@@ -66,9 +68,10 @@ public readonly struct RtuReadResponseHeader
     public static Result<RtuReadResponseHeader> Coils(byte slaveId, int quantity, ushort crc)
     {
         var quantity_result = ReadCoilsQuantity.Create(quantity);
-        if (!quantity_result) return quantity_result.PropagateError<RtuReadResponseHeader>();
+        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<RtuReadResponseHeader>();
 
-        return Coils(slaveId, quantity_result.Value, crc);
+        var value = Coils(slaveId, quantity_result.Value, crc);
+        return Result.Ok(value);
     }
     public static RtuReadResponseHeader Coils(byte slaveId, ReadCoilsQuantity quantity, ushort crc)
     {
@@ -84,9 +87,10 @@ public readonly struct RtuReadResponseHeader
     public static Result<RtuReadResponseHeader> DiscreteInputs(byte slaveId,int quantity, ushort crc)
     {
         var quantity_result = ReadCoilsQuantity.Create(quantity);
-        if (!quantity_result) return quantity_result.PropagateError<RtuReadResponseHeader>();
+        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<RtuReadResponseHeader>();
 
-        return DiscreteInputs(slaveId, quantity_result.Value, crc);
+        var value = DiscreteInputs(slaveId, quantity_result.Value, crc);
+        return Result.Ok(value);
     }
     public static RtuReadResponseHeader DiscreteInputs(byte slaveId, ReadCoilsQuantity quantity, ushort crc)
     {
@@ -102,9 +106,10 @@ public readonly struct RtuReadResponseHeader
     public static Result<RtuReadResponseHeader> HoldingRegisters(byte slaveId, int quantity, ushort crc)
     {
         var quantity_result = ReadRegistersQuantity.Create(quantity);
-        if (!quantity_result) return quantity_result.PropagateError<RtuReadResponseHeader>();
+        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<RtuReadResponseHeader>();
 
-        return HoldingRegisters(slaveId, quantity_result.Value, crc);
+        var value = HoldingRegisters(slaveId, quantity_result.Value, crc);
+        return Result.Ok(value);
     }
     public static RtuReadResponseHeader HoldingRegisters(byte slaveId, ReadRegistersQuantity quantity, ushort crc)
     {
@@ -119,9 +124,10 @@ public readonly struct RtuReadResponseHeader
     public static Result<RtuReadResponseHeader> InputRegisters(byte slaveId, int quantity, ushort crc)
     {
         var quantity_result = ReadRegistersQuantity.Create(quantity);
-        if (!quantity_result) return quantity_result.PropagateError<RtuReadResponseHeader>();
+        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<RtuReadResponseHeader>();
 
-        return InputRegisters(slaveId, quantity_result.Value, crc);
+        var value = InputRegisters(slaveId, quantity_result.Value, crc);
+        return Result.Ok(value);
     }
     public static RtuReadResponseHeader InputRegisters(byte slaveId, ReadRegistersQuantity quantity, ushort crc)
     {

@@ -32,7 +32,7 @@ public readonly record struct WriteCoilsQuantity
             return Result.Error<WriteCoilsQuantity>(ErrorType.InvalidParameter, MESSAGE);
         }
 
-        return new WriteCoilsQuantity((ushort)value);
+        return Result.Ok(new WriteCoilsQuantity((ushort)value));
     }
 
 

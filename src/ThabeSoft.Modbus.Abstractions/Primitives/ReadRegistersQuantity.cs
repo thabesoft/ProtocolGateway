@@ -34,7 +34,7 @@ public readonly record struct ReadRegistersQuantity
             return Result.Error<ReadRegistersQuantity>(ErrorType.InvalidParameter, MESSAGE);
         }
 
-        return new ReadRegistersQuantity((ushort)value);
+        return Result.Ok(new ReadRegistersQuantity((ushort)value));
     }
 
 

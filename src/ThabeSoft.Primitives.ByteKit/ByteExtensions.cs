@@ -34,13 +34,13 @@ public static class ByteExtensions
                 var bits_range = source.Slice(bits_start, bits_length);
 
                 var result = bits_range.ToByte(bitOrder);
-                if (!result) return result;
+                if (!result.IsSuccess) return result;
 
                 buffer[byte_index] = result.Value;
             }
 
             buffer.CopyTo(destination);
-            return true;
+            return Result.Ok();
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ public static class ByteExtensions
                 byte_value |= (byte)(1 << bitIndex);
             }
 
-            return byte_value;
+            return Result.Ok(byte_value);
         }
     }
 
@@ -100,7 +100,7 @@ public static class ByteExtensions
                 ? offset + index           // LSB0: 偏移 + 索引
                 : offset + (length - 1 - index);  // MSB0: 反向
 
-            return (source & (1 << bitIndex)) != 0;
+            return Result.Ok((source & (1 << bitIndex)) != 0);
 
         }
         /// <summary>
@@ -126,13 +126,13 @@ public static class ByteExtensions
             for (int i = 0; i < length; i++)
             {
                 var result = source.GetBit(i, 0..length, bitOrder);
-                if (!result) return result.PropagateError<int>();
+                if (!result.IsSuccess) return result.PropagateError<int>();
 
                 buffer[i] = result.Value;
             }
 
             buffer.CopyTo(destination);
-            return length;
+            return Result.Ok(length);
         }
     }
     /// <summary>
@@ -148,16 +148,17 @@ public static class ByteExtensions
         {
             if (source.Length < 2)
             {
-                return Result.Error<ushort>(ErrorType.InvalidParameter,
+                return Result.InvalidParameter<ushort>(
                     $"Byte[] 转 Word 失败，至少需要 2 字节，实际 {source.Length} 字节");
             }
 
             if (endianness == Endianness.BigEndian)
             {
-                return (ushort)(source[0] << 8 | source[1]);
+                return Result.Ok((ushort)(source[0] << 8 | source[1]));
             }
 
-            return (ushort)(source[1] << 8 | source[0]);
+            var value = (ushort)(source[1] << 8 | source[0]);
+            return Result.Ok(value);
         }
         /// <summary>
         /// 将字节组转换为 双字 (32 bit)
@@ -170,13 +171,16 @@ public static class ByteExtensions
                 return Result.Error<uint>(ErrorType.InvalidParameter, 
                     $"Byte[] 转 DWord 失败，至少需要 4 字节，实际 {source.Length} 字节");
             }
-
-            if (layout == Endianness.BigEndian)
+            else if (layout == Endianness.BigEndian)
             {
-                return (uint)((source[0] << 24) | (source[1] << 16) | (source[2] << 8) | source[3]);
+                var value = (uint)((source[0] << 24) | (source[1] << 16) | (source[2] << 8) | source[3]);
+                return Result.Ok(value);
             }
-
-            return (uint)((source[3] << 24) | (source[2] << 16) | (source[1] << 8) | source[0]);
+            else
+            {
+                var value = (uint)((source[3] << 24) | (source[2] << 16) | (source[1] << 8) | source[0]);
+                return Result.Ok(value);
+            }
         }
         /// <summary>
         /// 将字节组转换为 四字 (64 bit)
@@ -192,16 +196,22 @@ public static class ByteExtensions
 
             if (layout == Endianness.BigEndian)
             {
-                return ((ulong)source[0] << 56) | ((ulong)source[1] << 48) |
+                var value = ((ulong)source[0] << 56) | ((ulong)source[1] << 48) |
                        ((ulong)source[2] << 40) | ((ulong)source[3] << 32) |
                        ((ulong)source[4] << 24) | ((ulong)source[5] << 16) |
                        ((ulong)source[6] << 8) | source[7];
-            }
 
-            return ((ulong)source[7] << 56) | ((ulong)source[6] << 48) |
-                       ((ulong)source[5] << 40) | ((ulong)source[4] << 32) |
-                       ((ulong)source[3] << 24) | ((ulong)source[2] << 16) |
-                       ((ulong)source[1] << 8) | source[0];
+                return Result.Ok(value);
+            }
+            else
+            {
+                var value = ((ulong)source[7] << 56) | ((ulong)source[6] << 48) |
+                           ((ulong)source[5] << 40) | ((ulong)source[4] << 32) |
+                           ((ulong)source[3] << 24) | ((ulong)source[2] << 16) |
+                           ((ulong)source[1] << 8) | source[0];
+
+                return Result.Ok(value);
+            }
         }
 
 
@@ -226,11 +236,11 @@ public static class ByteExtensions
                 var cur_span = buffer.Slice(start_bit, bits_in_this_byte);
 
                 var result = source[i].ToBits(cur_span, birOrder);
-                if (!result) return result;
+                if (!result.IsSuccess) return result;
             }
 
             buffer.CopyTo(destination);
-            return true;
+            return Result.Ok();
         }
         /// <summary>
         /// 将字节序转为16位无符号整数序
@@ -250,13 +260,13 @@ public static class ByteExtensions
                 var span = source.Slice(begin, length);
 
                 var result = span.ToWord(endianness);
-                if(!result) return result;
+                if(!result.IsSuccess) return result;
 
                 buffer[i] = result.Value;
             }
 
             buffer.CopyTo(destination);
-            return true;
+            return Result.Ok();
         }
     }
 
@@ -295,12 +305,12 @@ public static class ByteExtensions
                 var byte_range = buffer.Slice(byte_start, byte_length);
 
                 var result = source[source_index].ToBytes(byte_range, endianness);
-                if (!result) return result;
+                if (!result.IsSuccess) return result;
             }
 
             // 全部拷贝至目标
             buffer.CopyTo(destination);
-            return true;
+            return Result.Ok();
         }
     }
     /// <summary>
@@ -331,7 +341,7 @@ public static class ByteExtensions
                 destination[1] = (byte)(source >> 8);
             }
 
-            return Result.Success;
+            return Result.Ok();
         }
     }
 
@@ -362,13 +372,13 @@ public static class ByteExtensions
 
             // 调换字序
             var result = buffer.Swap(layout);
-            if (!result) return result;
+            if (!result.IsSuccess) return result;
 
             // 调换端序
             if (layout == Endianness.LittleEndian) buffer.Reverse();
             buffer.CopyTo(destination);
 
-            return Result.Success;
+            return Result.Ok();
         }
     }
 
@@ -410,7 +420,7 @@ public static class ByteExtensions
                 destination[7] = (byte)(source >> 56);
             }
 
-            return Result.Success;
+            return Result.Ok();
         }
     }
 }

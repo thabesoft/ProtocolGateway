@@ -46,7 +46,7 @@ public readonly struct QWordLayout
         if ((swap & ~ValidSwapMask) != 0)
             return Result.InvalidParameter<QWordLayout>($"不支持的字节组合模式: [{endianness}] {swap}");
 
-        return new QWordLayout(endianness, swap);
+        return Result.Ok(new QWordLayout(endianness, swap));
     }
     public static Result<QWordLayout> FromLittleEndian(ByteSwap swap)
     {

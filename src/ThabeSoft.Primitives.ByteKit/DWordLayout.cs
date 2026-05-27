@@ -48,7 +48,7 @@ public readonly struct DWordLayout
         if ((swap & ~ValidSwapMask) != 0)
             return Result.InvalidParameter<DWordLayout>($"不支持的字节组合模式: [{endianness}] {swap}");
 
-        return new DWordLayout(endianness, swap);
+        return Result.Ok(new DWordLayout(endianness, swap));
     }
     public static Result<DWordLayout> FromLittleEndian(ByteSwap swap)
     {

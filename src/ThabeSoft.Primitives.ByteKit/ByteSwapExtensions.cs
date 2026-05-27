@@ -27,7 +27,7 @@ public static class ByteSwapExtensions
                 if (source.Length % 8 != 0) return Result.Error(ErrorType.InvalidParameter, "无法调换二字序, 字节数量不是8的倍数");
 
                 var result = source.SwapDWord();
-                if (!result) return result;
+                if (!result.IsSuccess) return result;
             }
 
             if (swap.HasFlag(ByteSwap.SwapWord))
@@ -35,7 +35,7 @@ public static class ByteSwapExtensions
                 if (source.Length % 4 != 0) return Result.Error(ErrorType.InvalidParameter, "无法调换字序, 字节数量不是4的倍数");
 
                 var result = source.SwapWord();
-                if (!result) return result;
+                if (!result.IsSuccess) return result;
             }
 
             // 调换字节序
@@ -45,7 +45,7 @@ public static class ByteSwapExtensions
                 return source.SwapByte();
             }
 
-            return Result.Success;
+            return Result.Ok();
         }
 
 
@@ -81,7 +81,7 @@ public static class ByteSwapExtensions
                 (source[i], source[j]) = (source[j], source[i]);
             }
 
-            return Result.Success;
+            return Result.Ok();
         }
 
         /// <summary>
@@ -102,7 +102,7 @@ public static class ByteSwapExtensions
                 (source[i + 1], source[i + 3]) = (source[i + 3], source[i + 1]);
             }
 
-            return Result.Success;
+            return Result.Ok();
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ public static class ByteSwapExtensions
                 }
             }
 
-            return Result.Success;
+            return Result.Ok();
         }
 
         /// <summary>
@@ -150,7 +150,7 @@ public static class ByteSwapExtensions
                 }
             }
 
-            return Result.Success;
+            return Result.Ok();
         }
     }
 
@@ -173,12 +173,11 @@ public static class ByteSwapExtensions
 
             // 执行交换
             var result = temp.Swap(swap);
-            if (!result)
-                return result;
+            if (!result.IsSuccess) return result;
 
             // 成功后再拷贝到目标
             temp.CopyTo(destination);
-            return Result.Success;
+            return Result.Ok();
         }
 
 
@@ -199,7 +198,7 @@ public static class ByteSwapExtensions
                 destination[source.Length - 1 - i] = source[i];
             }
 
-            return Result.Success;
+            return Result.Ok();
         }
 
         /// <summary>
@@ -225,7 +224,7 @@ public static class ByteSwapExtensions
                 destination[i + 3] = source[i + 1];
             }
 
-            return Result.Success;
+            return Result.Ok();
         }
 
         /// <summary>
@@ -256,7 +255,7 @@ public static class ByteSwapExtensions
                 destination[i + 7] = source[i + 3];
             }
 
-            return Result.Success;
+            return Result.Ok();
         }
 
         /// <summary>
@@ -283,7 +282,7 @@ public static class ByteSwapExtensions
                 }
             }
 
-            return Result.Success;
+            return Result.Ok();
         }
     }
 }

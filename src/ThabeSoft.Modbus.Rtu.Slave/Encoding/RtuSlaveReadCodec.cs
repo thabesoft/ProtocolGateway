@@ -47,8 +47,8 @@ public sealed class RtuSlaveReadCodec : ISlaveReadCodec
     {
         // 验证
         var crc_result = source[layout.CrcRange].ToWord(Endianness.LittleEndian);
-        if (!crc_result) return crc_result.PropagateError<RtuReadRequesteHeader>();
-        if (!Crc16.Validate(source[layout.PayloadRange], crc_result.Value))
+        if (!crc_result.IsSuccess) return crc_result.PropagateError<RtuReadRequesteHeader>();
+        if (!Crc16.Validate(source[layout.PayloadRange], crc_result.Value).IsSuccess)
             return Result.InvalidData<RtuReadRequesteHeader>("Crc校验失败");
 
         // 从站
@@ -56,15 +56,15 @@ public sealed class RtuSlaveReadCodec : ISlaveReadCodec
 
         // 功能码
         var funtion_code_result = FunctionCode.FromCode(source[layout.FunctionCodeIndex]);
-        if (!funtion_code_result) return funtion_code_result.PropagateError<RtuReadRequesteHeader>();
+        if (!funtion_code_result.IsSuccess) return funtion_code_result.PropagateError<RtuReadRequesteHeader>();
 
         // 起始地址
         var address_result = source[layout.AddressRange].ToWord(Endianness.BigEndian);
-        if (!address_result) return address_result.PropagateError<RtuReadRequesteHeader>();
+        if (!address_result.IsSuccess) return address_result.PropagateError<RtuReadRequesteHeader>();
 
         // 数量
         var quantity_result = source[layout.QuantityRange].ToWord(Endianness.BigEndian);
-        if (!quantity_result) return quantity_result.PropagateError<RtuReadRequesteHeader>();
+        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<RtuReadRequesteHeader>();
 
 
         return RtuReadRequesteHeader.Create(
@@ -80,10 +80,10 @@ public sealed class RtuSlaveReadCodec : ISlaveReadCodec
     {
         // 根据数量创建布局
         var quantity_result = ReadCoilsQuantity.Create(values.Length);
-        if (!quantity_result) return quantity_result.PropagateError<int>();
+        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<int>();
 
         var layout  = RtuReadResponseLayout.FromQuantity(quantity_result.Value);
-        return EncodeCoilsResponse(destination, header, values, layout).Then(layout.TotalLength);
+        return EncodeCoilsResponse(destination, header, values, layout).ThenReturn(layout.TotalLength);
     }
     public static Result EncodeCoilsResponse(Span<byte> destination, in ReadResponseHeader header, ReadOnlySpan<bool> values, in RtuReadResponseLayout layout)
     {
@@ -113,7 +113,7 @@ public sealed class RtuSlaveReadCodec : ISlaveReadCodec
 
         // 数据
         var data_result = values.ToBytes(buffer[layout.DataRange], BitOrder.LSB0);
-        if (!data_result) return data_result;
+        if (!data_result.IsSuccess) return data_result;
 
         // Crc
         var crc = Crc16.Validate(buffer[layout.PayloadRange]);
@@ -121,7 +121,7 @@ public sealed class RtuSlaveReadCodec : ISlaveReadCodec
 
         // 构建
         buffer.CopyTo(destination);
-        return true;
+        return Result.Ok();
     }
 
 
@@ -129,10 +129,10 @@ public sealed class RtuSlaveReadCodec : ISlaveReadCodec
     {
         // 根据数量创建布局
         var quantity_result = ReadCoilsQuantity.Create(values.Length);
-        if (!quantity_result) return quantity_result.PropagateError<int>();
+        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<int>();
 
         var layout = RtuReadResponseLayout.FromQuantity(quantity_result.Value);
-        return EncodeRegistersResponse(destination, header, values, layout).Then(layout.TotalLength);
+        return EncodeRegistersResponse(destination, header, values, layout).ThenReturn(layout.TotalLength);
     }
     public static Result EncodeRegistersResponse(Span<byte> destination, in ReadResponseHeader header, ReadOnlySpan<ushort> values, in RtuReadResponseLayout layout)
     {
@@ -162,7 +162,7 @@ public sealed class RtuSlaveReadCodec : ISlaveReadCodec
 
         // 数据
         var data_result = values.ToBytes(buffer[layout.DataRange], Endianness.BigEndian);
-        if (!data_result) return data_result;
+        if (!data_result.IsSuccess) return data_result;
 
         // Crc
         var crc = Crc16.Validate(buffer[layout.PayloadRange]);
@@ -170,7 +170,7 @@ public sealed class RtuSlaveReadCodec : ISlaveReadCodec
 
         // 构建
         buffer.CopyTo(destination);
-        return true;
+        return Result.Ok();
     }
 
 

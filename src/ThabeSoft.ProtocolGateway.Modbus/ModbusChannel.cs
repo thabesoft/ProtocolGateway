@@ -79,7 +79,7 @@ public sealed class ModbusChannel(IModbusMaster master) : IReadWriteChannel
 
         if (address.FunctionCode == FunctionCode.WriteMultipleRegisters)
         {
-            return true;
+            return Result.Ok();
         }
 
         if (address.FunctionCode == FunctionCode.WriteSingleCoil)
@@ -91,7 +91,7 @@ public sealed class ModbusChannel(IModbusMaster master) : IReadWriteChannel
 
         if (address.FunctionCode == FunctionCode.WriteSingleRegister)
         {
-            return true;
+            return Result.Ok();
         }
 
 
@@ -117,7 +117,7 @@ public sealed class ModbusChannel(IModbusMaster master) : IReadWriteChannel
             // 读取所有bit
             var bits_mem = bits_buffer.AsMemory(0, bits_count);
             var reaer_result = await readHandler(bits_mem, slaveId, address, ct);
-            if (!reaer_result) return reaer_result;
+            if (!reaer_result.IsSuccess) return reaer_result;
 
             // 将每8个bit解析为一个byte
             return bits_mem.Span.ToBytes(destination.Span, bitOrder);
@@ -149,7 +149,7 @@ public sealed class ModbusChannel(IModbusMaster master) : IReadWriteChannel
             // 读取所有word
             var word_mem = word_buffer.AsMemory(0, word_count);
             var reaer_result = await readHandler(word_mem, slaveId, address, ct);
-            if (!reaer_result) return reaer_result;
+            if (!reaer_result.IsSuccess) return reaer_result;
 
             // 将每个word解析为2个byte
             return word_mem.Span.ToBytes(destination.Span, endianness);

@@ -1,7 +1,9 @@
 ﻿namespace ThabeSoft.Primitives;
 
 
-// OrElse
+/// <summary>
+/// OrElse
+/// </summary>
 public static partial class ResultExtensions
 {
     // 无值版本
@@ -25,14 +27,32 @@ public static partial class ResultExtensions
     // 有值
     extension<T>(Result<T> result)
     {
-        public Result<U> OrElse<U>(Func<T, Result<U>> action)
+        public Result<T> OrElse(Func<Result<T>> resultGetter)
         {
-            if (!result.IsSuccess)
-            {
-                return result.PropagateError<U>();
-            }
+            if (result.IsSuccess) return result;
+            
+            return resultGetter();
+        }
+        public Result<T> OrElse(Func<ErrorType, Result<T>> resultGetter)
+        {
+            if (result.IsSuccess) return result;
 
-            return action(result.Value);
+            return resultGetter(result.ErrorType);
+        }
+
+
+        public Result<T> OrElse(Result<T> newResult)
+        {
+            if (result.IsSuccess) return result;
+
+            return newResult;
+        }
+
+        public Result<T> OrElse(T newValue)
+        {
+            if (result.IsSuccess) return result;
+
+            return Result.Ok(newValue);
         }
     }
     // 有值 ValueTask

@@ -24,8 +24,8 @@ public static class ModbusHelper
     {
         return value switch
         {
-            CoilOpen => true,
-            CoilClose => false,
+            CoilOpen => Result.Ok( true),
+            CoilClose => Result.Ok(false),
             _ => Result.InvalidParameter<bool>($"无效的 Modbus 线圈值: 0x{value:X4}，有效值为 0xFF00 (ON) 或 0x0000 (OFF)")
         };
     }

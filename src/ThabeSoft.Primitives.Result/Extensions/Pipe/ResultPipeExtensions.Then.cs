@@ -17,7 +17,7 @@ public static partial class ResultPipeExtensions
                 var (pipe, next) = data;
 
                 var result = pipe.Execute();
-                if (!result.IsSuccess) return Result.Error(result.ErrorType, result.Message);
+                if (!result.IsSuccess) return result;
 
                 return next.Invoke();
             }

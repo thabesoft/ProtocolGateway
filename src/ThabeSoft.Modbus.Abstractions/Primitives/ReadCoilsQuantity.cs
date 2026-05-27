@@ -34,7 +34,7 @@ public readonly record struct ReadCoilsQuantity
             return Result.Error<ReadCoilsQuantity>(ErrorType.InvalidParameter, MESSAGE);
         }
 
-        return new ReadCoilsQuantity((ushort)value);
+        return Result.Ok(new ReadCoilsQuantity((ushort)value));
     }
 
     public static bool IsValid(int value)

@@ -33,12 +33,12 @@ public readonly record struct ReadRequestHeader
     public static Result<ReadRequestHeader> AnyCoils(byte slaveId, FunctionCode functionCode, ushort address, ReadCoilsQuantity quantity)
     {
         if (functionCode.IsReadCoils) return Result.InvalidParameter<ReadRequestHeader>("无效功能码");
-        return new ReadRequestHeader(slaveId, functionCode, address, quantity);
+        return Result.Ok(new ReadRequestHeader(slaveId, functionCode, address, quantity));
     }
     public static Result<ReadRequestHeader> AnyCoils(byte slaveId, FunctionCode functionCode, ushort address, int quantity)
     {
         var quantity_result = ReadCoilsQuantity.Create(quantity);
-        if (!quantity_result) return quantity_result.PropagateError<ReadRequestHeader>();
+        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<ReadRequestHeader>();
 
         return AnyCoils(slaveId, functionCode, address, quantity_result.Value);
     }
@@ -46,12 +46,12 @@ public readonly record struct ReadRequestHeader
     public static Result<ReadRequestHeader> AnyRegisters(byte slaveId, FunctionCode functionCode, ushort address, ReadCoilsQuantity quantity)
     {
         if (functionCode.IsReadRegisters) return Result.InvalidParameter<ReadRequestHeader>("无效功能码");
-        return new ReadRequestHeader(slaveId, functionCode, address, quantity);
+        return Result.Ok(new ReadRequestHeader(slaveId, functionCode, address, quantity));
     }
     public static Result<ReadRequestHeader> AnyRegisters(byte slaveId, FunctionCode functionCode, ushort address, int quantity)
     {
         var quantity_result = ReadRegistersQuantity.Create(quantity);
-        if (!quantity_result) return quantity_result.PropagateError<ReadRequestHeader>();
+        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<ReadRequestHeader>();
 
         return AnyCoils(slaveId, functionCode, address, quantity_result.Value);
     }
@@ -61,9 +61,9 @@ public readonly record struct ReadRequestHeader
     public static Result<ReadRequestHeader> Coils(byte slaveId, ushort address, int quantity)
     {
         var quantity_result = ReadCoilsQuantity.Create(quantity);
-        if (!quantity_result) return quantity_result.PropagateError<ReadRequestHeader>();
+        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<ReadRequestHeader>();
 
-        return new ReadRequestHeader(slaveId, FunctionCode.ReadCoils, address, quantity_result.Value);
+        return Result.Ok(new ReadRequestHeader(slaveId, FunctionCode.ReadCoils, address, quantity_result.Value));
     }
     public static ReadRequestHeader Coils(byte slaveId, ushort address, ReadCoilsQuantity quantity)
     {
@@ -73,9 +73,9 @@ public readonly record struct ReadRequestHeader
     public static Result<ReadRequestHeader> DiscreteInputs(byte slaveId, ushort address, int quantity)
     {
         var quantity_result = ReadCoilsQuantity.Create(quantity);
-        if (!quantity_result) return quantity_result.PropagateError<ReadRequestHeader>();
+        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<ReadRequestHeader>();
 
-        return new ReadRequestHeader(slaveId, FunctionCode.ReadDiscreteInputs, address, quantity_result.Value);
+        return Result.Ok(new ReadRequestHeader(slaveId, FunctionCode.ReadDiscreteInputs, address, quantity_result.Value));
     }
     public static ReadRequestHeader DiscreteInputs(byte slaveId, ushort address, ReadCoilsQuantity quantity)
     {
@@ -86,9 +86,9 @@ public readonly record struct ReadRequestHeader
     public static Result<ReadRequestHeader> HoldingRegisters(byte slaveId, ushort address, int quantity)
     {
         var quantity_result = ReadRegistersQuantity.Create(quantity);
-        if (!quantity_result) return quantity_result.PropagateError<ReadRequestHeader>();
+        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<ReadRequestHeader>();
 
-        return new ReadRequestHeader(slaveId, FunctionCode.ReadHoldingRegisters, address, quantity_result.Value);
+        return Result.Ok(new ReadRequestHeader(slaveId, FunctionCode.ReadHoldingRegisters, address, quantity_result.Value));
     }
     public static ReadRequestHeader HoldingRegisters(byte slaveId, ushort address, ReadRegistersQuantity quantity)
     {
@@ -98,9 +98,9 @@ public readonly record struct ReadRequestHeader
     public static Result<ReadRequestHeader> InputRegisters(byte slaveId, ushort address, int quantity)
     {
         var quantity_result = ReadRegistersQuantity.Create(quantity);
-        if (!quantity_result) return quantity_result.PropagateError<ReadRequestHeader>();
+        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<ReadRequestHeader>();
 
-        return new ReadRequestHeader(slaveId, FunctionCode.ReadInputRegisters, address, quantity_result.Value);
+        return Result.Ok(new ReadRequestHeader(slaveId, FunctionCode.ReadInputRegisters, address, quantity_result.Value));
     }
     public static ReadRequestHeader InputRegisters(byte slaveId, ushort address, ReadRegistersQuantity quantity)
     {

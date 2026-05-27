@@ -35,7 +35,7 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
     public static Result<int> EncodeRequest(Span<byte> destination, in ReadRequestHeader header)
     {
         var layout = RtuReadRequestLayout.Instance;
-        return EncodeRequest(destination, header, layout).Then(layout.TotalLength);
+        return EncodeRequest(destination, header, layout).ThenReturn(layout.TotalLength);
     }
     public static Result EncodeRequest(Span<byte> destination, in ReadRequestHeader header, in RtuReadRequestLayout layout)
     {
@@ -58,26 +58,26 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
 
         // 起始地址
         var address_result = header.Address.ToBytes(buffer[layout.AddressRange], Endianness.BigEndian);
-        if (!address_result) return address_result;
+        if (!address_result.IsSuccess) return address_result;
 
         // 数量
         var quantity_result = header.Quantity.ToBytes(buffer[layout.QuantityRange], Endianness.BigEndian);
-        if (!quantity_result) return quantity_result.PropagateError<int>();
+        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<int>();
 
         // 验证
         var crc = Crc16.Validate(buffer[layout.PayloadRange]);
         var crc_result = crc.ToBytes(buffer[layout.CrcRange], Endianness.LittleEndian);
-        if (!crc_result) return crc_result.PropagateError<int>();
+        if (!crc_result.IsSuccess) return crc_result.PropagateError<int>();
 
         buffer.CopyTo(destination);
-        return true;
+        return Result.Ok();
     }
 
 
     public static Result<RtuReadResponseHeader> DecodeCoilsResponse(ReadOnlySpan<byte> source, Span<bool> destination)
     {
         var layout_result = ReadCoilsQuantity.Create(destination.Length).Map(RtuReadResponseLayout.FromQuantity);
-        if (!layout_result) return layout_result.PropagateError<RtuReadResponseHeader>();
+        if (!layout_result.IsSuccess) return layout_result.PropagateError<RtuReadResponseHeader>();
 
         return DecodeCoilsResponse(source, destination, layout_result.Value);
     }
@@ -85,7 +85,7 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
     {
         // 结果校验
         var result = DecodeResponse(source, destination.Length, layout);
-        if (!result) return result;
+        if (!result.IsSuccess) return result;
 
         // 功能码校验
         var function_code = result.Value.FunctionCode;
@@ -94,7 +94,7 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
 
         // 数据校验
         var data_result = source[layout.DataRange].ToBits(destination, BitOrder.LSB0);
-        if (!data_result) return result;
+        if (!data_result.IsSuccess) return result;
 
         return result;
     }
@@ -103,7 +103,7 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
     public static Result<RtuReadResponseHeader> DecodeRegistersResponse(ReadOnlySpan<byte> source, Span<ushort> destination)
     {
         var layout_result = ReadRegistersQuantity.Create(destination.Length).Map(RtuReadResponseLayout.FromQuantity);
-        if (!layout_result) return layout_result.PropagateError<RtuReadResponseHeader>();
+        if (!layout_result.IsSuccess) return layout_result.PropagateError<RtuReadResponseHeader>();
 
         return DecodeRegistersResponse(source, destination, layout_result.Value);
     }
@@ -111,7 +111,7 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
     {
         // 结果校验
         var result = DecodeResponse(source, destination.Length, layout);
-        if (!result) return result;
+        if (!result.IsSuccess) return result;
 
         // 功能码校验
         var function_code = result.Value.FunctionCode;
@@ -120,7 +120,7 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
 
         // 数据校验
         var data_result = source[layout.DataRange].ToWords(destination);
-        if (!data_result) return result;
+        if (!data_result.IsSuccess) return result;
 
         return result;
     }
@@ -135,11 +135,11 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
         // Crc
         var crc_result = source[layout.CrcRange]
             .ToWord(Endianness.LittleEndian);
-        if (!crc_result) return crc_result.PropagateError<RtuReadResponseHeader>();
+        if (!crc_result.IsSuccess) return crc_result.PropagateError<RtuReadResponseHeader>();
 
         // 验证
         var validate_result = Crc16.Validate(source[layout.PayloadRange], crc_result.Value);
-        if (!validate_result) return validate_result.PropagateError<RtuReadResponseHeader>();
+        if (!validate_result.IsSuccess) return validate_result.PropagateError<RtuReadResponseHeader>();
 
 
         // 从站
@@ -147,7 +147,7 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
 
         // 功能码
         var function_code_result = FunctionCode.FromCode(source[RtuReadResponseLayout.FunctionCodeIndex]).Where(x => x.IsRead);
-        if (!function_code_result) return function_code_result.PropagateError<RtuReadResponseHeader>();
+        if (!function_code_result.IsSuccess) return function_code_result.PropagateError<RtuReadResponseHeader>();
 
         // 数据长度
         var data_length = source[RtuReadResponseLayout.DataLengthIndex];

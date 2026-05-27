@@ -18,16 +18,16 @@ public sealed class RtuCodecTest
 
         // 请求头
         var request_header_result = ReadRequestHeader.Coils(slaveId, address, quantity);
-        Assert.IsTrue(request_header_result, request_header_result.Message);
+        Assert.IsTrue(request_header_result.IsSuccess, request_header_result.Message);
 
         // 编码
         var encode_result = RtuMasterReadCodec.EncodeRequest(encode_buffer, request_header_result.Value, layout);
         Console.WriteLine($"编码: {encode_buffer.ToHexString()}");
-        Assert.IsTrue(encode_result, encode_result.Message);
+        Assert.IsTrue(encode_result.IsSuccess, encode_result.Message);
 
         // 解码
         var decoode_result = RtuSlaveReadCodec.DecodeRequest(encode_buffer, layout);
-        Assert.IsTrue(decoode_result, decoode_result.Message);
+        Assert.IsTrue(decoode_result.IsSuccess, decoode_result.Message);
 
 
         var request_header = request_header_result.Value;
@@ -57,16 +57,16 @@ public sealed class RtuCodecTest
 
         // 请求头
         var request_header_result = ReadRequestHeader.HoldingRegisters(slaveId, address, quantity);
-        Assert.IsTrue(request_header_result, request_header_result.Message);
+        Assert.IsTrue(request_header_result.IsSuccess, request_header_result.Message);
 
         // 编码
         var encode_result = RtuMasterReadCodec.EncodeRequest(encode_buffer, request_header_result.Value, layout);
         Console.WriteLine($"编码: {encode_buffer.ToHexString()}");
-        Assert.IsTrue(encode_result, encode_result.Message);
+        Assert.IsTrue(encode_result.IsSuccess, encode_result.Message);
 
         // 解码
         var decoode_result = RtuSlaveReadCodec.DecodeRequest(encode_buffer, layout);
-        Assert.IsTrue(decoode_result, decoode_result.Message);
+        Assert.IsTrue(decoode_result.IsSuccess, decoode_result.Message);
 
 
         var request_header = request_header_result.Value;
@@ -92,7 +92,7 @@ public sealed class RtuCodecTest
     {
         // 布局
         var layout_result = RtuWriteMultipleRequestLayout.FromCoilsQuantity(2);
-        Assert.IsTrue(layout_result, layout_result.Message);
+        Assert.IsTrue(layout_result.IsSuccess, layout_result.Message);
         Span<byte> buffer = stackalloc byte[layout_result.Value.TotalLength];
 
         // 请求头
@@ -116,7 +116,7 @@ public sealed class RtuCodecTest
     {
         // 布局
         var layout_result = RtuWriteMultipleRequestLayout.FromRegistersQuantity(2);
-        Assert.IsTrue(layout_result, layout_result.Message);
+        Assert.IsTrue(layout_result.IsSuccess, layout_result.Message);
         Span<byte> buffer = stackalloc byte[layout_result.Value.TotalLength];
 
         // 请求头

@@ -4,7 +4,7 @@
 /// <summary>
 /// 字布局
 /// </summary>
-[Obsolete("直接用端序 Endianness")]
+[Obsolete("直接用端序 Endianness", true)]
 public readonly struct WordLayout
 {
     /// <summary>
@@ -41,7 +41,7 @@ public readonly struct WordLayout
         if ((swap & ~ValidSwapMask) != 0)
             return Result.InvalidParameter<WordLayout>($"不支持的字节组合模式: [{endianness}] {swap}");
 
-        return new WordLayout(endianness, swap);
+        return Result.Ok(new WordLayout(endianness, swap));
     }
     public static Result<WordLayout> FromLittleEndian(ByteSwap swap)
     {
