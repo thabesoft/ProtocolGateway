@@ -33,7 +33,7 @@ public sealed class IconService : IIconService, IDataTemplate
     {
         if(param is string str)
         {
-            return IconName.Create(str).Bind(x => GetIcon(x)).Value;
+            return IconName.Create(str).Bind(x => GetIcon(x)).GetValueOrDefault(null);
         }
 
         if(param is IconName name)

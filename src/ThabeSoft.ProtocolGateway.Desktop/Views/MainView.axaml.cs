@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Desktop.ViewModels;
 

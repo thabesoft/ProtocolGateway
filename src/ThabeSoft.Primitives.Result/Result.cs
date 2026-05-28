@@ -97,8 +97,9 @@ public readonly struct Result<TValue> : IResult<TValue>
     public ErrorType ErrorType { get; }
     /// <summary> 消息 </summary>
     public string? Message { get; }
-    /// <summary> 值 </summary>
-    public TValue Value { get; }
+    /// <summary> 值, 当结果为错误的时候访问会抛出异常 </summary>
+    /// <exception cref="InvalidOperationException">当结果是错误的时候访问抛出</exception>
+    public TValue Value => IsSuccess ? field : throw new InvalidOperationException("Cannot access Value of a failed Result.");
 
 
     private Result(bool isSuccess, ErrorType errorType, string? message, TValue value)

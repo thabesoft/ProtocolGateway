@@ -1,5 +1,4 @@
 ﻿using Avalonia.Controls;
-using Avalonia.Controls.Templates;
 using ThabeSoft.ProtocolGateway.Desktop.Models;
 
 namespace ThabeSoft.ProtocolGateway.Desktop.Services;
@@ -8,7 +7,7 @@ namespace ThabeSoft.ProtocolGateway.Desktop.Services;
 /// <summary>
 /// 图标业务
 /// </summary>
-public interface IIconService : IIconProvider, IIconRegistry, IDataTemplate;
+public interface IIconService : IIconProvider, IIconRegistry;
 
 
 /// <summary>
