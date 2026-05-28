@@ -18,7 +18,7 @@ public static partial class ResultPipeExtensions
                 var result =  pipe.Execute();
                 if (!result.IsSuccess)
                 {
-                    return Result.Error<U>(result.ErrorType, result.Message);
+                    return Result.Error<U>(result.ErrorType, result.Message!);
                 }
 
                 return Result.Ok(handler(result.Value));
