@@ -2,8 +2,8 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.Hosting;
-using ProtocolGateway.UI.Views;
 using ThabeSoft.ProtocolGateway.DependencyInjection;
+using ThabeSoft.ProtocolGateway.UI.Views;
 
 namespace ThabeSoft.ProtocolGateway.Desktop;
 
@@ -15,10 +15,7 @@ public class App : Application
     public App()
     {
         _host = Host.CreateDefaultBuilder()
-            .ConfigureServices((context, services) =>
-            {
-                services.AddProtocolGateway();
-            })
+            .ConfigureServices((_, services) => services.AddProtocolGateway())
             .Build();
     }
 
@@ -32,8 +29,10 @@ public class App : Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.MainWindow = new MainWindow();
+            desktop.MainWindow.Closed += async delegate { await _host.StopAsync(); };
         }
 
+        _host.Start();
         base.OnFrameworkInitializationCompleted();
     }
 }

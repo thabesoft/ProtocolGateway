@@ -1,6 +1,6 @@
 using Avalonia.Controls;
 
-namespace ProtocolGateway.UI.Views;
+namespace ThabeSoft.ProtocolGateway.UI.Views;
 
 
 public partial class MainView : UserControl
