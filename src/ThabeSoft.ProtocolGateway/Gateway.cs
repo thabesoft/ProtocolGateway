@@ -61,7 +61,7 @@ public sealed class Gateway : IGateway
         where TValue : unmanaged
     {
         // 是否启用
-        if (_channelOptions.TryGetValue(tag.ChannelName, out var opts) || !opts.IsSuspend)
+        if (_channelOptions.TryGetValue(tag.ChannelName, out var opts) || opts?.IsSuspend != true)
         {
             var result = Result.InvalidOperation<TValue>($"无法读取, 通道 [{tag.ChannelName}] 已禁用");
             return new ValueTask<Result<TValue>>(result);
@@ -74,7 +74,7 @@ public sealed class Gateway : IGateway
         where TValue : unmanaged
     {
         // 是否启用
-        if (_channelOptions.TryGetValue(tag.ChannelName, out var opts) || !opts.IsSuspend)
+        if (_channelOptions.TryGetValue(tag.ChannelName, out var opts) || opts?.IsSuspend != true)
         {
             var result = Result.InvalidOperation($"无法写入, 通道 [{tag.ChannelName}] 已禁用");
             return new ValueTask<Result>(result);

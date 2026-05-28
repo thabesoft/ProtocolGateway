@@ -148,7 +148,7 @@ public static partial class ResultPipeExtensions
                 var (pipe, next) = data;
 
                 var result = await pipe.ExecuteAsync(ct);
-                if (!result.IsSuccess) return next.Invoke();
+                if (result.IsSuccess) return next.Invoke();
 
                 return result;
             }
@@ -161,11 +161,10 @@ public static partial class ResultPipeExtensions
                 (IAsyncResultPipe<Result>, Func<ValueTask<Result<T>>>) data, CancellationToken ct)
             {
                 var (pipe, next) = data;
-
                 var result = await pipe.ExecuteAsync(ct);
-                if (!result.IsSuccess) return default!;
 
-                return await next.Invoke();
+                if (result.IsSuccess) return await next.Invoke();
+                return result.PropagateError<T>();
             }
 
             return Create((pipe, next), Handler);
@@ -180,7 +179,7 @@ public static partial class ResultPipeExtensions
                 var (pipe, next) = data;
 
                 var result = await pipe.ExecuteAsync(ct);
-                if (!result.IsSuccess) return await next.Invoke(ct);
+                if (result.IsSuccess) return await next.Invoke(ct);
 
                 return result;
             }
@@ -196,7 +195,7 @@ public static partial class ResultPipeExtensions
                 var (pipe, next) = data;
 
                 var result = await pipe.ExecuteAsync(ct);
-                if (!result.IsSuccess) return await next.Invoke(ct);
+                if (result.IsSuccess) return await next.Invoke(ct);
 
                 return result.PropagateError<U>();
             }
@@ -217,11 +216,10 @@ public static partial class ResultPipeExtensions
                 CancellationToken ct)
             {
                 var (pipe, next) = data;
-
                 var result = await pipe.ExecuteAsync(ct);
-                if (!result.IsSuccess) return Result.Error(result.ErrorType, result.Message);
 
-                return next.Invoke();
+                if (result.IsSuccess) return next.Invoke();
+                return result.PropagateError<T>();
             }
 
             return Create((pipe, next), Handler);
@@ -233,11 +231,10 @@ public static partial class ResultPipeExtensions
                 CancellationToken ct)
             {
                 var (pipe, next) = data;
-
                 var result = await pipe.ExecuteAsync(ct);
-                if (!result.IsSuccess) return Result.Error<U>(result.ErrorType, result.Message);
 
-                return next.Invoke();
+                if (result.IsSuccess) return next.Invoke();
+                return result.PropagateError<U>();
             }
 
             return Create((pipe, next), Handler);
@@ -251,11 +248,10 @@ public static partial class ResultPipeExtensions
                 CancellationToken ct)
             {
                 var (pipe, next) = data;
-
                 var result = await pipe.ExecuteAsync(ct);
-                if (!result.IsSuccess) return Result.Error(result.ErrorType, result.Message);
 
-                return next.Invoke(result.Value);
+                if (result.IsSuccess) return next.Invoke(result.Value);
+                return result.PropagateError<T>();
             }
 
             return Create((pipe, next), Handler);
@@ -269,9 +265,9 @@ public static partial class ResultPipeExtensions
                 var (pipe, next) = data;
 
                 var result = await pipe.ExecuteAsync(ct);
-                if (!result.IsSuccess) return Result.Error<U>(result.ErrorType, result.Message);
 
-                return next.Invoke(result.Value);
+                if (result.IsSuccess) return next.Invoke(result.Value);
+                return result.PropagateError<U>();
             }
 
             return Create((pipe, next), Handler);
@@ -319,7 +315,7 @@ public static partial class ResultPipeExtensions
                 var (pipe, next) = data;
 
                 var result = await pipe.ExecuteAsync(ct);
-                if (!result.IsSuccess) return Result.Error(result.ErrorType, result.Message);
+                if (!result.IsSuccess) return Result.Error(result.ErrorType, result.Message!);
 
                 return await next.Invoke(result.Value);
             }
@@ -335,7 +331,7 @@ public static partial class ResultPipeExtensions
                 var (pipe, next) = data;
 
                 var result = await pipe.ExecuteAsync(ct);
-                if (!result.IsSuccess) return Result.Error<U>(result.ErrorType, result.Message);
+                if (!result.IsSuccess) return Result.Error<U>(result.ErrorType, result.Message!);
 
                 return await next.Invoke(result.Value);
             }
@@ -353,7 +349,7 @@ public static partial class ResultPipeExtensions
                 var (pipe, next) = data;
 
                 var result = await pipe.ExecuteAsync(ct);
-                if (!result.IsSuccess) return Result.Error(result.ErrorType, result.Message);
+                if (!result.IsSuccess) return Result.Error(result.ErrorType, result.Message!);
 
                 return await next.Invoke(result.Value, ct);
             }
@@ -369,7 +365,7 @@ public static partial class ResultPipeExtensions
                 var (pipe, next) = data;
 
                 var result = await pipe.ExecuteAsync(ct);
-                if (!result.IsSuccess) return Result.Error<U>(result.ErrorType, result.Message);
+                if (!result.IsSuccess) return Result.Error<U>(result.ErrorType, result.Message!);
 
                 return await next.Invoke(result.Value, ct);
             }

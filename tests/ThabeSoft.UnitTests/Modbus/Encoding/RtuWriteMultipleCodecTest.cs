@@ -129,8 +129,4 @@ public sealed class RtuCodecTest
         // 打印
         Console.WriteLine(buffer.ToHexString());
     }
-
-
-
-    
 }

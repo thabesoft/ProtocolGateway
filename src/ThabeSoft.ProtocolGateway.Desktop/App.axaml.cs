@@ -5,7 +5,7 @@ using Microsoft.Extensions.Hosting;
 using ProtocolGateway.UI.Views;
 using ThabeSoft.ProtocolGateway.DependencyInjection;
 
-namespace ProtocolGateway.UI;
+namespace ThabeSoft.ProtocolGateway.Desktop;
 
 
 public class App : Application
