@@ -312,6 +312,34 @@ public static class ByteExtensions
             buffer.CopyTo(destination);
             return Result.Ok();
         }
+    
+        public Result<uint> ToDWord(DWordLayout layout = default)
+        {
+            if(source.Length < 4)
+            {
+                return Result.InvalidParameter<uint>("字组转双字失败, 至少需要4个字节");
+            }
+
+            Span<byte> buffer = stackalloc byte[4];
+            var to_result = source.ToBytes(buffer);
+            if (!to_result.IsSuccess) return to_result.PropagateError<uint>();
+
+            return buffer.ToDWord(layout);
+        }
+
+        public Result<ulong> ToQWord(QWordLayout layout = default)
+        {
+            if (source.Length < 8)
+            {
+                return Result.InvalidParameter<ulong>("字组转双字失败, 至少需要8个字节");
+            }
+
+            Span<byte> buffer = stackalloc byte[8];
+            var to_result = source.ToBytes(buffer);
+            if (!to_result.IsSuccess) return to_result.PropagateError<ulong>();
+
+            return buffer.ToQWord(layout);
+        }
     }
     /// <summary>
     /// 字
@@ -346,6 +374,63 @@ public static class ByteExtensions
     }
 
 
+    /// <summary>
+    /// 双子组
+    /// </summary>
+    extension(ReadOnlySpan<uint> source)
+    {
+        /// <summary>
+        /// 将 ushort 数组转换为字节数组
+        /// </summary>
+        /// <param name="destination">目标字节缓冲区</param>
+        /// <param name="endianness">字节序，默认大端</param>
+        public Result ToBytes(Span<byte> destination, Endianness endianness = default)
+        {
+            // 元数据数量
+            var source_count = source.Length;
+            // 元数据字节数量
+            var source_byte_count = source_count * 4;
+
+
+            if (destination.Length < source_byte_count)
+            {
+                return Result.Error(ErrorType.InvalidParameter,
+                    $"DWord[] 转 Byte[] 失败, Byte[] 缓冲区不足，至少需要 {source_byte_count} 字节，实际 {destination.Length} 字节");
+            }
+
+            // 暂存数据
+            Span<byte> buffer = stackalloc byte[source_byte_count];
+
+            for (int source_index = 0; source_index < source_count; source_index++)
+            {
+                var byte_start = source_index * 4;
+                const int byte_length = 4;
+                var byte_range = buffer.Slice(byte_start, byte_length);
+
+                var result = source[source_index].ToBytes(byte_range, endianness);
+                if (!result.IsSuccess) return result;
+            }
+
+            // 全部拷贝至目标
+            buffer.CopyTo(destination);
+            return Result.Ok();
+        }
+
+
+        public Result<ulong> ToQWord(QWordLayout layout = default)
+        {
+            if (source.Length < 8)
+            {
+                return Result.InvalidParameter<ulong>("字组转双字失败, 至少需要8个字节");
+            }
+
+            Span<byte> buffer = stackalloc byte[8];
+            var to_result = source.ToBytes(buffer);
+            if (!to_result.IsSuccess) return to_result.PropagateError<ulong>();
+
+            return buffer.ToQWord(layout);
+        }
+    }
     /// <summary>
     /// 双字
     /// </summary>

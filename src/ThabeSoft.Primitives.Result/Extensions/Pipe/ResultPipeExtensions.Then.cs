@@ -61,7 +61,7 @@ public static partial class ResultPipeExtensions
                 var result = pipe.Execute();
                 if (!result.IsSuccess) return next.Invoke();
 
-                return result.PropagateError<U>();
+                return result.PropagateError<T>();
             }
 
             return Create((pipe, next), Handler);

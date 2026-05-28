@@ -18,9 +18,7 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
     private ISerialOptions? _options;
     private SerialPort? port;
 
-    private readonly SemaphoreSlim _lock = new(1, 1);
-    private readonly SemaphoreSlim _readLock = new(1, 1);
-    private readonly SemaphoreSlim _writeLock = new(1, 1);
+    private readonly SerialPortLock _lock = new();
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -58,7 +56,7 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
 
         State = TransporterState.Connecting;
 
-        await _lock.WaitAsync(cancellation);
+        using var _ = await _lock.GetConfigLockAsync();
 
         try
         {
@@ -92,10 +90,6 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
             State = TransporterState.Faulted;
             return Result.InvalidOperation( $"串口连接失败: {ex.Message}");
         }
-        finally
-        {
-            _lock.Release();
-        }
     }
 
     public async ValueTask<Result> DisconnectAsync(CancellationToken cancellation = default)
@@ -106,7 +100,7 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
         }
 
         State = TransporterState.Disconnecting;
-        await _lock.WaitAsync(cancellation);
+        using var _ = await _lock.GetConfigLockAsync();
 
         try
         {
@@ -119,24 +113,19 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
             State = TransporterState.Faulted;
             return Result.InvalidOperation( $"断开连接时发生错误: {ex.Message}");
         }
-        finally
-        {
-            _lock.Release();
-        }
     }
 
 
     public async ValueTask<Result> ReadExactAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
     {
         if (port?.IsOpen != true || State != TransporterState.Connected)
-        {
             return Result.Error<int>(ErrorType.InvalidOperation, "未连接无法读取数据");
-        }
 
-        var result = GetReadLock();
-        if (!result.IsSuccess) return result.PropagateError<int>();
+        if (_options is null) 
+            return Result.InvalidOperation("串口未配置, 无法读取数据");
 
-        await result.Value.WaitAsync(cancellationToken);
+
+        //using var _ = await _lock.GetReadLockAsync(_options.DuplexMode);
 
         try
         {
@@ -151,22 +140,17 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
         {
             return Result.InvalidOperation<int>("连接意外中断");
         }
-        finally
-        {
-            result.Value.Release();
-        }
     }
     public async ValueTask<Result> WriteAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
     {
         if (port?.IsOpen != true || State != TransporterState.Connected)
-        {
             return Result.Error(ErrorType.InvalidOperation, "未连接无法写入数据");
-        }
 
-        var result = GetWriteLock();
-        if (!result.IsSuccess) return result;
+        if (_options is null)
+            return Result.InvalidOperation("串口未配置, 无法写入数据");
 
-        await result.Value.WaitAsync(cancellationToken);
+
+        //using var _ = await _lock.GetWriteLockAsync(_options.DuplexMode);
 
         try
         {
@@ -177,10 +161,6 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
         {
             return Result.Error(ErrorType.InvalidOperation, "串口已关闭");
         }
-        finally
-        {
-            result.Value.Release();
-        }
     }
 
 
@@ -188,7 +168,7 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
     {
         if (State == TransporterState.Disposed) return;
 
-        await _lock.WaitAsync();
+        using var _ = await _lock.GetConfigLockAsync();
 
         try
         {
@@ -207,39 +187,7 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
             port = null;
 
             State = TransporterState.Disposed;
-            _lock.Release();
         }
-    }
-
-
-    private Result<SemaphoreSlim> GetReadLock()
-    {
-        if (_options is null)
-        {
-            return Result.Error<SemaphoreSlim>(ErrorType.InvalidOperation, "未配置串口");
-        }
-
-        if(_options.DuplexMode == DuplexMode.FullDuplex)
-        {
-             return Result.Ok(_readLock);
-        }
-
-        return Result.Ok(_lock);
-    }
-
-    private Result<SemaphoreSlim> GetWriteLock()
-    {
-        if (_options is null)
-        {
-            return Result.Error<SemaphoreSlim>(ErrorType.InvalidOperation, "未配置串口");
-        }
-
-        if (_options.DuplexMode == DuplexMode.FullDuplex)
-        {
-            return Result.Ok(_writeLock);
-        }
-
-        return Result.Ok(_lock);
     }
 
 
@@ -259,5 +207,87 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
         {
             return Result.Error<SerialPort>(ErrorType.InvalidOperation, $"无法创建串口: {ex.Message}");
         }
+    }
+}
+
+
+
+/// <summary>
+/// 串口锁
+/// </summary>
+internal sealed class SerialPortLock
+{
+    private readonly SemaphoreSlim _fullDuplexReadLock = new(1, 1);
+    private readonly SemaphoreSlim _fullDuplexWriteLock = new(1, 1);
+    private readonly SemaphoreSlim _halfDuplexLock = new(1, 1);
+    private readonly SemaphoreSlim _configLock = new(1, 1);
+
+    public async Task<IDisposable> GetReadLockAsync(DuplexMode mode)
+    {
+        await _configLock.WaitAsync();
+        _configLock.Release();
+
+        if (mode == DuplexMode.FullDuplex)
+            return await _fullDuplexReadLock.LockAsync();
+        else
+            return await _halfDuplexLock.LockAsync();
+    }
+
+    public async Task<IDisposable> GetWriteLockAsync(DuplexMode mode)
+    {
+        await _configLock.WaitAsync();
+        _configLock.Release();
+
+        if (mode == DuplexMode.FullDuplex)
+            return await _fullDuplexWriteLock.LockAsync();
+        else
+            return await _halfDuplexLock.LockAsync();
+    }
+
+    public async Task<IDisposable> GetConfigLockAsync()
+    {
+        // 获取配置锁，阻止新的读写
+        await _configLock.WaitAsync();
+
+        // 等待所有正在进行的操作完成
+        await _fullDuplexReadLock.WaitAsync();
+        await _fullDuplexWriteLock.WaitAsync();
+        await _halfDuplexLock.WaitAsync();
+
+        return new ConfigLockReleaser(this);
+    }
+
+    private class ConfigLockReleaser(SerialPortLock parent) : IDisposable
+    {
+        public void Dispose()
+        {
+            parent._halfDuplexLock.Release();
+            parent._fullDuplexWriteLock.Release();
+            parent._fullDuplexReadLock.Release();
+            parent._configLock.Release();
+        }
+    }
+}
+
+internal static class SemaphoreSlimExtensions
+{
+    extension(SemaphoreSlim slim)
+    {
+        public Releaser Lock()
+        {
+            slim.Wait();
+            return new Releaser(slim);
+        }
+
+        public async Task<Releaser> LockAsync()
+        {
+            await slim.WaitAsync();
+            return new Releaser(slim);
+        }
+    }
+
+    public readonly struct Releaser(SemaphoreSlim slim) : IDisposable
+    {
+        public void Dispose() => slim.Release();
     }
 }

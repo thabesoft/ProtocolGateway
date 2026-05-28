@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Reactive.Linq;
 using ThabeSoft.Primitives;
 
 namespace ThabeSoft.ProtocolGateway;
@@ -13,8 +14,6 @@ public sealed class Gateway : IGateway
     private readonly ConcurrentDictionary<ChannelName, IChannel> _channels = new();
     // 通道运行时配置
     private readonly ConcurrentDictionary<ChannelName, ChannelRuntimeOptions> _channelOptions = [];
-    // 通道管理器
-    private readonly ConcurrentDictionary<ChannelName, IChannelManager> _channelManagers = [];
 
 
     // 添加
@@ -27,7 +26,6 @@ public sealed class Gateway : IGateway
 
         _channels[name] = channel;
         _channelOptions[name] = new();
-        _channelManagers[name] = new ChannelManager(this, name);
 
         return Result.Ok();
     }
@@ -35,8 +33,6 @@ public sealed class Gateway : IGateway
     public Result RemoveChannel(ChannelName name)
     {
         _channelOptions.TryRemove(name, out _);
-        _channelManagers.TryRemove(name, out _);
-
 
         if (!_channels.TryRemove(name, out _))
         {
@@ -45,27 +41,99 @@ public sealed class Gateway : IGateway
 
         return Result.Ok();
     }
-    // 获取
-    public Result<IChannelManager> GetChannel(ChannelName name)
-    {
-        if (!_channelManagers.TryGetValue(name, out var manager))
-        {
-            return Result.InvalidOperation<IChannelManager>($"未查询到通道管理器 [{name}]");
-        }
 
-        return Result.Ok(manager);
+
+    // 启用
+    public Result ResumeChannel(ChannelName name)
+    {
+        return GetChannelOptions(name).Tap(x => x.IsSuspend = false);
     }
+    // 禁用
+    public Result SuspendChannel(ChannelName name)
+    {
+        return GetChannelOptions(name).Tap(x => x.IsSuspend = true);
+    }
+
+
+
     // 读取
     public ValueTask<Result<TValue>> ReadAsync<TValue>(IRoutableTag<TValue> tag, CancellationToken cancellationToken = default)
         where TValue : unmanaged
     {
         // 是否启用
-        if (_channelOptions.TryGetValue(tag.ChannelName, out var opts) && !opts.IsEnabled)
+        if (_channelOptions.TryGetValue(tag.ChannelName, out var opts) || !opts.IsSuspend)
         {
             var result = Result.InvalidOperation<TValue>($"无法读取, 通道 [{tag.ChannelName}] 已禁用");
             return new ValueTask<Result<TValue>>(result);
         }
 
+        return InternalReadAsync(tag, cancellationToken);
+    }
+    // 写入
+    public ValueTask<Result> WriteAsync<TValue>(IRoutableTag<TValue> tag, TValue value, CancellationToken cancellationToken = default)
+        where TValue : unmanaged
+    {
+        // 是否启用
+        if (_channelOptions.TryGetValue(tag.ChannelName, out var opts) || !opts.IsSuspend)
+        {
+            var result = Result.InvalidOperation($"无法写入, 通道 [{tag.ChannelName}] 已禁用");
+            return new ValueTask<Result>(result);
+        }
+
+        return InternalWriteAsync(tag, value, cancellationToken);
+    }
+    // 轮询
+    public IObservable<Result<TValue>> Poll<TValue>(IRoutableTag<TValue> tag) where TValue : unmanaged
+    {
+        return Observable.Create<Result<TValue>>(async (observer, ct) =>
+        {
+            var interval = TimeSpan.FromMilliseconds(100);
+
+            while (!ct.IsCancellationRequested)
+            {
+                try
+                {
+                    var options = GetChannelOptions(tag.ChannelName).Bind(x => x.IsSuspend);
+                    if (!options.IsSuccess || options.Value)
+                    {
+                        await Task.Delay(10, ct);
+                        continue;
+                    }
+
+                    var result = await InternalReadAsync(tag, ct);
+                    observer.OnNext(result);
+                }
+                catch(OperationCanceledException)
+                {
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    observer.OnNext(Result.InvalidData<TValue>(ex.Message));
+                }
+
+                await Task.Delay(interval, ct);
+            }
+
+            observer.OnCompleted();
+        });
+    }
+
+
+    // 释放
+    public void Dispose()
+    {
+        _channels.Clear();
+        _channelOptions.Clear();
+    }
+
+
+
+
+
+    private ValueTask<Result<TValue>> InternalReadAsync<TValue>(IRoutableTag<TValue> tag, CancellationToken cancellationToken = default)
+        where TValue : unmanaged
+    {
         // 查询通道
         if (!_channels.TryGetValue(tag.ChannelName, out var channel))
         {
@@ -83,16 +151,9 @@ public sealed class Gateway : IGateway
         return readable.ReadAsync(tag, cancellationToken);
     }
     // 写入
-    public ValueTask<Result> WriteAsync<TValue>(IRoutableTag<TValue> tag, TValue value, CancellationToken cancellationToken = default)
+    private ValueTask<Result> InternalWriteAsync<TValue>(IRoutableTag<TValue> tag, TValue value, CancellationToken cancellationToken = default)
         where TValue : unmanaged
     {
-        // 是否启用
-        if (_channelOptions.TryGetValue(tag.ChannelName, out var opts) && !opts.IsEnabled)
-        {
-            var result = Result.InvalidOperation($"无法写入, 通道 [{tag.ChannelName}] 已禁用");
-            return new ValueTask<Result>(result);
-        }
-
         // 查询通道
         if (!_channels.TryGetValue(tag.ChannelName, out var channel))
         {
@@ -109,25 +170,7 @@ public sealed class Gateway : IGateway
         // 写入
         return writable.WriteAsync(tag, value, cancellationToken);
     }
-    // 释放
-    public void Dispose()
-    {
-        _channels.Clear();
-        _channelOptions.Clear();
-        _channelManagers.Clear();
-    }
 
-
-    // 启用
-    public Result EnableChannel(ChannelName name)
-    {
-        return GetChannelOptions(name).Tap(x => x.IsEnabled = true);
-    }
-    // 禁用
-    public Result DisableChannel(ChannelName name)
-    {
-        return GetChannelOptions(name).Tap(x => x.IsEnabled = false);
-    }
     // 获取通道配置
     private Result<ChannelRuntimeOptions> GetChannelOptions(ChannelName name)
     {

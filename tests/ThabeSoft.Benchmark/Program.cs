@@ -4,4 +4,6 @@ using ThabeSoft.Benchmark.Modbus.Encoding;
 
 //BenchmarkRunner.Run<Benchmark>();
 
-BenchmarkRunner.Run<Benchmark>();
+//BenchmarkRunner.Run<Benchmark>();
+
+await ModbusTest.Fuck();

@@ -5,5 +5,8 @@
 /// </summary>
 internal sealed class ChannelRuntimeOptions
 {
-    public bool IsEnabled { get; set; } = true;
+    /// <summary>
+    /// 是否暂停了
+    /// </summary>
+    public bool IsSuspend { get; set; }
 }

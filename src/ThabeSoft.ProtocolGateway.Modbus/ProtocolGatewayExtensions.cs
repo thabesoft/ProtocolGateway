@@ -13,7 +13,7 @@ public static class ProtocolGatewayExtensions
         /// </summary>
         /// <param name="name">通道名称</param>
         /// <param name="master">Modbus主站</param>
-        public ModbusChannel AddChannel(ChannelName name, IModbusMaster master)
+        public ModbusChannel AddModbusChannel(ChannelName name, IModbusMaster master)
         {
             ModbusChannel channel = new(master);
             gateway.AddChannel(name, channel);
@@ -26,7 +26,7 @@ public static class ProtocolGatewayExtensions
         /// </summary>
         /// <param name="name">通道名称</param>
         /// <param name="master">Modbus主站</param>
-        public Result<ModbusChannel> AddChannel(string name, IModbusMaster master)
+        public Result<ModbusChannel> AddModbusChannel(string name, IModbusMaster master)
         {
             ModbusChannel channel = new(master);
             gateway.AddChannel(name, channel);

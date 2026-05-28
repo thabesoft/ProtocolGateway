@@ -26,8 +26,4 @@
 		<ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway\ThabeSoft.ProtocolGateway.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Ports\" />
-	</ItemGroup>
-
 </Project>

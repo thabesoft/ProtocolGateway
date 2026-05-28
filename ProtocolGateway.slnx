@@ -14,6 +14,7 @@
     <Project Path="src/ThabeSoft.Modbus.Rtu.Master/ThabeSoft.Modbus.Rtu.Master.csproj" />
     <Project Path="src/ThabeSoft.Modbus.Rtu.Slave/ThabeSoft.Modbus.Rtu.Slave.csproj" />
     <Project Path="src/ThabeSoft.Modbus.Rtu/ThabeSoft.Modbus.Rtu.csproj" />
+    <Project Path="src/ThabeSoft.Modbus/ThabeSoft.Modbus.csproj" />
   </Folder>
   <Folder Name="/Modules/Ports/">
     <Project Path="src/ThabeSoft.Ports.Abstractions/ThabeSoft.Ports.Abstractions.csproj" />

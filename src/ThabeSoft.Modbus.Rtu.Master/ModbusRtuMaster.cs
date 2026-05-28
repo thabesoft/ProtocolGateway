@@ -15,8 +15,12 @@ namespace ThabeSoft.Modbus;
 /// </summary>
 public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
 {
+    private readonly SemaphoreSlim _lock = new(1, 1);
+
     public async ValueTask<Result> ReadCoilsAsync(Memory<bool> destination, byte slaveId, ushort address, CancellationToken cancellationToken = default)
     {
+        using var _ = await _lock.LockAsync();
+
         // 请求头
         var request_header_result = ReadRequestHeader.Coils(slaveId, address, destination.Length);
         if (!request_header_result.IsSuccess) return request_header_result;
@@ -32,6 +36,8 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
     }
     public async ValueTask<Result> ReadDiscreteInputsAsync(Memory<bool> destination, byte slaveId, ushort address, CancellationToken cancellationToken = default)
     {
+        using var _ = await _lock.LockAsync();
+
         // 请求头
         var request_header_result = ReadRequestHeader.DiscreteInputs(slaveId, address, destination.Length);
         if (!request_header_result.IsSuccess) return request_header_result;
@@ -47,6 +53,8 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
     }
     public async ValueTask<Result> ReadHoldingRegistersAsync(Memory<ushort> destination, byte slaveId, ushort address, CancellationToken cancellationToken = default)
     {
+        using var _ = await _lock.LockAsync();
+
         var header_result = ReadRequestHeader.HoldingRegisters(slaveId, address, destination.Length);
         if (!header_result.IsSuccess) return header_result;
 
@@ -61,6 +69,8 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
     }
     public async ValueTask<Result> ReadInputRegistersAsync(Memory<ushort> destination, byte slaveId, ushort address, CancellationToken cancellationToken = default)
     {
+        using var _ = await _lock.LockAsync();
+
         var header_result = ReadRequestHeader.InputRegisters(slaveId, address, destination.Length);
         if (!header_result.IsSuccess) return header_result;
 
@@ -77,6 +87,8 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
 
     public async ValueTask<Result> WriteSingleCoilsAsync(byte slaveId, ushort address, bool value, CancellationToken cancellationToken = default)
     {
+        using var _ = await _lock.LockAsync();
+
         // 协议布局
         var layout = RtuWriteSingleLayout.Instance;
 
@@ -111,6 +123,8 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
     }
     public async ValueTask<Result> WriteSingleRegisterAsync(byte slaveId, ushort address, ushort value, CancellationToken cancellationToken = default)
     {
+        using var _ = await _lock.LockAsync();
+
         // 协议布局
         var layout = RtuWriteSingleLayout.Instance;
 
@@ -145,6 +159,8 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
     }
     public async ValueTask<Result> WriteMultipleCoilsAsync(byte slaveId, ushort address, ReadOnlyMemory<bool> values, CancellationToken cancellationToken = default)
     {
+        using var _ = await _lock.LockAsync();
+
         // 数据量
         var quantity_result = WriteCoilsQuantity.Create(values.Length);
         if (!quantity_result.IsSuccess) return quantity_result;
@@ -185,6 +201,8 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
     }
     public async ValueTask<Result> WriteMultipleRegistersAsync(byte slaveId, ushort address, ReadOnlyMemory<ushort> values, CancellationToken cancellationToken = default)
     {
+        using var _ = await _lock.LockAsync();
+
         // 数据量
         var quantity_result = WriteRegistersQuantity.Create(values.Length);
         if (!quantity_result.IsSuccess) return quantity_result;
@@ -391,7 +409,7 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
             // 数据长度
             var data_length = resp_header.Span[RtuReadResponseLayout.DataLengthIndex];
             // 剩余长度 (因为提前读了5个, 数据长度在第三个, 所以减去两个) 但是还有个Crc 数据2字节, 所以没变了
-            var tail_length = RtuReadResponseLayout.DataLengthIndex - data_length;
+            var tail_length = (current_length + data_length) - RtuErrorResponseLayout.TotalLength;
 
             var tail_span = destination.Slice(current_length, tail_length);
             return await port.ReadExactAsync(tail_span, cancellationToken);
@@ -402,5 +420,32 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
             var tail_span = destination.Slice(current_length, 3);
             return await port.ReadExactAsync(tail_span, cancellationToken);
         }
+    }
+}
+
+
+/// <summary>
+/// 信号量扩展
+/// </summary>
+internal static class SemaphoreSlimExtensions
+{
+    extension(SemaphoreSlim slim)
+    {
+        public Releaser Lock()
+        {
+            slim.Wait();
+            return new Releaser(slim);
+        }
+
+        public async Task<Releaser> LockAsync()
+        {
+            await slim.WaitAsync();
+            return new Releaser(slim);
+        }
+    }
+
+    public readonly struct Releaser(SemaphoreSlim slim) : IDisposable
+    {
+        public void Dispose() => slim.Release();
     }
 }
