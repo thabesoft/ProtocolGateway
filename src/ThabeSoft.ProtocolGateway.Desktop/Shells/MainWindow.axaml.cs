@@ -1,8 +1,8 @@
 using Avalonia.Controls;
 
-namespace ThabeSoft.ProtocolGateway.Desktop.Views;
+namespace ThabeSoft.ProtocolGateway.Shells;
 
-public partial class MainWindow : Window
+public sealed partial class MainWindow : Window
 {
     public MainWindow()
     {

@@ -1,0 +1,17 @@
+﻿using Avalonia.Controls;
+
+namespace ThabeSoft.ProtocolGateway.Services.View;
+
+
+/// <summary>
+/// 视图提供者
+/// </summary>
+public interface IViewProvider
+{
+    /// <summary>
+    /// 获取视图
+    /// </summary>
+    /// <param name="viewModel"></param>
+    /// <returns></returns>
+    Control? GetView(IViewModel viewModel);
+}

@@ -3,12 +3,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             xmlns:vm="using:ThabeSoft.ProtocolGateway.Desktop.ViewModels"
+             xmlns:local="using:ThabeSoft.ProtocolGateway.Shells"
+             xmlns:nav="using:ThabeSoft.ProtocolGateway.Navigation"
              xmlns:i="using:Avalonia.Xaml.Interactivity"
              xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
              Background="Transparent"
-             x:DataType="vm:MainViewModel"
-             x:Class="ThabeSoft.ProtocolGateway.Desktop.Views.MainView">
+             x:DataType="local:MainViewModel"
+             x:Class="ThabeSoft.ProtocolGateway.Shells.MainView">
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -55,18 +56,26 @@
 
         <!--菜单栏-->
         <ScrollViewer Width="100">
-            <ItemsControl ItemsSource="{Binding NavigationItems}">
+            <ItemsControl ItemsSource="{Binding MenuItemsSource}">
 
                 <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="vm:NavigationItemViewModel">
+                    <DataTemplate DataType="nav:NavigationMenuItemViewModel">
 
                         <RadioButton GroupName="Navigation"
                                      IsChecked="{Binding IsSelected}"
-                                     Classes="Navagate"
-                                     Content="{Binding Header}" >
+                                     Classes="Navagate" >
 
+                            <RadioButton.Content>
+                                <DockPanel>
+                                    <ContentPresenter DockPanel.Dock="Left"
+                                                      Content="{Binding Icon}" />
+                                    <TextBlock Text="{Binding Header}" />
+                                </DockPanel>
+                            </RadioButton.Content>
+
+                            <!--点击处理-->
                             <i:Interaction.Behaviors>
-                                <ia:EventTriggerBehavior  EventName="Click">
+                                <ia:EventTriggerBehavior EventName="Click">
                                     <ia:InvokeCommandAction Command="{Binding $parent[ItemsControl].DataContext.SelectMenuCommand}"
                                                             CommandParameter="{Binding}"/>
                                 </ia:EventTriggerBehavior >
@@ -89,7 +98,7 @@
         </ScrollViewer>
 
         <!--内容-->
-        <ContentPresenter Background="{DynamicResource ContentBackground}" Content=""/>
+        <ContentPresenter Padding="20" Background="{DynamicResource ContentBackground}" Content="{Binding Content}"/>
 
     </DockPanel>
 

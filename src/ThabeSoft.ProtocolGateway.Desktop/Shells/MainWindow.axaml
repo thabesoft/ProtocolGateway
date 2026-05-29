@@ -5,12 +5,13 @@
         mc:Ignorable="d"
         d:DesignWidth="800"
         d:DesignHeight="450"
-        xmlns:local="using:ThabeSoft.ProtocolGateway.Desktop.Views"
-        x:Class="ThabeSoft.ProtocolGateway.Desktop.Views.MainWindow"
+        x:Class="ThabeSoft.ProtocolGateway.Shells.MainWindow"
         xmlns:chrome="using:Avalonia.Controls.Chrome"
+        xmlns:vm="using:ThabeSoft.ProtocolGateway.Shells"
         ExtendClientAreaToDecorationsHint="True"
         SizeToContent="Manual"
         WindowDecorations="BorderOnly"
+        x:DataType="vm:MainWindowViewModel"
         Title="ProtocolGateway.Desktop">
 
     <Window.Resources>
@@ -95,8 +96,8 @@
 
         </DockPanel>
 
-        <!--主页-->
-        <local:MainView Margin="10" Grid.Row="1"/>
+        <!--内容-->
+        <ContentPresenter Grid.Row="1" Content="{Binding Content}" />
 
     </Grid>
 

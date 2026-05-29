@@ -1,14 +1,14 @@
 using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Controls.Templates;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using ThabeSoft.ProtocolGateway.Desktop.Views;
+using ThabeSoft.ProtocolGateway.Services;
 
-namespace ThabeSoft.ProtocolGateway.Desktop;
+namespace ThabeSoft.ProtocolGateway;
 
 
-public class App : Application
+public class App : Application, IDataTemplateRegistry, IApplicationLifetimeAccessor
 {
     private readonly IHost _host;
 
@@ -17,8 +17,12 @@ public class App : Application
         _host = Host.CreateDefaultBuilder()
             .ConfigureServices((_, services) =>
             {
-                services.AddProtocolGateway();
+                services.AddSingleton<IDataTemplateRegistry>(this);
+                services.AddSingleton<IApplicationLifetimeAccessor>(this);
+
+
                 services.AddProtocolGatewayDesktop();
+                services.AddProtocolGateway();
             })
             .Build();
     }
@@ -27,16 +31,20 @@ public class App : Application
     {
         AvaloniaXamlLoader.Load(this);
     }
-
-    public override void OnFrameworkInitializationCompleted()
+    public override async void OnFrameworkInitializationCompleted()
     {
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-        {
-            desktop.MainWindow = new MainWindow();
-            desktop.MainWindow.Closed += async delegate { await _host.StopAsync(); };
-        }
-
-        _host.Start();
+        await _host.StartAsync();
         base.OnFrameworkInitializationCompleted();
+    }
+
+
+    void IDataTemplateRegistry.Add(IDataTemplate dataTemplate)
+    {
+        if (DataTemplates.Contains(dataTemplate)) return;
+        DataTemplates.Add(dataTemplate);
+    }
+    async Task IApplicationLifetimeAccessor.ShutdownAsync()
+    {
+        await _host.StopAsync();
     }
 }

@@ -1,6 +1,6 @@
 ﻿using ThabeSoft.Primitives;
 
-namespace ThabeSoft.ProtocolGateway.Desktop.Models;
+namespace ThabeSoft.ProtocolGateway;
 
 
 /// <summary>

@@ -1,6 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection.Extensions;
-using ThabeSoft.ProtocolGateway.Desktop.Services;
-using ThabeSoft.ProtocolGateway.Desktop.Services.Hosted;
+using ThabeSoft.ProtocolGateway;
+using ThabeSoft.ProtocolGateway.Pages;
+using ThabeSoft.ProtocolGateway.Services;
+using ThabeSoft.ProtocolGateway.Services.Icon;
+using ThabeSoft.ProtocolGateway.Services.Locators;
+using ThabeSoft.ProtocolGateway.Services.View;
+using ThabeSoft.ProtocolGateway.Shells;
 
 #pragma warning disable IDE0130 // 命名空间与文件夹结构不匹配
 namespace Microsoft.Extensions.DependencyInjection;
@@ -19,14 +24,25 @@ public static class DependencyInjectionExtensions
         /// </summary>
         public void AddProtocolGatewayDesktop()
         {
-            // 图标
-            services.TryAddSingleton<IconService>();
-            services.TryAddSingleton<IIconService>(x => x.GetRequiredService<IconService>());
-            services.TryAddSingleton<IIconRegistry>(x => x.GetRequiredService<IconService>());
-            services.TryAddSingleton<IIconProvider>(x => x.GetRequiredService<IconService>());
+            // 视图模型
+            services.TryAddSingleton<IViewModelProvider, ViewModelProvider>(); // 视图模型提供者
+            services.TryAddSingleton<MainWindowViewModel>();         // 主窗口
+            services.TryAddSingleton<MainViewModel>();               // 主视图
+            services.TryAddSingleton<ChannelPageViewModel>();        // 通道
+            services.TryAddTransient<ChannelDetailsPageViewModel>(); // 通道详情
 
-            // 资源初始化
-            services.AddHostedService<ResourceInitialization>();
+            // 图标
+            services.TryAddSingleton<ProtocolTypeIconLocator>(); // 协议类型图标
+            services.TryAddSingleton<IconLocator>();
+            services.TryAddSingleton<IIconRegistry>(x => x.GetRequiredService<IconLocator>());
+            services.TryAddSingleton<IIconProvider>(x => x.GetRequiredService<IconLocator>());
+            // 视图
+            services.TryAddSingleton<ViewLocator>();
+            services.TryAddSingleton<IViewRegistry>(x => x.GetRequiredService<ViewLocator>());
+            services.TryAddSingleton<IViewProvider>(x => x.GetRequiredService<ViewLocator>());
+
+            // 后台业务
+            services.AddHostedService<Initialization>(); // 资源初始化
         }
     }
 }

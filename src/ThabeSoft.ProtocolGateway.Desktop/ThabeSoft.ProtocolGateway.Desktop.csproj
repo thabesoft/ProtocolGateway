@@ -9,12 +9,14 @@
 		<Nullable>enable</Nullable>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+		<RootNamespace>ThabeSoft.ProtocolGateway</RootNamespace>
 
 	</PropertyGroup>
 
 	<!--依赖包-->
 	<ItemGroup>
 		<PackageReference Include="Avalonia" Version="12.0.4" />
+		<PackageReference Include="Avalonia.Controls.DataGrid" Version="12.0.0" />
 		<PackageReference Include="Avalonia.Desktop" Version="12.0.4" />
 		<PackageReference Include="Avalonia.Themes.Fluent" Version="12.0.4" />
 		<PackageReference Include="Avalonia.Fonts.Inter" Version="12.0.4" />
@@ -29,12 +31,13 @@
 
 	<!--依赖项目-->
 	<ItemGroup>
+		<ProjectReference Include="..\ThabeSoft.ProtocolGateway.ViewModels\ThabeSoft.ProtocolGateway.ViewModels.csproj" />
 		<ProjectReference Include="..\ThabeSoft.ProtocolGateway\ThabeSoft.ProtocolGateway.csproj" />
 	</ItemGroup>
-
-
 	<ItemGroup>
-		<Folder Include="Views\Pages\" />
+	  <Compile Update="Pages\ChannelDetailsPage.axaml.cs">
+	    <DependentUpon>ChannelDetailsPage.axaml</DependentUpon>
+	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
