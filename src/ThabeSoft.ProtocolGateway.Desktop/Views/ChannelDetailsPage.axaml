@@ -1,0 +1,85 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+
+             xmlns:vm="using:ThabeSoft.ProtocolGateway.ViewModels"
+
+             x:Class="ThabeSoft.ProtocolGateway.Views.ChannelDetailsPage"
+
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="vm:ChannelDetailsPageViewModel">
+    <Grid RowDefinitions="Auto,1,Auto,*">
+
+        <!--工具栏-->
+        <DockPanel Height="40" Grid.Row="0">
+
+            <!--左侧-->
+            <Button DockPanel.Dock="Left"
+                    Command="{Binding BackCommand}"
+                    Content="返回"/>
+
+            <!--右侧功能-->
+            <StackPanel DockPanel.Dock="Right"
+                        Orientation="Horizontal">
+
+                <Button Content="运行" />
+                <Button Content="停止" />
+
+            </StackPanel>
+
+            <TextBlock Margin="10 0 0 0"
+                       VerticalAlignment="Center"
+                       DockPanel.Dock="Left"
+                       Text="{Binding Name}" />
+
+        </DockPanel>
+
+        <!--分界线-->
+        <Separator Margin="0" Height="1" Grid.Row="1" />
+
+        <!--状态-->
+        <UniformGrid IsVisible="False" Height="80" Grid.Row="2" Columns="4">
+
+            <Button Content="1"></Button>
+            <Button Content="2"></Button>
+            <Button Content="3"></Button>
+            <Button Content="4"></Button>
+
+        </UniformGrid>
+
+        <!--内容-->
+        <TabControl Grid.Row="3">
+
+            <TabItem Header="标签">
+                <DataGrid ItemsSource="{Binding Tags}">
+
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="名称" Binding="{Binding Name}" Width="Auto"/>
+                        <DataGridTextColumn Header="最新值" Binding="{Binding Value}" Width="80"/>
+                        <DataGridTextColumn Header="值类型" Binding="{Binding ValueType}" Width="80"/>
+                        <DataGridTextColumn Header="质量" Binding="{Binding ValueQuality}" Width="80"/>
+                        <DataGridTextColumn Header="时间戳" Binding="{Binding Timestamp}" Width="150"/>
+
+                        <!--就不能实现 判断当前的tag 是什么类型决定要不要绑定吗-->
+                        <DataGridTextColumn Header="从站 Id" Binding="{Binding SlaveId}" Width="Auto"/>
+                        <DataGridTextColumn Header="起始地址" Binding="{Binding Address}" Width="Auto"/>
+                        <DataGridTextColumn Header="功能码" Binding="{Binding FunctionCode}" Width="Auto"/>
+                    </DataGrid.Columns>
+
+                </DataGrid>
+            </TabItem>
+
+            <TabItem Header="日志">
+                <Button Content="日志" />
+            </TabItem>
+
+            <TabItem Header="配置">
+                <Button Content="配置" />
+            </TabItem>
+
+        </TabControl>
+
+    </Grid>
+
+</UserControl>

@@ -1,4 +1,6 @@
-﻿namespace ThabeSoft.ProtocolGateway.Services;
+﻿using ThabeSoft.ProtocolGateway.ViewModels;
+
+namespace ThabeSoft.ProtocolGateway.Services;
 
 
 /// <summary>

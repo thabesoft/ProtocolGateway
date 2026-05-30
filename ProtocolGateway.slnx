@@ -25,7 +25,7 @@
     <Project Path="tests/ThabeSoft.UnitTests/ThabeSoft.UnitTests.csproj" />
   </Folder>
   <Folder Name="/UI/">
+    <Project Path="src/ThabeSoft.ProtocolGateway.Application/ThabeSoft.ProtocolGateway.Application.csproj" />
     <Project Path="src/ThabeSoft.ProtocolGateway.Desktop/ThabeSoft.ProtocolGateway.Desktop.csproj" />
-    <Project Path="src/ThabeSoft.ProtocolGateway.ViewModels/ThabeSoft.ProtocolGateway.ViewModels.csproj" />
   </Folder>
 </Solution>

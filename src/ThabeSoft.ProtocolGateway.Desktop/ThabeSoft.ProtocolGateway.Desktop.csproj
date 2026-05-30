@@ -28,14 +28,14 @@
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.8" />
 		<PackageReference Include="Xaml.Behaviors.Avalonia" Version="12.0.0.1" />
 	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.Application\ThabeSoft.ProtocolGateway.Application.csproj" />
+	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway\ThabeSoft.ProtocolGateway.csproj" />
+	</ItemGroup>
 
 	<!--依赖项目-->
 	<ItemGroup>
-		<ProjectReference Include="..\ThabeSoft.ProtocolGateway.ViewModels\ThabeSoft.ProtocolGateway.ViewModels.csproj" />
-		<ProjectReference Include="..\ThabeSoft.ProtocolGateway\ThabeSoft.ProtocolGateway.csproj" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Compile Update="Pages\ChannelDetailsPage.axaml.cs">
+	  <Compile Update="Views\ChannelDetailsPage.axaml.cs">
 	    <DependentUpon>ChannelDetailsPage.axaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>

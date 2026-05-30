@@ -1,6 +1,7 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using ThabeSoft.ProtocolGateway.Services.View;
+using ThabeSoft.ProtocolGateway.ViewModels;
 
 namespace ThabeSoft.ProtocolGateway.Services.Locators;
 
