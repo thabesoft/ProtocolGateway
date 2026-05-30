@@ -11,12 +11,12 @@ public sealed class ChannelConfig
     /// <summary>
     /// 名称
     /// </summary>
-    public ChannelName Name { get; init; }
+    public required ChannelName Name { get; init; }
 
     /// <summary>
     /// 协议
     /// </summary>
-    public ProtocolType Protocol { get; init; }
+    public required ProtocolType Protocol { get; init; }
 
     /// <summary>
     /// 通信端口
@@ -26,5 +26,5 @@ public sealed class ChannelConfig
     /// <summary>
     /// 标签
     /// </summary>
-    public required TagConfig[] Tags { get; set; }
+    public TagConfig[] Tags { get; set; } = [];
 }
