@@ -1,6 +1,6 @@
 ﻿using ThabeSoft.Primitives;
 
-namespace ThabeSoft.ProtocolGateway.Converters;
+namespace ThabeSoft.ProtocolGateway;
 
 
 /// <summary>
@@ -15,7 +15,7 @@ public sealed class QWordConverter(QWordLayout layout) :
     public static QWordConverter LittleEndian { get; } = new(QWordLayout.LittleEndian);
 
 
-    private Result<ulong> Convert(ReadOnlySpan<byte> source)
+    private Result<ulong> From(ReadOnlySpan<byte> source)
     {
         if (source.Length < 8) return Result.Error<ulong>(ErrorType.InvalidParameter, "四字至少需要8字节");
 
@@ -23,18 +23,18 @@ public sealed class QWordConverter(QWordLayout layout) :
         source.Swap(destination, layout);
         return destination.ToQWord(layout);
     }
-    private Result Convert(ulong value, Span<byte> destination)
+    private Result To(ulong value, Span<byte> destination)
     {
         //TODO: 反向写入如何决定字节序
         return value.ToBytes(destination, layout);
     }
 
 
-    Result<ulong> IValueConverter<ulong>.From(ReadOnlySpan<byte> source) => Convert(source);
-    Result<long> IValueConverter<long>.From(ReadOnlySpan<byte> source) => Convert(source).Map(x => (long)x);
-    Result<double> IValueConverter<double>.From(ReadOnlySpan<byte> source) => Convert(source).Map(x => (double)x);
+    Result<ulong> IValueConverter<ulong>.From(ReadOnlySpan<byte> source) => From(source);
+    Result<long> IValueConverter<long>.From(ReadOnlySpan<byte> source) => From(source).Map(x => (long)x);
+    Result<double> IValueConverter<double>.From(ReadOnlySpan<byte> source) => From(source).Map(x => (double)x);
 
-    Result IValueConverter<ulong>.To(ulong source, Span<byte> destination) => Convert(source, destination);
-    Result IValueConverter<long>.To(long source, Span<byte> destination) => Convert((ulong)source, destination);
-    Result IValueConverter<double>.To(double source, Span<byte> destination) => Convert((ulong)source, destination);
+    Result IValueConverter<ulong>.To(ulong source, Span<byte> destination) => To(source, destination);
+    Result IValueConverter<long>.To(long source, Span<byte> destination) => To((ulong)source, destination);
+    Result IValueConverter<double>.To(double source, Span<byte> destination) => To((ulong)source, destination);
 }

@@ -61,10 +61,4 @@ public sealed partial class ChannelViewModel : ObservableObject, IViewModel
     {
         Console.WriteLine("Resume");
     }
-
-
-    public override string ToString()
-    {
-        return $"(通道名称={Name}, 协议类型={ProtocolType})";
-    }
 }

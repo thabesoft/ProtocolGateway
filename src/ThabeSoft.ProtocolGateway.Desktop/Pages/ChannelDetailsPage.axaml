@@ -4,77 +4,79 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              xmlns:vm="using:ThabeSoft.ProtocolGateway.Pages"
-             x:DataType="vm:ChannelPageViewModel"
+             xmlns:local="using:ThabeSoft.ProtocolGateway.Pages"
+             x:DataType="vm:ChannelDetailsPageViewModel"
              x:Class="ThabeSoft.ProtocolGateway.Pages.ChannelDetailsPage">
-    <Grid RowDefinitions="Auto,*">
+    <Grid RowDefinitions="Auto,1,Auto,*">
 
-        <!--顶部信息-->
-        <StackPanel Grid.Row="0" Orientation="Vertical">
+        <!--工具栏-->
+        <DockPanel Height="40" Grid.Row="0">
 
-            <!--信息-->
-            <UniformGrid Height="50" Columns="2">
+            <!--左侧-->
+            <Button DockPanel.Dock="Left"
+                    Command="{Binding BackCommand}"
+                    Content="返回"/>
 
-                <TextBlock VerticalAlignment="Center" Text="测试" />
-                <TextBlock VerticalAlignment="Center" Text="测试" />
+            <!--右侧功能-->
+            <StackPanel DockPanel.Dock="Right"
+                        Orientation="Horizontal">
 
-            </UniformGrid>
+                <Button Content="运行" />
+                <Button Content="停止" />
 
-            <!--工具栏-->
-            <DockPanel>
+            </StackPanel>
 
-                <TextBox DockPanel.Dock="Left" Text="HelloWorld!" />
-                <Button Margin="10 0" DockPanel.Dock="Left" Content="列"/>
+            <TextBlock Margin="10 0 0 0"
+                       VerticalAlignment="Center"
+                       DockPanel.Dock="Left"
+                       Text="{Binding Name}" />
 
-            </DockPanel>
+        </DockPanel>
 
-        </StackPanel>
+        <!--分界线-->
+        <Separator Margin="0" Height="1" Grid.Row="1" />
 
-        <DataGrid Margin="0 10 0 0" Grid.Row="1"
-                  ItemsSource="{Binding ChannelItemsSource}"
-                  AutoGenerateColumns="False"
-                  CanUserResizeColumns="True"
-                  CanUserSortColumns="True">
+        <!--状态-->
+        <UniformGrid IsVisible="False" Height="80" Grid.Row="2" Columns="4">
 
-            <DataGrid.Columns>
+            <Button Content="1"></Button>
+            <Button Content="2"></Button>
+            <Button Content="3"></Button>
+            <Button Content="4"></Button>
 
-                <DataGridTemplateColumn Header="名称" Width="Auto">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <HyperlinkButton Content="{Binding Name}"
-                                    Command="{Binding $parent[DataGrid].DataContext.OpenDetailsPageCommand}"
-                                    CommandParameter="{Binding}"
-                                    Classes="TextButton"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+        </UniformGrid>
 
-                <DataGridTextColumn Header="协议" Binding="{Binding ProtocolType}" Width="*" />
+        <!--内容-->
+        <TabControl Grid.Row="3">
 
-                <DataGridTemplateColumn Header="操作" Width="Auto">
+            <TabItem Header="标签">
+                <DataGrid ItemsSource="{Binding Tags}">
 
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <Button Content="🔗"
-                                        Command="{Binding ConnectCommand}"
-                                        Classes="DataGridButton"/>
-                                <Button Content="🚮"
-                                        Command="{Binding DisconnectCommand}"
-                                        Classes="DataGridButton"/>
-                                <Button Content="⏸"
-                                        Command="{Binding PauseCommand}"
-                                        ToolTip.Tip="启动"/>
-                                <Button Content="▶"
-                                        Command="{Binding ResumeCommand}"
-                                        ToolTip.Tip="停止"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="名称" Binding="{Binding Name}" Width="Auto"/>
+                        <DataGridTextColumn Header="最新值" Binding="{Binding Value}" Width="80"/>
+                        <DataGridTextColumn Header="值类型" Binding="{Binding ValueType}" Width="80"/>
+                        <DataGridTextColumn Header="质量" Binding="{Binding ValueQuality}" Width="80"/>
+                        <DataGridTextColumn Header="时间戳" Binding="{Binding Timestamp}" Width="150"/>
 
-            </DataGrid.Columns>
+                        <!--就不能实现 判断当前的tag 是什么类型决定要不要绑定吗-->
+                        <DataGridTextColumn Header="从站 Id" Binding="{Binding SlaveId}" Width="Auto"/>
+                        <DataGridTextColumn Header="起始地址" Binding="{Binding Address}" Width="Auto"/>
+                        <DataGridTextColumn Header="功能码" Binding="{Binding FunctionCode}" Width="Auto"/>
+                    </DataGrid.Columns>
 
-        </DataGrid>
+                </DataGrid>
+            </TabItem>
+
+            <TabItem Header="日志">
+                <Button Content="日志" />
+            </TabItem>
+
+            <TabItem Header="配置">
+                <Button Content="配置" />
+            </TabItem>
+
+        </TabControl>
 
     </Grid>
 

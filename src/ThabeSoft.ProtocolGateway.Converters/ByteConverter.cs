@@ -1,12 +1,14 @@
 ﻿using ThabeSoft.Primitives;
 
-namespace ThabeSoft.ProtocolGateway.Converters;
+namespace ThabeSoft.ProtocolGateway;
 
 
 /// <summary>
 /// 字节转换器
 /// </summary>
-public readonly struct ByteConverter : IValueConverter<byte>
+public readonly struct ByteConverter : 
+    IValueConverter<byte>,
+    IValueConverter<sbyte>
 {
 
     private readonly BitOrder _bitOrder;
@@ -22,7 +24,7 @@ public readonly struct ByteConverter : IValueConverter<byte>
     }
 
 
-    Result<byte> IValueConverter<byte>.From(ReadOnlySpan<byte> source)
+    public Result<byte> From(ReadOnlySpan<byte> source)
     {
         if (source.Length < 1) return Result.InvalidParameter<byte>("至少需要1字节");
         Span<bool> bits = stackalloc bool[8];
@@ -32,10 +34,20 @@ public readonly struct ByteConverter : IValueConverter<byte>
         if (!bits_result.IsSuccess) return bits_result.PropagateError<byte>();
         return bits.ToByte();
     }
-    Result IValueConverter<byte>.To(byte source, Span<byte> destination)
+    public  Result To(byte source, Span<byte> destination)
     {
         if (destination.Length < 1) return Result.InvalidParameter("缓冲区至少需要1字节");
         destination[0] = source;
         return Result.Ok();
+    }
+
+
+    Result<sbyte> IValueConverter<sbyte>.From(ReadOnlySpan<byte> source)
+    {
+        return From(source).Map(x => (sbyte)x);
+    }
+    Result IValueConverter<sbyte>.To(sbyte source, Span<byte> destination)
+    {
+        return To((byte)source, destination);
     }
 }

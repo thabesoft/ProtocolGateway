@@ -1,11 +1,10 @@
 ﻿namespace ThabeSoft.ProtocolGateway;
 
+
 /// <summary>
-/// 表示设备上一个数据的信息
+/// 标签
 /// </summary>
-/// <typeparam name="TValue">对应在C#中的具体类型</typeparam>
-public interface ITag<TValue>
-    where TValue : unmanaged
+public interface ITag
 {
     /// <summary>
     /// 地址
@@ -17,6 +16,19 @@ public interface ITag<TValue>
     /// </summary>
     int Length { get; }
 
+    /// <summary>
+    /// 值类型
+    /// </summary>
+    TagValueType ValueType { get; }
+}
+
+/// <summary>
+/// 表示设备上一个数据的信息
+/// </summary>
+/// <typeparam name="TValue">对应在C#中的具体类型</typeparam>
+public interface ITag<TValue> : ITag
+    where TValue : unmanaged
+{
     /// <summary>
     /// 值转换器
     /// </summary>

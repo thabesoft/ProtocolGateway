@@ -1,4 +1,6 @@
 using Avalonia.Controls;
+using Avalonia.Data;
+using ThabeSoft.ProtocolGateway.Tags;
 
 namespace ThabeSoft.ProtocolGateway.Pages;
 

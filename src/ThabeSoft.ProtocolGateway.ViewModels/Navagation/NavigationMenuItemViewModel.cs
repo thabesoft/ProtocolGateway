@@ -92,14 +92,4 @@ public sealed partial class NavigationMenuItemViewModel : ObservableObject, IVie
     {
         return Target.GetHashCode();
     }
-    // 
-    public override string ToString()
-    {
-        if (IsSelected)
-        {
-            return $"导航菜单:[(:已选择) 标题={Header}, 目标={Target}]";
-        }
-
-        return $"导航菜单:[标题={Header}, 目标={Target}]";
-    }
 }

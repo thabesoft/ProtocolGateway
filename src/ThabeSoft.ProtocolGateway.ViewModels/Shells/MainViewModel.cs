@@ -124,6 +124,7 @@ public sealed partial class MainViewModel(IViewModelProvider viewModelProvider) 
     public void NavigateTo(IViewModel target)
     {
         Content = target;
+        OnPropertyChanged(nameof(Content));
 
         // 查询菜单
         var vm_type = target.GetType();
@@ -136,17 +137,5 @@ public sealed partial class MainViewModel(IViewModelProvider viewModelProvider) 
         // 选择当前
         menu_item?.Select();
         SelectedMenuItem = menu_item;
-    }
-
-
-
-    public override string ToString()
-    {
-        if(Content is null)
-        {
-            return "主视图:无内容";
-        }
-
-        return $"主视图:[内容={Content}]";
     }
 }
