@@ -2,7 +2,6 @@
 using Avalonia.Media;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using ThabeSoft.ProtocolGateway.Enums;
 using ThabeSoft.ProtocolGateway.Services.Icon;
 using ThabeSoft.ProtocolGateway.Services.Locators;
 using ThabeSoft.ProtocolGateway.Services.View;

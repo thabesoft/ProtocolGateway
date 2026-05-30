@@ -1,6 +1,4 @@
-﻿using System.IO.Ports;
-
-namespace ThabeSoft.Ports.Options;
+﻿namespace ThabeSoft.Ports.Options;
 
 
 /// <summary>

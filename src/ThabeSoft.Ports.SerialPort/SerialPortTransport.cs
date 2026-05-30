@@ -195,7 +195,7 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
     {
         try
         {
-            var value = new SerialPort(options.PortName, options.BaudRate, options.Parity, options.DataBits, options.StopBits)
+            var value = new SerialPort(options.PortName, options.BaudRate, (System.IO.Ports.Parity)options.Parity, options.DataBits, (System.IO.Ports.StopBits)options.StopBits)
             {
                 ReadTimeout = (int)options.ReadTimeout.TotalMilliseconds,
                 WriteTimeout = (int)options.WriteTimeout.TotalMilliseconds

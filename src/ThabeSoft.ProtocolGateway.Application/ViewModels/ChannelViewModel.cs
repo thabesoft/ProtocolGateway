@@ -28,11 +28,6 @@ public sealed partial class ChannelViewModel : ObservableObject, IViewModel
 
     internal static ChannelViewModel Create(ChannelName name, IChannel channel)
     {
-        if (channel is ModbusChannel modbus)
-        {
-
-        }
-
         return new ChannelViewModel(name, ProtocolType.ModbusRtu);
     }
 

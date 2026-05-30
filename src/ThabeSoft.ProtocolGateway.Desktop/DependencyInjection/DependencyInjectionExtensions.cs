@@ -23,11 +23,7 @@ public static class DependencyInjectionExtensions
         public void AddProtocolGatewayDesktop()
         {
             // 视图模型
-            services.TryAddSingleton<IViewModelProvider, ViewModelProvider>(); // 视图模型提供者
-            services.TryAddSingleton<MainWindowViewModel>();         // 主窗口
-            services.TryAddSingleton<MainViewModel>();               // 主视图
-            services.TryAddSingleton<ChannelPageViewModel>();        // 通道
-            services.TryAddTransient<ChannelDetailsPageViewModel>(); // 通道详情
+            services.TryAddSingleton<MainWindowViewModel>(); // 主窗口
 
             // 图标
             services.TryAddSingleton<ProtocolTypeIconLocator>(); // 协议类型图标

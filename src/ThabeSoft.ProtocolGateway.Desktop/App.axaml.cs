@@ -21,8 +21,9 @@ public class App : Application, IDataTemplateRegistry, IApplicationLifetimeAcces
                 services.AddSingleton<IApplicationLifetimeAccessor>(this);
 
 
-                services.AddProtocolGatewayDesktop();
                 services.AddProtocolGateway();
+                services.AddProtocolGatewayApplication();
+                services.AddProtocolGatewayDesktop();
             })
             .Build();
     }

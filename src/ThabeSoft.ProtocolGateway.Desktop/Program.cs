@@ -1,6 +1,6 @@
 ﻿using Avalonia;
 
-namespace ThabeSoft.ProtocolGateway.Desktop;
+namespace ThabeSoft.ProtocolGateway;
 
 internal static class Program
 {

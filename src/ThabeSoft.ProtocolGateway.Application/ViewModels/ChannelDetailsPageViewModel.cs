@@ -4,7 +4,6 @@ using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.ObjectModel;
 using ThabeSoft.ProtocolGateway.Enums;
 using ThabeSoft.ProtocolGateway.Messages;
-using ThabeSoft.ProtocolGateway.Tags;
 
 namespace ThabeSoft.ProtocolGateway.ViewModels;
 
