@@ -2,6 +2,7 @@
   <Folder Name="/App/">
     <Project Path="src/ThabeSoft.ProtocolGateway.Application/ThabeSoft.ProtocolGateway.Application.csproj" />
     <Project Path="src/ThabeSoft.ProtocolGateway.Desktop/ThabeSoft.ProtocolGateway.Desktop.csproj" />
+    <Project Path="src/ThabeSoft.ProtocolGateway.Infrastructure/ThabeSoft.ProtocolGateway.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/Core/">
     <Project Path="src/ThabeSoft.ProtocolGateway.Abstractions/ThabeSoft.ProtocolGateway.Abstractions.csproj" />

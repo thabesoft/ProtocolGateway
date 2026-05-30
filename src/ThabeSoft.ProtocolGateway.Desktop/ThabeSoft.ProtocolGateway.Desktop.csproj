@@ -9,6 +9,7 @@
 		<Nullable>enable</Nullable>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+		<EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
 		<RootNamespace>ThabeSoft.ProtocolGateway</RootNamespace>
 
 	</PropertyGroup>
@@ -31,6 +32,7 @@
 	<!--依赖项目-->
 	<ItemGroup>
 	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.Application\ThabeSoft.ProtocolGateway.Application.csproj" />
+	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.Infrastructure\ThabeSoft.ProtocolGateway.Infrastructure.csproj" />
 	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway\ThabeSoft.ProtocolGateway.csproj" />
 	</ItemGroup>
 

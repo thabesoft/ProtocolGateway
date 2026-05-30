@@ -4,7 +4,7 @@
 /// <summary>
 /// 配置选项
 /// </summary>
-internal sealed class ConfigOptions
+public sealed class ConfigOptions
 {
     /// <summary>
     /// 配置文件目录

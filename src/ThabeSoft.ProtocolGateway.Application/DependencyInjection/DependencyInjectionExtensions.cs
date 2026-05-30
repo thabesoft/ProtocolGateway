@@ -1,6 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection.Extensions;
-using System.Text.Json;
-using ThabeSoft.ProtocolGateway.Services;
 using ThabeSoft.ProtocolGateway.ViewModels;
 
 
@@ -19,17 +17,11 @@ public static class DependencyInjectionExtensions
         /// <summary>
         /// 添加桌面业务
         /// </summary>
-        public void AddProtocolGatewayApplication()
+        public void AddProtocolGatewayViewModels()
         {
-            // 视图模型
-            services.TryAddSingleton<IViewModelProvider, ViewModelProvider>(); // 视图模型提供者
             services.TryAddSingleton<MainViewModel>();               // 主视图
             services.TryAddSingleton<ChannelPageViewModel>();        // 通道
-            services.TryAddTransient<ChannelDetailsPageViewModel>(); // 通道详情
-
-
-            // 通道配置
-            services.AddSingleton<IChannelConfigService, ChannelJsonConfigService>();
+            services.TryAddTransient<ChannelDetailsPageViewModel>(); // 通道详
         }
     }
 }
