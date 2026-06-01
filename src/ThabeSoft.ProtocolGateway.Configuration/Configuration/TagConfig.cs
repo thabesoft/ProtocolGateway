@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using ThabeSoft.Modbus;
-using ThabeSoft.ProtocolGateway.Enums;
+using ThabeSoft.ProtocolGateway.Internal;
 
 namespace ThabeSoft.ProtocolGateway.Configuration;
 

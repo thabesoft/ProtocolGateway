@@ -1,4 +1,4 @@
-﻿namespace ThabeSoft.ProtocolGateway.Enums;
+﻿namespace ThabeSoft.ProtocolGateway.Internal;
 
 
 /// <summary>

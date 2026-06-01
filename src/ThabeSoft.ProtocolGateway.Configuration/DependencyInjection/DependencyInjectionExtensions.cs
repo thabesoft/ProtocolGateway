@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection.Extensions;
-using ThabeSoft.ProtocolGateway.Provisioners;
+using ThabeSoft.ProtocolGateway;
+using ThabeSoft.ProtocolGateway.Internal;
 
 
 #pragma warning disable IDE0130 // 命名空间与文件夹结构不匹配
@@ -19,8 +20,8 @@ public static class DependencyInjectionExtensions
         /// </summary>
         public void AddProtocolGatewayConfiguration()
         {
-            // 主视图
-            services.TryAddSingleton<IChannelProvisioner, ChannelProvisioner>();
+            // 配置加载业务
+            services.TryAddSingleton<IChannelConfigService, ChannelJsonConfigService>();
         }
     }
 }

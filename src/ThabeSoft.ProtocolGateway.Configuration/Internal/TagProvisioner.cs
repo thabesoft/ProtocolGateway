@@ -1,12 +1,7 @@
 ﻿using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Configuration;
 
-namespace ThabeSoft.ProtocolGateway.Provisioners;
-
-public interface ITagProvisioner
-{
-    Result<ITag> Provision(TagConfig config);
-}
+namespace ThabeSoft.ProtocolGateway.Internal;
 
 internal sealed class TagProvisioner(ChannelName channelName) : ITagProvisioner
 {

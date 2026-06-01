@@ -2,12 +2,7 @@
 using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Configuration;
 
-namespace ThabeSoft.ProtocolGateway.Provisioners;
-
-public interface IPortProvisioner
-{
-    Result<IPort> Provision(PortConfig config);
-}
+namespace ThabeSoft.ProtocolGateway.Internal;
 
 internal sealed class PortProvisioner : IPortProvisioner
 {
