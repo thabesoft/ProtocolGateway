@@ -38,7 +38,7 @@ public interface IGateway : IChannelManager, IDisposable
 public static class GatewayExtensions
 {
     private delegate ValueTask<Result<object>> ReaderDelegate(IGateway gateway, ITag tag, CancellationToken ct);
-    private static readonly ConcurrentDictionary<DataType, ReaderDelegate?> _caches = [];
+    private static readonly ConcurrentDictionary<TagValueType, ReaderDelegate?> _caches = [];
 
 
     extension(IGateway gateway)
@@ -53,25 +53,25 @@ public static class GatewayExtensions
     }
 
 
-    private static ReaderDelegate? CreateReaderDelegate(DataType type)
+    private static ReaderDelegate? CreateReaderDelegate(TagValueType type)
     {
         return type switch
         {
-            DataType.Byte => new ReaderDelegate((gateway, tag, ct) => gateway.ReadAsync((IRoutableTag<byte>)tag, ct).MapAsync(x => (object)x)),
-            DataType.SByte => new ReaderDelegate((gateway, tag, ct) => gateway.ReadAsync((IRoutableTag<sbyte>)tag, ct).MapAsync(x => (object)x)),
-            DataType.Bool => new ReaderDelegate((gateway, tag, ct) => gateway.ReadAsync((IRoutableTag<bool>)tag, ct).MapAsync(x => (object)x)),
+            TagValueType.Byte => new ReaderDelegate((gateway, tag, ct) => gateway.ReadAsync((IRoutableTag<byte>)tag, ct).MapAsync(x => (object)x)),
+            TagValueType.SByte => new ReaderDelegate((gateway, tag, ct) => gateway.ReadAsync((IRoutableTag<sbyte>)tag, ct).MapAsync(x => (object)x)),
+            TagValueType.Bool => new ReaderDelegate((gateway, tag, ct) => gateway.ReadAsync((IRoutableTag<bool>)tag, ct).MapAsync(x => (object)x)),
 
-            DataType.Int16 => new ReaderDelegate((gateway, tag, ct) => gateway.ReadAsync((IRoutableTag<short>)tag, ct).MapAsync(x => (object)x)),
-            DataType.UInt16 => new ReaderDelegate((gateway, tag, ct) => gateway.ReadAsync((IRoutableTag<ushort>)tag, ct).MapAsync(x => (object)x)),
-            DataType.Char => new ReaderDelegate((gateway, tag, ct) => gateway.ReadAsync((IRoutableTag<char>)tag, ct).MapAsync(x => (object)x)),
+            TagValueType.Int16 => new ReaderDelegate((gateway, tag, ct) => gateway.ReadAsync((IRoutableTag<short>)tag, ct).MapAsync(x => (object)x)),
+            TagValueType.UInt16 => new ReaderDelegate((gateway, tag, ct) => gateway.ReadAsync((IRoutableTag<ushort>)tag, ct).MapAsync(x => (object)x)),
+            TagValueType.Char => new ReaderDelegate((gateway, tag, ct) => gateway.ReadAsync((IRoutableTag<char>)tag, ct).MapAsync(x => (object)x)),
 
-            DataType.Int32 => new ReaderDelegate((gateway, tag, ct) => gateway.ReadAsync((IRoutableTag<int>)tag, ct).MapAsync(x => (object)x)),
-            DataType.UInt32 => new ReaderDelegate((gateway, tag, ct) => gateway.ReadAsync((IRoutableTag<uint>)tag, ct).MapAsync(x => (object)x)),
-            DataType.Float => new ReaderDelegate((gateway, tag, ct) => gateway.ReadAsync((IRoutableTag<float>)tag, ct).MapAsync(x => (object)x)),
+            TagValueType.Int32 => new ReaderDelegate((gateway, tag, ct) => gateway.ReadAsync((IRoutableTag<int>)tag, ct).MapAsync(x => (object)x)),
+            TagValueType.UInt32 => new ReaderDelegate((gateway, tag, ct) => gateway.ReadAsync((IRoutableTag<uint>)tag, ct).MapAsync(x => (object)x)),
+            TagValueType.Float => new ReaderDelegate((gateway, tag, ct) => gateway.ReadAsync((IRoutableTag<float>)tag, ct).MapAsync(x => (object)x)),
 
-            DataType.Int64 => new ReaderDelegate((gateway, tag, ct) => gateway.ReadAsync((IRoutableTag<long>)tag, ct).MapAsync(x => (object)x)),
-            DataType.UInt64 => new ReaderDelegate((gateway, tag, ct) => gateway.ReadAsync((IRoutableTag<ulong>)tag, ct).MapAsync(x => (object)x)),
-            DataType.Double => new ReaderDelegate((gateway, tag, ct) => gateway.ReadAsync((IRoutableTag<double>)tag, ct).MapAsync(x => (object)x)),
+            TagValueType.Int64 => new ReaderDelegate((gateway, tag, ct) => gateway.ReadAsync((IRoutableTag<long>)tag, ct).MapAsync(x => (object)x)),
+            TagValueType.UInt64 => new ReaderDelegate((gateway, tag, ct) => gateway.ReadAsync((IRoutableTag<ulong>)tag, ct).MapAsync(x => (object)x)),
+            TagValueType.Double => new ReaderDelegate((gateway, tag, ct) => gateway.ReadAsync((IRoutableTag<double>)tag, ct).MapAsync(x => (object)x)),
 
             _ => default,
         };

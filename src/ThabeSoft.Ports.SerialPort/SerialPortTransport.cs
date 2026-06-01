@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.IO.Ports;
-using ThabeSoft.Ports.Options;
 using ThabeSoft.Primitives;
 
 namespace ThabeSoft.Ports;
@@ -15,7 +14,7 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
     private static readonly PropertyChangedEventArgs StatePropertyChangedEventArgs = new(nameof(State));
 
 
-    private ISerialOptions? _options;
+    private ISerialPortOptions? _options;
     private SerialPort? port;
 
     private readonly SerialPortLock _lock = new();
@@ -38,14 +37,14 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
 
     ValueTask<Result> ITransport.ConnectAsync(ITransportOptions options, CancellationToken cancellation)
     {
-        if (options is not ISerialOptions serialOptions)
+        if (options is not ISerialPortOptions serialOptions)
         {
             return new ValueTask<Result>(Result.Error(ErrorType.InvalidOperation, "当前配置不持支创建串口链接"));
         }
 
         return ConnectAsync(serialOptions);
     }
-    public async ValueTask<Result> ConnectAsync(ISerialOptions options, CancellationToken cancellation = default)
+    public async ValueTask<Result> ConnectAsync(ISerialPortOptions options, CancellationToken cancellation = default)
     {
         if (State != TransporterState.Pending &&
             State != TransporterState.Disconnected &&
@@ -191,7 +190,7 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
     }
 
 
-    private static Result<SerialPort> CreateSerialPort(ISerialOptions options)
+    private static Result<SerialPort> CreateSerialPort(ISerialPortOptions options)
     {
         try
         {

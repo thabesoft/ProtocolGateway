@@ -2,6 +2,7 @@
 using ThabeSoft.ProtocolGateway.Services;
 using ThabeSoft.ProtocolGateway.Services.Icon;
 using ThabeSoft.ProtocolGateway.Services.Locators;
+using ThabeSoft.ProtocolGateway.Services.Navigation;
 using ThabeSoft.ProtocolGateway.Services.View;
 using ThabeSoft.ProtocolGateway.ViewModels;
 
@@ -23,9 +24,19 @@ public static class DependencyInjectionExtensions
         /// </summary>
         public void AddProtocolGatewayDesktop()
         {
+            // 视图模型提供者
+            services.TryAddSingleton<IViewModelProvider, ViewModelProvider>();
             // 视图模型
             services.TryAddSingleton<MainWindowViewModel>(); // 主窗口
-                                                             // 图标
+            services.TryAddSingleton<MainViewModel>();       // 主视图
+            services.TryAddSingleton<INavigationService>(x => x.GetRequiredService<MainViewModel>()); // 导航业务
+            services.TryAddSingleton<IMenuService>(x => x.GetRequiredService<MainViewModel>());       // 菜单业务
+            // 页面
+            services.TryAddSingleton<ChannelPageViewModel>();        // 通道
+            services.TryAddTransient<ChannelDetailsPageViewModel>(); // 通道详
+
+
+            // 图标
             services.TryAddSingleton<ProtocolTypeIconLocator>(); // 协议类型图标
             services.TryAddSingleton<IconLocator>();
             services.TryAddSingleton<IIconRegistry>(x => x.GetRequiredService<IconLocator>());

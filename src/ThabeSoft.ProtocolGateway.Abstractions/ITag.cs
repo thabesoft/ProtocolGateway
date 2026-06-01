@@ -19,7 +19,7 @@ public interface ITag
     /// <summary>
     /// 值类型
     /// </summary>
-    DataType ValueType { get; }
+    TagValueType ValueType { get; }
 }
 
 /// <summary>

@@ -1,7 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using ThabeSoft.Primitives;
-using ThabeSoft.ProtocolGateway.Enums;
 
 namespace ThabeSoft.ProtocolGateway.Services.Icon;
 

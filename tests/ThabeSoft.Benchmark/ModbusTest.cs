@@ -1,6 +1,5 @@
 ﻿using ThabeSoft.Modbus;
 using ThabeSoft.Ports;
-using ThabeSoft.Ports.Options;
 using ThabeSoft.ProtocolGateway;
 
 namespace ThabeSoft.Benchmark;
@@ -11,7 +10,7 @@ internal static class ModbusTest
     {
         // 端口
         SerialPortTransport transport = new();
-        await transport.ConnectAsync(SerialOptions.Create("Com2"), cancellationToken);
+        await transport.ConnectAsync(SerialPortOptions.Create("Com2"), cancellationToken);
 
         // 网关
          Gateway gateway = new();

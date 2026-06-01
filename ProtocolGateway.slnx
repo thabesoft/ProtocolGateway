@@ -1,13 +1,12 @@
 <Solution>
   <Folder Name="/App/">
-    <Project Path="src/ThabeSoft.ProtocolGateway.Application/ThabeSoft.ProtocolGateway.Application.csproj" />
     <Project Path="src/ThabeSoft.ProtocolGateway.Desktop/ThabeSoft.ProtocolGateway.Desktop.csproj" />
-    <Project Path="src/ThabeSoft.ProtocolGateway.Infrastructure/ThabeSoft.ProtocolGateway.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/Core/">
     <Project Path="src/ThabeSoft.ProtocolGateway.Abstractions/ThabeSoft.ProtocolGateway.Abstractions.csproj" />
-    <Project Path="src/ThabeSoft.ProtocolGateway.Configuration/ThabeSoft.ProtocolGateway.Configuration.csproj" />
+    <Project Path="src/ThabeSoft.ProtocolGateway.Configuration.Abstractions/ThabeSoft.ProtocolGateway.Configuration.Abstractions.csproj" />
     <Project Path="src/ThabeSoft.ProtocolGateway.Converters/ThabeSoft.ProtocolGateway.Converters.csproj" />
+    <Project Path="src/ThabeSoft.ProtocolGateway.Modbus.Configuration/ThabeSoft.ProtocolGateway.Modbus.Configuration.csproj" />
     <Project Path="src/ThabeSoft.ProtocolGateway.Modbus/ThabeSoft.ProtocolGateway.Modbus.csproj" />
     <Project Path="src/ThabeSoft.ProtocolGateway/ThabeSoft.ProtocolGateway.csproj" />
   </Folder>

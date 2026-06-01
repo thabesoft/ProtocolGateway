@@ -3,14 +3,8 @@ using Avalonia.Controls.Templates;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using ThabeSoft.ProtocolGateway.Options;
 using ThabeSoft.ProtocolGateway.Services;
-using ThabeSoft.ProtocolGateway.Services.Icon;
-using ThabeSoft.ProtocolGateway.Services.Locators;
-using ThabeSoft.ProtocolGateway.Services.View;
-using ThabeSoft.ProtocolGateway.ViewModels;
 
 namespace ThabeSoft.ProtocolGateway;
 
@@ -24,15 +18,11 @@ public class App : Application, IDataTemplateRegistry, IApplicationLifetimeAcces
         _host = Host.CreateDefaultBuilder()
             .ConfigureServices((context, services) =>
             {
-                // 基础层
-                services.AddProtocolGatewayInfrastructure(x => context.Configuration.GetSection("Config").Bind(x));
                 // 核心
-                services.AddProtocolGateway();
+                services.AddProtocolGateway(x => context.Configuration.GetSection("Config").Bind(x));
 
                 // 桌面
                 services.AddProtocolGatewayDesktop();
-                // 视图模型
-                services.AddProtocolGatewayViewModels();
 
                 // 模板注册器
                 services.AddSingleton<IDataTemplateRegistry>(this);
