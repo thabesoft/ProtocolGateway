@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection.Extensions;
+using ThabeSoft.ProtocolGateway.Services;
+using ThabeSoft.ProtocolGateway.Services.Navigation;
 using ThabeSoft.ProtocolGateway.ViewModels;
 
 
@@ -19,7 +21,11 @@ public static class DependencyInjectionExtensions
         /// </summary>
         public void AddProtocolGatewayViewModels()
         {
-            services.TryAddSingleton<MainViewModel>();               // 主视图
+            // 主视图
+            services.TryAddSingleton<MainViewModel>();
+            services.TryAddSingleton<INavigationService>(x => x.GetRequiredService<MainViewModel>());
+            services.TryAddSingleton<IMenuService>(x => x.GetRequiredService<MainViewModel>());
+
             services.TryAddSingleton<ChannelPageViewModel>();        // 通道
             services.TryAddTransient<ChannelDetailsPageViewModel>(); // 通道详
         }

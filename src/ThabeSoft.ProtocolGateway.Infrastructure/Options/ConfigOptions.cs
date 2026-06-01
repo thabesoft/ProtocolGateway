@@ -9,10 +9,10 @@ public sealed class ConfigOptions
     /// <summary>
     /// 配置文件目录
     /// </summary>
-    public required string Directory { get; init; }
+    public required string Directory { get; init; } = "Configs";
 
     /// <summary>
     /// 通道配置文件路径（自动组合）
     /// </summary>
-    public string ChannelsFilePath => Path.Combine(Directory, "channels.json");
+    public string ChannelsFilePath => Path.Combine(Directory, "Channels.json");
 }

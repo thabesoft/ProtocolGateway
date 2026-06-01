@@ -27,14 +27,15 @@
             <DockPanel>
 
                 <TextBox DockPanel.Dock="Left" Text="HelloWorld!" />
-                <Button Margin="10 0" DockPanel.Dock="Left" Content="列"/>
+                <Button Margin="10 0" DockPanel.Dock="Left" Content="刷新"
+                        Command="{Binding ReloadCommand}"/>
 
             </DockPanel>
 
         </StackPanel>
 
         <DataGrid Margin="0 10 0 0" Grid.Row="1"
-                  ItemsSource="{Binding ChannelItemsSource}"
+                  ItemsSource="{Binding Channels}"
                   AutoGenerateColumns="False"
                   CanUserResizeColumns="True"
                   CanUserSortColumns="True">

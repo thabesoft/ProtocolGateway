@@ -2,7 +2,11 @@
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.ObjectModel;
+using ThabeSoft.Primitives;
+using ThabeSoft.ProtocolGateway.Configuration;
 using ThabeSoft.ProtocolGateway.Messages;
+using ThabeSoft.ProtocolGateway.Services;
+using ThabeSoft.ProtocolGateway.Services.Navigation;
 
 namespace ThabeSoft.ProtocolGateway.ViewModels;
 
@@ -12,23 +16,26 @@ namespace ThabeSoft.ProtocolGateway.ViewModels;
 /// </summary>
 public sealed partial class ChannelPageViewModel : ObservableRecipient, IViewModel
 {
+    private readonly INavigationService _navigationService;
+    private readonly IChannelConfigService _configService;
+
     // 所有通道元素
-    private readonly ObservableCollection<ChannelViewModel> _channelItemsSource = [];
-    private readonly MainViewModel mainViewModel;
+    private ObservableCollection<ChannelViewModel> _channelItemsSource = [];
 
-    public ChannelPageViewModel(MainViewModel mainViewModel)
+    public ChannelPageViewModel(
+        INavigationService navigationService,
+        IChannelConfigService configService)
     {
-        this.mainViewModel = mainViewModel;
-        Messenger.Register<ChannelDetailsClosed>(this, (_, _) => mainViewModel.NavigateTo(this));
+        _navigationService = navigationService;
+        _configService = configService;
 
-
-        _channelItemsSource.Add(ChannelViewModel.Create(ChannelName.Create("Fuck").Value, null!));
+        Messenger.Register<ChannelDetailsClosed>(this, (_, _) => navigationService.NavigateTo(this));
     }
 
     /// <summary>
     /// 所有通道元素
     /// </summary>
-    public IReadOnlyCollection<ChannelViewModel> ChannelItemsSource => _channelItemsSource;
+    public IReadOnlyCollection<ChannelViewModel> Channels => _channelItemsSource;
 
 
 
@@ -36,7 +43,30 @@ public sealed partial class ChannelPageViewModel : ObservableRecipient, IViewMod
     [RelayCommand]
     private void OpenDetailsPage(ChannelViewModel item)
     {
-        var fuck = new ChannelDetailsPageViewModel(item.Name, item.ProtocolType);
-        mainViewModel.NavigateTo(fuck);
+        var fuck = new ChannelDetailsPageViewModel(item.Config);
+        _navigationService.NavigateTo(fuck);
+    }
+
+    [RelayCommand]
+    private async Task ReloadAsync()
+    {
+        var channel_configs = await _configService.LoadAsync();
+
+        _channelItemsSource.Clear();
+        _channelItemsSource = [.. Creates(channel_configs)];
+        OnPropertyChanged(nameof(Channels));
+    }
+
+
+    public static IReadOnlyCollection<ChannelViewModel> Creates(IEnumerable<ChannelConfig> configs)
+    {
+        List<ChannelViewModel> items = [];
+
+        foreach (var config in configs)
+        {
+            items.Add(new ChannelViewModel(config));
+        }
+
+        return items;
     }
 }

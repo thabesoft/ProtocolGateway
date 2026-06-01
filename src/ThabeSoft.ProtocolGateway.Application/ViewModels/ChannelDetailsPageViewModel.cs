@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.ObjectModel;
+using ThabeSoft.ProtocolGateway.Configuration;
 using ThabeSoft.ProtocolGateway.Enums;
 using ThabeSoft.ProtocolGateway.Messages;
 
@@ -11,26 +12,18 @@ namespace ThabeSoft.ProtocolGateway.ViewModels;
 /// <summary>
 /// 通道页面
 /// </summary>
-public sealed partial class ChannelDetailsPageViewModel : ObservableRecipient, IViewModel
+public sealed partial class ChannelDetailsPageViewModel(ChannelConfig config) : ObservableRecipient, IViewModel
 {
-    private readonly ObservableCollection<TagViewModel> _tags = [];
-    private readonly ChannelName name;
-    private readonly ProtocolType protocolType;
-
-    public ChannelDetailsPageViewModel(ChannelName name, ProtocolType protocolType)
-    {
-        this.name = name;
-        this.protocolType = protocolType;
+    private readonly ObservableCollection<TagViewModel> _tags = [.. config.Tags.Select(TagViewModel.FromTagConfig)];
 
 
-        _tags.Add(TagViewModel.Create(ChannelName.Create("Shit").Value));
-    }
-
-    public ChannelName Name => name;
-    public ProtocolType ProtocolType => protocolType;
-
-
+    [ObservableProperty]
+    public partial string Name { get; private set; } = config.Name;
+    public ProtocolType Protocol => config.Protocol;
     public IReadOnlyCollection<TagViewModel> Tags => _tags;
+
+
+    public bool IsModbusProtocol => Protocol is ProtocolType.ModbusRtu or ProtocolType.ModbusTcp;
 
 
     [RelayCommand]

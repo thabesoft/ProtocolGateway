@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net8.0</TargetFrameworks>
+		<RootNamespace>ThabeSoft.ProtocolGateway</RootNamespace>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.8" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <ProjectReference Include="..\ThabeSoft.Modbus.Abstractions\ThabeSoft.Modbus.Abstractions.csproj" />
+	  <ProjectReference Include="..\ThabeSoft.Ports.Abstractions\ThabeSoft.Ports.Abstractions.csproj" />
+	  <ProjectReference Include="..\ThabeSoft.Ports.SerialPort\ThabeSoft.Ports.SerialPort.csproj" />
+	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.Abstractions\ThabeSoft.ProtocolGateway.Abstractions.csproj" />
+	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.Modbus\ThabeSoft.ProtocolGateway.Modbus.csproj" />
+	</ItemGroup>
+
+</Project>

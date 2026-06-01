@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Primitives;
 using ThabeSoft.ProtocolGateway.Services;
+using ThabeSoft.ProtocolGateway.Services.Navigation;
 
 namespace ThabeSoft.ProtocolGateway.ViewModels;
 
@@ -11,7 +12,7 @@ namespace ThabeSoft.ProtocolGateway.ViewModels;
 /// <summary>
 /// 主视图
 /// </summary>
-public sealed partial class MainViewModel(IViewModelProvider viewModelProvider) : ObservableObject, IViewModel
+public sealed partial class MainViewModel(IViewModelProvider viewModelProvider) : ObservableObject, IViewModel, INavigationService, IMenuService
 {
     private readonly ObservableCollection<NavigationMenuItemViewModel> _menuItems = [];
 
@@ -48,15 +49,13 @@ public sealed partial class MainViewModel(IViewModelProvider viewModelProvider) 
         SelectedMenuItem = item;
 
         // 导航到目标
-        var target_vm = viewModelProvider.Get(item.Target);
-        if (target_vm is null) return;
-        NavigateTo(target_vm);
+        NavigateTo(SelectedMenuItem.Target);
     }
 
     /// <summary>
     /// 添加菜单
     /// </summary>
-    internal void AddMenu<T>(NavigationMenuItemViewModel item)
+    internal void AddMenu(NavigationMenuItemViewModel item)
     {
         // 存在则跳过
         if (_menuItems.Contains(item)) return;
@@ -73,17 +72,8 @@ public sealed partial class MainViewModel(IViewModelProvider viewModelProvider) 
     /// </summary>
     public void AddMenu<T>(IconName icon, string header) where T : IViewModel
     {
-        AddMenu<T>(NavigationMenuItemViewModel.Create<T>(icon, header));
+        AddMenu(NavigationMenuItemViewModel.Create<T>(icon, header));
     }
-    /// <summary>
-    /// 添加菜单
-    /// </summary>
-    public Result AddMenu<T>(string iconName, string header) where T : IViewModel
-    {
-        return NavigationMenuItemViewModel.Create<T>(iconName, header)
-            .Tap(AddMenu<T>);
-    }
-
     /// <summary>
     /// 删除菜单
     /// </summary>
@@ -137,5 +127,16 @@ public sealed partial class MainViewModel(IViewModelProvider viewModelProvider) 
         // 选择当前
         menu_item?.Select();
         SelectedMenuItem = menu_item;
+    }
+
+    /// <summary>
+    /// 导航到目标
+    /// </summary>
+    public void NavigateTo(Type target)
+    {
+        var target_vm = viewModelProvider.Get(target);
+        if (target_vm is null) return;
+
+        NavigateTo(target_vm);
     }
 }

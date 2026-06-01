@@ -19,7 +19,7 @@ public abstract class TagConfig
     /// <summary>
     /// 值类型
     /// </summary>
-    public required DataType ValueType { get; init; }
+    public required DataType DataType { get; init; }
 }
 
 

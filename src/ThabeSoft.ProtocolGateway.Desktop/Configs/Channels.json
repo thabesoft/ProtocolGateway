@@ -1,0 +1,21 @@
+﻿[
+  {
+    "Name": "Default",
+    "Protocol": "ModbusRtu",
+    "Port": {
+      "$type": "Serial",
+      "PortName": "COM2",
+      "BaudRate": 9600
+    },
+    "Tags": [
+      {
+        "$type": "Modbus",
+        "Name": "温度",
+        "ValueType": "Int16",
+        "SlaveId": 1,
+        "Address": 0,
+        "FunctionCode": 3
+      }
+    ]
+  }
+]

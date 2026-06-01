@@ -14,7 +14,7 @@ public sealed class ModbusChannel(IModbusMaster master) : IReadWriteChannel
     /// <summary>
     /// 读取
     /// </summary>
-    public async ValueTask<Result<TValue>> ReadAsync<TValue>(ITag<TValue> tag, CancellationToken cancellationToken = default) 
+    public async ValueTask<Result<TValue>> ReadAsync<TValue>(ITag<TValue> tag, CancellationToken cancellationToken = default)
         where TValue : unmanaged
     {
         if (tag.Address is not ModbusAddress address) return Result.Error<TValue>(ErrorType.InvalidOperation, "无效地址");
@@ -30,26 +30,26 @@ public sealed class ModbusChannel(IModbusMaster master) : IReadWriteChannel
             // 读线圈
             if (address.FunctionCode == FunctionCode.ReadCoils)
             {
-                await ReadCoilsToByteAsync(data_mem, address.SlaveId, address.Start, master.ReadCoilsAsync);
+                await ReadCoilsToByteAsync(data_mem, address.SlaveId, address.Start, master.ReadCoilsAsync, ct: cancellationToken);
                 return tag.Converter.From(data_mem.Span);
             }
             // 读离散输入
             if (address.FunctionCode == FunctionCode.ReadDiscreteInputs)
             {
-                await ReadCoilsToByteAsync(data_mem, address.SlaveId, address.Start, master.ReadDiscreteInputsAsync);
+                await ReadCoilsToByteAsync(data_mem, address.SlaveId, address.Start, master.ReadDiscreteInputsAsync, ct: cancellationToken);
                 return tag.Converter.From(data_mem.Span);
             }
 
             // 读保持寄存器
             if (address.FunctionCode == FunctionCode.ReadHoldingRegisters)
             {
-                await ReadRegistersToByteAsync(data_mem, address.SlaveId, address.Start, master.ReadHoldingRegistersAsync);
+                await ReadRegistersToByteAsync(data_mem, address.SlaveId, address.Start, master.ReadHoldingRegistersAsync, ct: cancellationToken);
                 return tag.Converter.From(data_mem.Span);
             }
             // 读输入寄存器
             if (address.FunctionCode == FunctionCode.ReadInputRegisters)
             {
-                await ReadRegistersToByteAsync(data_mem, address.SlaveId, address.Start, master.ReadInputRegistersAsync);
+                await ReadRegistersToByteAsync(data_mem, address.SlaveId, address.Start, master.ReadInputRegistersAsync, ct: cancellationToken);
                 return tag.Converter.From(data_mem.Span);
             }
         }
@@ -108,7 +108,7 @@ public sealed class ModbusChannel(IModbusMaster master) : IReadWriteChannel
     /// <param name="address">起始地址</param>
     /// <param name="readHandler">读取请求委托</param>
     /// <param name="bitOrder">位序</param>
-    private async ValueTask<Result> ReadCoilsToByteAsync(Memory<byte> destination, byte slaveId, ushort address, ReadCoilsHandler readHandler, BitOrder bitOrder= BitOrder.LSB0, CancellationToken ct =default)
+    private static async ValueTask<Result> ReadCoilsToByteAsync(Memory<byte> destination, byte slaveId, ushort address, ReadCoilsHandler readHandler, BitOrder bitOrder = BitOrder.LSB0, CancellationToken ct = default)
     {
         var bits_count = destination.Length * 8;
         var bits_buffer = ArrayPool<bool>.Shared.Rent(bits_count);
@@ -137,7 +137,7 @@ public sealed class ModbusChannel(IModbusMaster master) : IReadWriteChannel
     /// <param name="address">起始地址</param>
     /// <param name="readHandler">读取请求委托</param>
     /// <param name="endianness">端序</param>
-    private async ValueTask<Result> ReadRegistersToByteAsync(Memory<byte> destination, byte slaveId, ushort address, ReadRegistersHandler readHandler, Endianness endianness = Endianness.BigEndian, CancellationToken ct = default)
+    private static async ValueTask<Result> ReadRegistersToByteAsync(Memory<byte> destination, byte slaveId, ushort address, ReadRegistersHandler readHandler, Endianness endianness = Endianness.BigEndian, CancellationToken ct = default)
     {
         var byte_count = destination.Length;
         if (byte_count % 2 != 0) return Result.InvalidParameter($"读取寄存器失败,需要偶数字节,实际:{byte_count}");

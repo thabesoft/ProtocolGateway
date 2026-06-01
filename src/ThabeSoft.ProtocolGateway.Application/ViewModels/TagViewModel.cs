@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using ThabeSoft.Modbus;
+using ThabeSoft.ProtocolGateway.Configuration;
 using ThabeSoft.ProtocolGateway.Enums;
 
 namespace ThabeSoft.ProtocolGateway.ViewModels;
@@ -11,34 +12,48 @@ namespace ThabeSoft.ProtocolGateway.ViewModels;
 public sealed partial class TagViewModel : ObservableObject
 {
     [ObservableProperty]
-    public partial ChannelName ChannelName { get; private set; }
-
+    public partial string? Name { get; private set; }
     [ObservableProperty]
-    public partial string Name { get; private set; }
+    public partial object? Value { get; private set; }
     [ObservableProperty]
-    public partial object Value { get; private set; }
+    public partial DataType? ValueType { get; private set; }
     [ObservableProperty]
-    public partial TagValueType ValueType { get; private set; }
+    public partial ValueQuality? ValueQuality { get; private set; }
     [ObservableProperty]
-    public partial ValueQuality ValueQuality { get; private set; }
-    [ObservableProperty]
-    public partial DateTime Timestamp { get; private set; }
+    public partial DateTime? Timestamp { get; private set; }
 
 
 
     [ObservableProperty]
-    public partial byte SlaveId { get; private set; }
+    public partial byte? SlaveId { get; private set; }
 
     [ObservableProperty]
-    public partial ushort Address { get; private set; }
+    public partial ushort? Address { get; private set; }
 
     [ObservableProperty]
-    public partial FunctionCode FunctionCode { get; private set; }
+    public partial FunctionCode? FunctionCode { get; private set; }
 
 
-    public static TagViewModel Create(ChannelName channelName)
+    public static TagViewModel FromTagConfig(TagConfig config)
     {
-        return new TagViewModel() { ChannelName = channelName, Value = 10, ValueType = TagValueType.Byte, ValueQuality = ValueQuality.Good, Timestamp = DateTime.Now, SlaveId = 01, Address = 100, FunctionCode = FunctionCode.ReadDiscreteInputs };
+        if (config is ModbusTagConfig modbusConfig)
+        {
+            return FromModbusConfig(modbusConfig);
+        }
+
+        throw new NotSupportedException($"Unsupported tag config type: {config.GetType().FullName}");
+    }
+
+    public static TagViewModel FromModbusConfig(ModbusTagConfig config)
+    {
+        return new TagViewModel()
+        {
+            Name = config.Name,
+            ValueType = config.ValueType,
+            SlaveId = config.SlaveId,
+            Address = config.Address,
+            FunctionCode = config.FunctionCode
+        };
     }
 
 

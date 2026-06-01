@@ -6,7 +6,6 @@ using ThabeSoft.Modbus.Layouts;
 using ThabeSoft.Modbus.Primitives;
 using ThabeSoft.Ports;
 using ThabeSoft.Primitives;
-using static ThabeSoft.ProtocolGateway.GatewayTests;
 
 namespace ThabeSoft.ProtocolGateway;
 
@@ -66,7 +65,7 @@ public class GatewayTests
                     return new ValueTask<Result>(Result.Ok());
                 });
             mock_port.Setup(x => x.WriteAsync(It.IsAny<ReadOnlyMemory<byte>>(), It.IsAny<CancellationToken>()))
-                .Returns(ValueTask.FromResult(Result.Ok()));
+                .Returns(() => ValueTask.FromResult(Result.Ok()));
 
             return mock_port;
         }
@@ -127,7 +126,7 @@ public class GatewayTests
                     return new ValueTask<Result>(Result.Ok());
                 });
             mock_port.Setup(x => x.WriteAsync(It.IsAny<ReadOnlyMemory<byte>>(), It.IsAny<CancellationToken>()))
-                .Returns(ValueTask.FromResult(Result.Ok()));
+                .Returns(() => ValueTask.FromResult(Result.Ok()));
 
             return mock_port;
         }
@@ -162,7 +161,7 @@ public class GatewayTests
                 return new ValueTask<Result>(Result.Ok());
             });
         mock_port.Setup(x => x.WriteAsync(It.IsAny<ReadOnlyMemory<byte>>(), It.IsAny<CancellationToken>()))
-            .Returns(ValueTask.FromResult(Result.Ok()));
+            .Returns(() => ValueTask.FromResult(Result.Ok()));
 
         return mock_port;
     }

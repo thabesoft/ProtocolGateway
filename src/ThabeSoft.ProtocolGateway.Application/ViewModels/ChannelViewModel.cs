@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ThabeSoft.ProtocolGateway.Configuration;
 using ThabeSoft.ProtocolGateway.Enums;
 
 namespace ThabeSoft.ProtocolGateway.ViewModels;
@@ -10,6 +11,8 @@ namespace ThabeSoft.ProtocolGateway.ViewModels;
 /// </summary>
 public sealed partial class ChannelViewModel : ObservableObject, IViewModel
 {
+    internal ChannelConfig Config { get; }
+
     private readonly ChannelName name;
     private readonly ProtocolType protocolType;
 
@@ -20,17 +23,12 @@ public sealed partial class ChannelViewModel : ObservableObject, IViewModel
     public ProtocolType ProtocolType => protocolType;
 
 
-    internal ChannelViewModel(ChannelName name, ProtocolType protocolType)
+    internal ChannelViewModel(ChannelConfig config)
     {
-        this.name = name;
-        this.protocolType = protocolType;
+        Config = config;
+        name = config.Name;
+        protocolType = config.Protocol;
     }
-
-    internal static ChannelViewModel Create(ChannelName name, IChannel channel)
-    {
-        return new ChannelViewModel(name, ProtocolType.ModbusRtu);
-    }
-
 
 
     [RelayCommand]
