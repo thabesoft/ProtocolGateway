@@ -11,10 +11,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\ThabeSoft.Ports.Abstractions\ThabeSoft.Ports.Abstractions.csproj" />
 		<ProjectReference Include="..\ThabeSoft.Primitives.ByteKit\ThabeSoft.Primitives.ByteKit.csproj" />
 		<ProjectReference Include="..\ThabeSoft.ProtocolGateway.Abstractions\ThabeSoft.ProtocolGateway.Abstractions.csproj" />
-		<ProjectReference Include="..\ThabeSoft.ProtocolGateway.Configuration.Abstractions\ThabeSoft.ProtocolGateway.Configuration.Abstractions.csproj" />
 		<ProjectReference Include="..\ThabeSoft.ProtocolGateway.Converters\ThabeSoft.ProtocolGateway.Converters.csproj" />
 	</ItemGroup>
 

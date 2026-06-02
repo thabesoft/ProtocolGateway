@@ -1,9 +1,9 @@
 ﻿[
   {
-    "Name": "Default",
+    "Name": "鱼缸",
     "Protocol": "ModbusRtu",
     "Port": {
-      "$type": "Serial",
+      "$type": "SerialPort",
       "PortName": "COM2",
       "BaudRate": 9600
     },
@@ -14,6 +14,22 @@
         "ValueType": "Int16",
         "SlaveId": 1,
         "Address": 0,
+        "FunctionCode": 3
+      },
+       {
+        "$type": "Modbus",
+        "Name": "湿度",
+        "ValueType": "Int16",
+        "SlaveId": 1,
+        "Address": 2,
+        "FunctionCode": 3
+      },
+      {
+        "$type": "Modbus",
+        "Name": "水位",
+        "ValueType": "Int16",
+        "SlaveId": 1,
+        "Address": 4,
         "FunctionCode": 3
       }
     ]

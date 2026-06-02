@@ -1,8 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Reactive.Linq;
 using ThabeSoft.Primitives;
-using ThabeSoft.ProtocolGateway.Configuration;
-using ThabeSoft.ProtocolGateway.Services;
 
 namespace ThabeSoft.ProtocolGateway;
 
@@ -10,21 +8,14 @@ namespace ThabeSoft.ProtocolGateway;
 /// <summary>
 /// 网关
 /// </summary>
-public sealed class Gateway(IChannelHandleFactory factory) : IConfigureGateway
+public sealed class Gateway : IGateway
 {
     // 所有通道
     private readonly ConcurrentDictionary<ChannelName, IChannel> _channels = new();
-    private readonly ConcurrentDictionary<ChannelName, IChannelHandle> _handles = new();
     // 通道运行时配置
     private readonly ConcurrentDictionary<ChannelName, ChannelRuntimeOptions> _channelOptions = [];
 
 
-    // 添加
-    public Result<IChannelHandle> AddOrUpdateChannel(IChannelConfig config)
-    {
-        return factory.GetHandle(config)
-            .Tap(x => _handles[config.Name] = x);
-    }
     // 添加
     public Result AddChannel(ChannelName name, IChannel channel)
     {

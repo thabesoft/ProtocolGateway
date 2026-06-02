@@ -31,9 +31,9 @@
 	
 	<!--依赖项目-->
 	<ItemGroup>
-	  <ProjectReference Include="..\ThabeSoft.Modbus.Abstractions\ThabeSoft.Modbus.Abstractions.csproj" />
 	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.Application\ThabeSoft.ProtocolGateway.Application.csproj" />
-	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.Modbus.Configuration\ThabeSoft.ProtocolGateway.Modbus.Configuration.csproj" />
+	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.ConfigurationActivator\ThabeSoft.ProtocolGateway.ConfigurationActivator.csproj" />
+	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.Configuration\ThabeSoft.ProtocolGateway.Configuration.csproj" />
 	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway\ThabeSoft.ProtocolGateway.csproj" />
 	</ItemGroup>
 

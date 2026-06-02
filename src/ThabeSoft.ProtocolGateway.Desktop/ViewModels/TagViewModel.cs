@@ -33,7 +33,7 @@ public sealed partial class TagViewModel : ObservableObject
     public partial FunctionCode? FunctionCode { get; private set; }
 
 
-    public static TagViewModel FromTagConfig(ITagConfig config)
+    public static TagViewModel FromTagConfig(TagConfig config)
     {
         if (config is ModbusTagConfig modbusConfig)
         {

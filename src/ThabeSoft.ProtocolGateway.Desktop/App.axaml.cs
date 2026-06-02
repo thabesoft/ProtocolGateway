@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using ThabeSoft.ProtocolGateway.Services;
+using ThabeSoft.ProtocolGateway.Services.Application;
 
 namespace ThabeSoft.ProtocolGateway;
 
@@ -19,15 +19,13 @@ public class App : Application, IDataTemplateRegistry, IApplicationLifetimeAcces
             .ConfigureServices((context, services) =>
             {
                 // 核心
-                services.AddProtocolGateway(x => context.Configuration.GetSection("Config").Bind(x));
-
+                services.AddProtocolGateway();
+                // 配置
+                services.AddProtocolGatewayConfiguration(x => context.Configuration.GetSection("Config").Bind(x));
+                // 配置实例创建
+                services.AddProtocolGatewayConfigurationActivator();
                 // 桌面
-                services.AddProtocolGatewayDesktop();
-
-                // 模板注册器
-                services.AddSingleton<IDataTemplateRegistry>(this);
-                // UI 程序生命周期
-                services.AddSingleton<IApplicationLifetimeAccessor>(this);
+                services.AddProtocolGatewayDesktop(this);
             })
             .Build();
     }

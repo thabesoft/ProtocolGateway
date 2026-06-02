@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using ThabeSoft.ProtocolGateway.Configuration;
+using ThabeSoft.ProtocolGateway.Handles;
+using ThabeSoft.ProtocolGateway.Services.Channel;
 
 namespace ThabeSoft.ProtocolGateway.ViewModels;
 
@@ -8,38 +9,43 @@ namespace ThabeSoft.ProtocolGateway.ViewModels;
 /// <summary>
 /// 通道元素
 /// </summary>
-public sealed partial class ChannelViewModel : ObservableObject, IViewModel
+public sealed partial class ChannelViewModel(ChannelRuntimeContext context) : ObservableObject, IViewModel
 {
-    internal IChannelConfig Config { get; }
-
-    private readonly ChannelName name;
-    private readonly ProtocolType protocolType;
+    private CancellationTokenSource _cts = new();
 
     /// <summary>
-    /// 通道名称
+    /// 名称
     /// </summary>
-    public ChannelName Name => name;
-    public ProtocolType ProtocolType => protocolType;
+    public ChannelName Name => context.Handle.Name;
 
+    /// <summary>
+    /// 类型
+    /// </summary>
+    public ChannelType Type => context.Handle.Type;
 
-    internal ChannelViewModel(IChannelConfig config)
-    {
-        Config = config;
-        name = config.Name;
-        protocolType = config.Protocol;
-    }
+    /// <summary>
+    /// 协议
+    /// </summary>
+    public ProtocolType ProtocolType => context.Handle.Protocol;
+
 
 
     [RelayCommand]
     private async Task ConnectAsync()
     {
-        Console.WriteLine("ConnectAsync");
+        await _cts.CancelAsync();
+        _cts = new();
+
+        await context.Handle.ConnectAsync(_cts.Token);
     }
 
     [RelayCommand]
     private async Task DisconnectAsync()
     {
-        Console.WriteLine("ConnectAsync");
+        await _cts.CancelAsync();
+        _cts = new();
+
+        await context.Handle.DisconnectAsync(_cts.Token);
     }
 
 
