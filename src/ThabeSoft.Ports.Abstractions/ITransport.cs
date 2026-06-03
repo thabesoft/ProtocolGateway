@@ -6,14 +6,8 @@ namespace ThabeSoft.Ports;
 /// <summary>
 /// 传输
 /// </summary>
-public interface ITransport : IPort, IAsyncDisposable
+public interface ITransport : IPort
 {
-    /// <summary>
-    /// 传输器状态
-    /// </summary>
-    TransporterState State { get; }
-
-
     /// <summary>
     /// 连接
     /// </summary>

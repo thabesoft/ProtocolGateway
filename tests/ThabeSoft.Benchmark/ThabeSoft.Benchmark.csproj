@@ -16,7 +16,7 @@
 	  <ProjectReference Include="..\..\src\ThabeSoft.Modbus.Rtu.Master\ThabeSoft.Modbus.Rtu.Master.csproj" />
 	  <ProjectReference Include="..\..\src\ThabeSoft.Modbus.Rtu.Slave\ThabeSoft.Modbus.Rtu.Slave.csproj" />
 	  <ProjectReference Include="..\..\src\ThabeSoft.Modbus.Rtu\ThabeSoft.Modbus.Rtu.csproj" />
-	  <ProjectReference Include="..\..\src\ThabeSoft.Modbus\ThabeSoft.Modbus.csproj" />
+	  <ProjectReference Include="..\..\src\ThabeSoft.Modbus\ThabeSoft.Startable.Abstractions.csproj" />
 	  <ProjectReference Include="..\..\src\ThabeSoft.Ports.SerialPort\ThabeSoft.Ports.SerialPort.csproj" />
 	  <ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.Abstractions\ThabeSoft.ProtocolGateway.Abstractions.csproj" />
 	  <ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.Modbus\ThabeSoft.ProtocolGateway.Modbus.csproj" />

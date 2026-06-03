@@ -6,6 +6,7 @@ using ThabeSoft.Modbus.Primitives;
 using ThabeSoft.Ports;
 using ThabeSoft.Primitives;
 using ThabeSoft.Primitives.Crc;
+using ThabeSoft.Startable;
 
 namespace ThabeSoft.Modbus;
 
@@ -423,14 +424,10 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
     }
 
 
-    public ValueTask<Result> StartAsync(CancellationToken cancellationToken = default)
-    {
-        return port.StartAsync(cancellationToken);
-    }
-    public ValueTask<Result> StopAsync(CancellationToken cancellationToken = default)
-    {
-        return port.StopAsync(cancellationToken);
-    }
+
+    State IStartable.State => port.State;
+    ValueTask<Result> IStartable.StartAsync(CancellationToken cancellationToken) => port.StartAsync(cancellationToken);
+    ValueTask<Result> IStartable.StopAsync(CancellationToken cancellationToken) => port.StopAsync(cancellationToken);
 }
 
 

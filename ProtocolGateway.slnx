@@ -13,6 +13,7 @@
     <Project Path="src/ThabeSoft.ProtocolGateway.Converters/ThabeSoft.ProtocolGateway.Converters.csproj" />
   </Folder>
   <Folder Name="/Modules/">
+    <Project Path="src/ThabeSoft.Modbus/ThabeSoft.Startable.Abstractions.csproj" />
     <Project Path="src/ThabeSoft.Mvvm/ThabeSoft.Mvvm.csproj" />
     <Project Path="src/ThabeSoft.Primitives.ByteKit/ThabeSoft.Primitives.ByteKit.csproj" />
     <Project Path="src/ThabeSoft.Primitives.Result/ThabeSoft.Primitives.Result.csproj" />
@@ -22,7 +23,6 @@
     <Project Path="src/ThabeSoft.Modbus.Rtu.Master/ThabeSoft.Modbus.Rtu.Master.csproj" />
     <Project Path="src/ThabeSoft.Modbus.Rtu.Slave/ThabeSoft.Modbus.Rtu.Slave.csproj" />
     <Project Path="src/ThabeSoft.Modbus.Rtu/ThabeSoft.Modbus.Rtu.csproj" />
-    <Project Path="src/ThabeSoft.Modbus/ThabeSoft.Modbus.csproj" />
   </Folder>
   <Folder Name="/Modules/Ports/">
     <Project Path="src/ThabeSoft.Ports.Abstractions/ThabeSoft.Ports.Abstractions.csproj" />

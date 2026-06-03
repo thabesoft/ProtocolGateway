@@ -24,14 +24,14 @@ public readonly struct ChannelName : IEquatable<ChannelName>, IEquatable<string>
     /// <summary>
     /// 从字符名称创建
     /// </summary>
-    public static Result<ChannelName> Create(string name)
+    public static Result<ChannelName> Create(string? name)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
             return Result.InvalidParameter<ChannelName>("通道名称创建失败, 不可为空白或者空白字符");
         }
 
-        var trimmed = name.Trim();
+        var trimmed = name!.Trim();
         return Result.Ok(new ChannelName(trimmed));
     }
 

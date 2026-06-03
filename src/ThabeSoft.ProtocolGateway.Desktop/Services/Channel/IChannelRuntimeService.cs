@@ -100,11 +100,8 @@ internal sealed class ChannelRuntimeService : IChannelRuntimeService
     {
         if (_contexts.TryRemove(name, out var context))
         {
-            if (context.Handle.IsConnected)
-            {
-                await context.Handle.DisconnectAsync();
-            }
-            ChannelDeactivated?.Invoke(this, name);
+            await context.Handle.StopAsync();
+             ChannelDeactivated?.Invoke(this, name);
         }
 
         return Result.Ok();

@@ -1,6 +1,9 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using Avalonia.Controls;
+using CommunityToolkit.Mvvm.Input;
 using ThabeSoft.Mvvm;
+using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Handles;
+using ThabeSoft.ProtocolGateway.Services;
 using ThabeSoft.ProtocolGateway.Services.Channel;
 
 namespace ThabeSoft.ProtocolGateway.ViewModels;
@@ -13,28 +16,17 @@ public sealed partial class ChannelConfigViewModel : ViewModelBase, IViewModel
 {
     private readonly Lock _lock = new();
 
-    /// <summary>
-    /// 名称
-    /// </summary>
-    public string Name
-    {
-        get; set => Change(field, value, x => field = x)
-            .NotWhiteSpace()
-            .IsSuccess(x => ChannelName.Create(x))
-            .Apply();
-    } = "None";
 
     /// <summary>
-    /// 协议
+    /// 导航业务
     /// </summary>
-    public ProtocolType Protocol
+    public INotificationService? NotificationService
     {
-        get; set => Change(field, value, x => field = x)
-            .IsDefined()
-            .Apply();
-    } = ProtocolType.ModbusRtu;
-
-    // 通道句柄
+        get; set => Apply(field, value, x => field = x);
+    }
+    /// <summary>
+    /// 通道句柄
+    /// </summary>
     public IChannelHandle? ChannelHandle
     {
         get; set => Change(field, value, x => field = x)
@@ -47,8 +39,41 @@ public sealed partial class ChannelConfigViewModel : ViewModelBase, IViewModel
             })
             .Apply();
     }
+    /// <summary>
+    /// 名称
+    /// </summary>
+    public string? Name
+    {
+        get; set => Change(field, value, x => field = x)
+            .NotNullOrWhiteSpace()
+            .IsSuccess(x => ChannelName.Create(x))
+            .Apply();
+    }
+    /// <summary>
+    /// 协议
+    /// </summary>
+    public ProtocolType Protocol
+    {
+        get; set => Change(field, value, x => field = x)
+            .IsDefined()
+            .Apply();
+
+    } = ProtocolType.ModbusRtu;
+    public bool IsShowConnectButton => ChannelHandle?.State == Startable.State.Starting;
 
 
+    public ChannelConfigViewModel()
+    {
+        if(Design.IsDesignMode)
+        {
+            Name = "设计时名称";
+            Protocol = ProtocolType.ModbusRtu;
+        }
+    }
+    public ChannelConfigViewModel(INotificationService notificationService)
+    {
+        NotificationService = notificationService;
+    }
     public void LoadContext(ChannelRuntimeContext context)
     {
         using var _ = _lock.EnterScope();
@@ -59,18 +84,23 @@ public sealed partial class ChannelConfigViewModel : ViewModelBase, IViewModel
     }
 
 
+
     [RelayCommand(CanExecute = nameof(HasChannelHandle))]
     private async Task ConnectAsync()
     {
         if (ChannelHandle is null) return;
-        await ChannelHandle.ConnectAsync();
+
+        var result = await ChannelHandle.StartAsync();
+        NotificationService?.Show(result);
     }
 
     [RelayCommand(CanExecute = nameof(HasChannelHandle))]
     private async Task DisconnectAsync()
     {
         if (ChannelHandle is null) return;
-        await ChannelHandle.DisconnectAsync();
+
+        var result = await ChannelHandle.StopAsync();
+        NotificationService?.Show(result);
     }
 
 

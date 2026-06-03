@@ -1,6 +1,8 @@
 ﻿using Avalonia.Collections;
+using Avalonia.Controls;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using System.Diagnostics;
 using ThabeSoft.Mvvm;
 using ThabeSoft.ProtocolGateway.Messages;
 using ThabeSoft.ProtocolGateway.Services;
@@ -78,6 +80,10 @@ public sealed partial class ChannelPageViewModel : ViewModelBase, IDisposable
 
     public ChannelPageViewModel()
     {
+        if(Design.IsDesignMode)
+        {
+            _channels = [.. Enumerable.Range(1, Random.Shared.Next(1, 10)).Select(x => new ChannelConfigViewModel() { Name = $"测试通道{x}" })];
+        }
     }
     public ChannelPageViewModel(INavigationService navigationService, IChannelRuntimeService runtimeService, INotificationService notificationService)
     {
@@ -98,7 +104,7 @@ public sealed partial class ChannelPageViewModel : ViewModelBase, IDisposable
 
 
 
-
+    // 打开详情
     [RelayCommand(CanExecute = nameof(OpenDetailsPageCommandCanExecute))]
     private void OpenDetailsPage(ChannelConfigViewModel item)
     {
@@ -125,6 +131,7 @@ public sealed partial class ChannelPageViewModel : ViewModelBase, IDisposable
         }
     }
 
+    // 重载
     [RelayCommand(CanExecute = nameof(ReloadCommandCanExecute))]
     private async Task ReloadAsync()
     {
@@ -157,7 +164,7 @@ public sealed partial class ChannelPageViewModel : ViewModelBase, IDisposable
 
             Channels = [.. vms];
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             TryNotification(x => x.Error(ex.Message).Title("重新加载失败").Show());
         }
@@ -168,12 +175,7 @@ public sealed partial class ChannelPageViewModel : ViewModelBase, IDisposable
     }
 
 
-    private void TryNotification(Action<INotificationService> action)
-    {
-        if(NotificationService is null) return;
-        action(NotificationService);
-    }
-
+    // 通道已添加
     private void OnChannelActivated(object? sender, ChannelRuntimeContext context)
     {
         if (IsLoading) return;
@@ -186,6 +188,7 @@ public sealed partial class ChannelPageViewModel : ViewModelBase, IDisposable
             _channels.Add(vm);
         });
     }
+    // 通道已取消
     private void OnChannelDeactivated(object? sender, ChannelName channelName)
     {
         if (IsLoading) return;
@@ -200,6 +203,20 @@ public sealed partial class ChannelPageViewModel : ViewModelBase, IDisposable
         });
     }
 
+
+    // 重载命令是否可以执行
     private bool ReloadCommandCanExecute() => ChannelRuntimeService is not null;
+    // 打开详情页命令是否可以执行
     private bool OpenDetailsPageCommandCanExecute() => ChannelRuntimeService is not null && NavigationService is not null;
+
+    // 尝试通知
+    private void TryNotification(Action<INotificationService> action)
+    {
+        if (NotificationService is null)
+        {
+            Debug.WriteLine("无法通知, 通知业务未初始化");
+            return;
+        }
+        action(NotificationService);
+    }
 }

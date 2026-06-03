@@ -1,15 +1,10 @@
-﻿using ThabeSoft.Primitives;
+﻿using ThabeSoft.Startable;
 
 namespace ThabeSoft.ProtocolGateway.Handles;
 
-public interface IChannelHandle
+public interface IChannelHandle : IStartable
 {
     ChannelName Name { get; }
     ChannelType Type { get; }
     ProtocolType Protocol { get; }
-
-    bool IsConnected { get; }
-
-    ValueTask<Result> ConnectAsync(CancellationToken cancellationToken = default);
-    ValueTask<Result> DisconnectAsync(CancellationToken cancellationToken = default);
 }

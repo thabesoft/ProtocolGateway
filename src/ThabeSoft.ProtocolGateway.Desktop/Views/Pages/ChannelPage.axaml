@@ -10,6 +10,10 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="vm:ChannelPageViewModel">
 
+    <UserControl.DataContext>
+        <vm:ChannelPageViewModel />
+    </UserControl.DataContext>
+
     <Grid RowDefinitions="Auto,*">
 
         <!--顶部信息-->
@@ -60,16 +64,16 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                <Button Content="🔗"
+                                <Button Content="连接"
                                         Command="{Binding ConnectCommand}"
                                         Classes="DataGridButton"/>
-                                <Button Content="🚮"
+                                <Button Content="断开"
                                         Command="{Binding DisconnectCommand}"
                                         Classes="DataGridButton"/>
-                                <Button Content="⏸"
+                                <Button Content="暂停"
                                         Command="{Binding PauseCommand}"
                                         ToolTip.Tip="启动"/>
-                                <Button Content="▶"
+                                <Button Content="恢复"
                                         Command="{Binding ResumeCommand}"
                                         ToolTip.Tip="停止"/>
                             </StackPanel>

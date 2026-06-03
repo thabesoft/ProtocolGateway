@@ -1,7 +1,7 @@
-﻿using System.ComponentModel;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO.Ports;
 using ThabeSoft.Primitives;
+using ThabeSoft.Startable;
 
 namespace ThabeSoft.Ports;
 
@@ -9,30 +9,15 @@ namespace ThabeSoft.Ports;
 /// <summary>
 /// 串口传输器
 /// </summary>
-public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
+public sealed class SerialPortTransport : ITransport
 {
-    private static readonly PropertyChangedEventArgs StatePropertyChangedEventArgs = new(nameof(State));
-
-
     private ISerialPortOptions? _options;
     private SerialPort? port;
 
     private readonly SerialPortLock _lock = new();
 
-    public event PropertyChangedEventHandler? PropertyChanged;
 
-
-    public TransporterState State
-    {
-        get;
-        private set
-        {
-            if (value == field) return;
-            field = value;
-            PropertyChanged?.Invoke(this, StatePropertyChangedEventArgs);
-        }
-
-    } = TransporterState.Pending;
+    public State State { get; private set; }
 
 
     ValueTask<Result> ITransport.ConnectAsync(ITransportOptions options, CancellationToken cancellation)
@@ -47,14 +32,14 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
 
     public async ValueTask<Result> ConnectAsync(ISerialPortOptions options, CancellationToken cancellation = default)
     {
-        if (State != TransporterState.Pending &&
-            State != TransporterState.Disconnected &&
-            State != TransporterState.Faulted)
+        if (State != State.Ready &&
+            State != State.Stoped &&
+            State != State.Error)
         {
             return Result.Error(ErrorType.InvalidOperation, "当前状态无法链接");
         }
 
-        State = TransporterState.Connecting;
+        State = State.Starting;
 
         using var _ = await _lock.GetConfigLockAsync();
 
@@ -62,54 +47,54 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
         {
             _options = options;
 
-            return CreateSerialPort(options).Tap(x =>
+            return CreateSerialPort(options).Tap((Action<SerialPort>)(x =>
             {
                 port = x;
                 port.Open();
 
-                State = TransporterState.Connected;
-            });
+                State = Startable.State.Started;
+            }));
         }
         catch (UnauthorizedAccessException)
         {
-            State = TransporterState.Faulted;
+            State = State.Error;
             return Result.InvalidOperation("访问被拒绝, 无法打开串口");
         }
         catch (ArgumentOutOfRangeException)
         {
-            State = TransporterState.Faulted;
+            State = State.Error;
             return Result.InvalidOperation("参数超出范围, 无法打开串口");
         }
         catch (IOException)
         {
-            State = TransporterState.Faulted;
+            State = State.Error;
             return Result.InvalidOperation( "IO异常, 无法打开串口");
         }
         catch (InvalidOperationException ex)
         {
-            State = TransporterState.Faulted;
+            State = State.Error;
             return Result.InvalidOperation( $"串口连接失败: {ex.Message}");
         }
     }
     public async ValueTask<Result> DisconnectAsync(CancellationToken cancellation = default)
     {
-        if (State != TransporterState.Connected && State != TransporterState.Connecting)
+        if (State != State.Started && State != State.Starting)
         {
             return Result.Error(ErrorType.InvalidOperation, "传输未连接, 无法断开");
         }
 
-        State = TransporterState.Disconnecting;
+        State = State.Stoping;
         using var _ = await _lock.GetConfigLockAsync();
 
         try
         {
             port?.Close();
-            State = TransporterState.Disconnected;
+            State = State.Stoped;
             return Result.Ok();
         }
         catch(IOException ex)
         {
-            State = TransporterState.Faulted;
+            State = State.Error;
             return Result.InvalidOperation( $"断开连接时发生错误: {ex.Message}");
         }
     }
@@ -117,7 +102,7 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
 
     public async ValueTask<Result> ReadExactAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
     {
-        if (port?.IsOpen != true || State != TransporterState.Connected)
+        if (port?.IsOpen != true || State != State.Started)
             return Result.Error<int>(ErrorType.InvalidOperation, "未连接无法读取数据");
 
         if (_options is null)
@@ -142,7 +127,7 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
     }
     public async ValueTask<Result> WriteAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
     {
-        if (port?.IsOpen != true || State != TransporterState.Connected)
+        if (port?.IsOpen != true || State != State.Started)
             return Result.Error(ErrorType.InvalidOperation, "未连接无法写入数据");
 
         if (_options is null)
@@ -165,7 +150,7 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
 
     public async ValueTask DisposeAsync()
     {
-        if (State == TransporterState.Disposed) return;
+        if (State == State.Disposed) return;
 
         using var _ = await _lock.GetConfigLockAsync();
 
@@ -173,7 +158,7 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
         {
             if ((port?.IsOpen) != true) return;
 
-            State = TransporterState.Disconnecting;
+            State = State.Stoping;
             port.Close();
         }
         catch(IOException ex)
@@ -185,7 +170,7 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
             port?.Dispose();
             port = null;
 
-            State = TransporterState.Disposed;
+            State = State.Disposed;
         }
     }
 
@@ -207,6 +192,7 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
             return Result.Error<SerialPort>(ErrorType.InvalidOperation, $"无法创建串口: {ex.Message}");
         }
     }
+
 
 
     public ValueTask<Result> StartAsync(CancellationToken cancellationToken = default)

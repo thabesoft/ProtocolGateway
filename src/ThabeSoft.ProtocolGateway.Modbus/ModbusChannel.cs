@@ -1,6 +1,7 @@
 ﻿using System.Buffers;
 using ThabeSoft.Modbus;
 using ThabeSoft.Primitives;
+using ThabeSoft.Startable;
 
 namespace ThabeSoft.ProtocolGateway;
 
@@ -11,14 +12,9 @@ namespace ThabeSoft.ProtocolGateway;
 /// <param name="master">Modbus主站</param>
 public sealed class ModbusChannel(IModbusMaster master) : IReadWriteChannel
 {
-    public ValueTask<Result> StartAsync(CancellationToken cancellationToken = default)
-    {
-        return master.StartAsync(cancellationToken);
-    }
-    public ValueTask<Result> StopAsync(CancellationToken cancellationToken = default)
-    {
-        return master.StartAsync(cancellationToken);
-    }
+    State IStartable.State => master.State;
+    ValueTask<Result> IStartable.StartAsync(CancellationToken cancellationToken) => master.StartAsync(cancellationToken);
+    ValueTask<Result> IStartable.StopAsync(CancellationToken cancellationToken) => master.StopAsync(cancellationToken);
 
 
     /// <summary>

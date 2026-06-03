@@ -1,4 +1,4 @@
-﻿using ThabeSoft.Primitives;
+﻿using ThabeSoft.Startable;
 
 namespace ThabeSoft.ProtocolGateway;
 
@@ -6,11 +6,7 @@ namespace ThabeSoft.ProtocolGateway;
 /// <summary>
 /// 读写通道
 /// </summary>
-public interface IChannel
-{
-    ValueTask<Result> StartAsync(CancellationToken cancellationToken = default);
-    ValueTask<Result> StopAsync(CancellationToken cancellationToken = default);
-}
+public interface IChannel : IStartable;
 
 
 /// <summary>

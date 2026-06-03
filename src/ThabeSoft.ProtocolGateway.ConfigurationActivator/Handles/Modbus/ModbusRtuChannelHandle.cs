@@ -1,5 +1,6 @@
 ﻿using ThabeSoft.Ports;
 using ThabeSoft.Primitives;
+using ThabeSoft.Startable;
 
 namespace ThabeSoft.ProtocolGateway.Handles.Modbus;
 
@@ -9,17 +10,15 @@ public sealed class ModbusRtuChannelHandle(ChannelName name, IChannel channel, S
     public ChannelName Name => name;
     public ChannelType Type => ChannelType.Modbus;
     public ProtocolType Protocol => ProtocolType.ModbusRtu;
-    public bool IsConnected { get; private set;  }
+    public State State => transport.State;
 
 
-    public async ValueTask<Result> ConnectAsync(CancellationToken cancellationToken = default)
+    public ValueTask<Result> StartAsync(CancellationToken cancellationToken = default)
     {
-        var result = await transport.ConnectAsync(options, cancellationToken);
-        return result.Tap(() => IsConnected = true);
+        return transport.ConnectAsync(options, cancellationToken);
     }
-    public async ValueTask<Result> DisconnectAsync(CancellationToken cancellationToken = default)
+    public ValueTask<Result> StopAsync(CancellationToken cancellationToken = default)
     {
-        var result = await transport.DisconnectAsync(cancellationToken);
-        return result.Tap(() => IsConnected = false);
+        return transport.DisconnectAsync(cancellationToken);
     }
 }
