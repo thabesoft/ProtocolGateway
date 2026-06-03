@@ -34,7 +34,7 @@ public readonly record struct RtuWriteMultipleRequestHeader : IRequestHeader, IC
     public static Result<RtuWriteMultipleRequestHeader> Coils(byte slaveId, ushort address, ushort crc)
     {
         var value = new RtuWriteMultipleRequestHeader(slaveId, FunctionCode.WriteMultipleCoils, address, crc);
-        return Result.Ok(value);
+        return Result.Success(value);
     }
     /// <summary>
     /// 写多个寄存器值
@@ -42,7 +42,7 @@ public readonly record struct RtuWriteMultipleRequestHeader : IRequestHeader, IC
     public static Result<RtuWriteMultipleRequestHeader> Registers(byte slaveId, ushort address, ushort crc)
     {
         var value =  new RtuWriteMultipleRequestHeader(slaveId, FunctionCode.WriteMultipleRegisters, address, crc);
-        return Result.Ok(value);
+        return Result.Success(value);
     }
 
     public override string ToString()

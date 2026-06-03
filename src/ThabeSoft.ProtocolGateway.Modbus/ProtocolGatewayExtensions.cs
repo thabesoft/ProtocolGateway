@@ -31,7 +31,7 @@ public static class ProtocolGatewayExtensions
             ModbusChannel channel = new(master);
             gateway.AddChannel(name, channel);
 
-            return Result.Ok(channel);
+            return Result.Success(channel);
         }
     }
 }

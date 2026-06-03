@@ -5,84 +5,89 @@
 /// </summary>
 public readonly struct Result : IResult
 {
-    /// <summary> 是否成功 </summary>
-    public bool IsSuccess { get; }
     /// <summary> 错误类型 </summary>
     public ErrorType ErrorType { get; }
+    /// <summary> 等级 </summary>
+    public ResultLevel Level { get; }
     /// <summary> 消息 </summary>
     public string? Message { get; }
 
-
-    private Result(bool isSuccess, ErrorType errorType, string? message)
+    internal Result(ResultLevel level, string? message)
     {
-        IsSuccess = isSuccess;
-        ErrorType = errorType;
+        Level = level;
         Message = message;
 
 #if DEBUG
-        if (!isSuccess) ResultException.ThrowIfDebugger(errorType, message);
+        if (Level == ResultLevel.Error) ResultException.ThrowIfDebugger(message);
 #endif
     }
 
 
-    /// <summary>
-    /// 成功
-    /// </summary>
-    public static Result Ok()
-    {
-        return new(true, ErrorType.None, null);
-    }
-    /// <summary>
-    /// 成功
-    /// </summary>
-    public static Result<TValue> Ok<TValue>(TValue value)
-    {
-        return Result<TValue>.Ok(value);
-    }
 
-    /// <summary>
-    /// 错误
-    /// </summary>
-    /// <param name="message">错误信息</param>
-    public static Result Error(ErrorType type, string message)
+    public static Result Success()
     {
-        if (type == ErrorType.None || type == ErrorType.Unspecified)
-        {
-            return new(false, ErrorType.Unspecified, message);
-        }
-
-        return new(false, type, message);
+        return new(ResultLevel.Success, null);
     }
-    /// <summary>
-    /// 错误
-    /// </summary>
-    /// <param name="type">错误类型</param>
-    /// <param name="message">错误信息</param>
-    public static Result<TValue> Error<TValue>(ErrorType type, string message)
+    public static Result Info(string message)
     {
-        return Result<TValue>.Error(type, message);
+        return new(ResultLevel.Info, message);
+    }
+    public static Result Warning(string message)
+    {
+        return new(ResultLevel.Warning, message);
+    }
+    public static Result Error(string message)
+    {
+        return new(ResultLevel.Error, message);
     }
 
 
-    /// <summary>
-    /// 将当前结果的错误传播到指定类型的 Result。
-    /// </summary>
-    /// <remarks>
-    /// 如果当前结果成功，此方法不应被调用。
-    /// 建议仅在 <c>if (!result.IsSuccess) return result.PropagateError&lt;T&gt;();</c> 场景使用。
-    /// </remarks>
-    /// <exception cref="ResultException">但结果为成功时候则抛出</exception>
-    public Result<U> PropagateError<U>()
+    public static Result<TValue> Success<TValue>(TValue value)
     {
-        if (IsSuccess) throw new ResultException("Cannot propagate error from successful result");
-        return Result<U>.Error(ErrorType, Message!);
+        return Result<TValue>.Success(value);
+    }
+
+    public static Result<TValue> Info<TValue>(string message)
+    {
+        return Result<TValue>.Info(message);
+    }
+    public static Result<TValue> Info<TValue>(string message, TValue value)
+    {
+        return Result<TValue>.Info(message, value);
+    }
+
+    public static Result<TValue> Warning<TValue>(string message)
+    {
+        return Result<TValue>.Warning(message);
+    }
+    public static Result<TValue> Warning<TValue>(string message, TValue value)
+    {
+        return Result<TValue>.Warning(message, value);
+    }
+
+    public static Result<TValue> Error<TValue>(string message)
+    {
+        return Result<TValue>.Error(message);
+    }
+    public static Result<TValue> Error<TValue>(string message, TValue value)
+    {
+        return Result<TValue>.Error(message, value);
+    }
+
+
+    /// <summary>
+    /// 转换结果
+    /// </summary>
+    public Result<U> Cast<U>()
+    {
+        return new Result<U>(Level, Message);
     }
 
 
     public override string ToString()
     {
-        if (IsSuccess) return "Ok";
-        return $"[{ErrorType}] {Message}";
+        if (this.IsSuccess) return "Ok";
+        return $"[{Level}] {ErrorType}-{Message}";
     }
 }
 
@@ -91,26 +96,38 @@ public readonly struct Result : IResult
 /// </summary>
 public readonly struct Result<TValue> : IResult<TValue>
 {
-    /// <summary> 是否成功 </summary>
-    public bool IsSuccess { get; }
-    /// <summary> 错误类型 </summary>
-    public ErrorType ErrorType { get; }
+    private readonly bool _hasValue;
+
+
+    /// <summary> 等级 </summary>
+    public ResultLevel Level { get; }
     /// <summary> 消息 </summary>
     public string? Message { get; }
     /// <summary> 值, 当结果为错误的时候访问会抛出异常 </summary>
     /// <exception cref="InvalidOperationException">当结果是错误的时候访问抛出</exception>
-    public TValue Value => IsSuccess ? field : throw new InvalidOperationException("Cannot access Value of a failed Result.");
+    public TValue Value => _hasValue ? field : throw new InvalidOperationException("Cannot access Value of a failed Result.");
 
 
-    private Result(bool isSuccess, ErrorType errorType, string? message, TValue value)
+    internal Result(ResultLevel level, string? message)
     {
-        IsSuccess = isSuccess;
-        ErrorType = errorType;
+        Level = level;
         Message = message;
-        Value = value;
+        Value = default!;
+        _hasValue = false;
 
 #if DEBUG
-        if (!isSuccess) ResultException.ThrowIfDebugger(errorType, message);
+        if (Level == ResultLevel.Error) ResultException.ThrowIfDebugger(message);
+#endif
+    }
+    private Result(ResultLevel level, string? message, TValue value)
+    {
+        Level = level;
+        Message = message;
+        Value = value;
+        _hasValue = true;
+
+#if DEBUG
+        if (Level == ResultLevel.Error) ResultException.ThrowIfDebugger( message);
 #endif
     }
 
@@ -120,56 +137,63 @@ public readonly struct Result<TValue> : IResult<TValue>
     /// </summary>
     public static implicit operator Result(Result<TValue> result)
     {
-        if (result.IsSuccess) return Result.Ok();
-        return Result.Error(result.ErrorType, result.Message ?? "未知错误");
+        return new Result(result.Level, result.Message);
+    }
+
+
+    public static Result<TValue> Success(TValue value)
+    {
+        return new(ResultLevel.Success, null, value);
+    }
+
+    public static Result<TValue> Info(string message)
+    {
+        return new(ResultLevel.Info, message);
+    }
+    public static Result<TValue> Info(string message, TValue value)
+    {
+        return new(ResultLevel.Info, message, value);
+    }
+
+
+    public static Result<TValue> Warning(string message)
+    {
+        return new(ResultLevel.Warning,message);
+    }
+    public static Result<TValue> Warning(string message, TValue value)
+    {
+        return new(ResultLevel.Info, message, value);
+    }
+
+    public static Result<TValue> Error(string message)
+    {
+        return new(ResultLevel.Error, message);
+    }
+    public static Result<TValue> Error(string message, TValue value)
+    {
+        return new(ResultLevel.Error, message, value);
     }
 
 
     /// <summary>
-    /// 成功
+    /// 转换错误到指定类型 (必须是没有值的结果)
     /// </summary>
-    public static Result<TValue> Ok(TValue value)
+    /// <typeparam name="U"></typeparam>
+    /// <returns></returns>
+    /// <exception cref="ResultException"></exception>
+    public Result<U> Cast<U>()
     {
-        return new(true, ErrorType.None, null, value);
-    }
-    /// <summary>
-    /// 错误
-    /// </summary>
-    /// <param name="message">错误消息</param>
-    public static Result<TValue> Error(ErrorType type, string message)
-    {
-        if (type == ErrorType.None || type == ErrorType.Unspecified)
+        if (_hasValue)
         {
-            return new(false, ErrorType.Unspecified, message, default!);
+            throw new ResultException("Cannot propagate error from successful result");
         }
 
-        return new(false, type, message, default!);
-    }
-
-
-    /// <summary>
-    /// 将当前结果的错误传播到指定类型的 Result。
-    /// </summary>
-    /// <remarks>
-    /// 如果当前结果成功，此方法不应被调用。
-    /// 建议仅在 <c>if (!result.IsSuccess) return result.PropagateError&lt;T&gt;();</c> 场景使用。
-    /// </remarks>
-    /// <exception cref="ResultException">但结果为成功时候则抛出</exception>
-    public Result<U> PropagateError<U>()
-    {
-        if (IsSuccess) throw new ResultException(ErrorType.Internal, "Cannot propagate error from successful result");
-        return Result<U>.Error(ErrorType, Message!);
+        return new Result<U>(Level, Message);
     }
 
 
     public override string ToString()
     {
-        if (IsSuccess)
-        {
-            if (Message is not null) return $"{Message}={Value}";
-            return $"Ok={Value}";
-        }
-
-        return $"[{ErrorType}] {Message}";
+        return $"[{Level}] {Message}-{Value}";
     }
 }

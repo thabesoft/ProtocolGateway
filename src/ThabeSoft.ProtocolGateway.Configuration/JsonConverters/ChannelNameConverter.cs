@@ -1,7 +1,8 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+using ThabeSoft.Primitives;
 
-namespace ThabeSoft.ProtocolGateway.Infrastructure.JsonConverters;
+namespace ThabeSoft.ProtocolGateway.JsonConverters;
 
 
 /// <summary>

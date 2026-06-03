@@ -63,8 +63,8 @@ public static class NotifyPropertyExtensions
         {
             property.OnValidate((_, value) =>
             {
-                if (value is not null) return Result.Ok();
-                return Result.InvalidParameter(errorMessage?.Invoke() ?? "不可为空");
+                if (value is not null) return Result.Success();
+                return Result.Error(errorMessage?.Invoke() ?? "不可为空");
             });
 
             return property;
@@ -74,8 +74,8 @@ public static class NotifyPropertyExtensions
         {
             property.OnValidate((_, value) =>
             {
-                if (condition) return Result.Ok();
-                return Result.InvalidParameter(errorMessage?.Invoke(value) ?? "验证失败");
+                if (condition) return Result.Success();
+                return Result.Error(errorMessage?.Invoke(value) ?? "验证失败");
             });
 
             return property;
@@ -94,8 +94,8 @@ public static class NotifyPropertyExtensions
         {
             property.OnValidate((_, value) =>
             {
-                if (value is not null && !value.Any()) return Result.Ok();
-                return Result.InvalidParameter(errorMessage?.Invoke() ?? "集合不可为空");
+                if (value is not null && !value.Any()) return Result.Success();
+                return Result.Error(errorMessage?.Invoke() ?? "集合不可为空");
             });
 
             return property;
@@ -108,8 +108,8 @@ public static class NotifyPropertyExtensions
         {
             property.OnValidate((_, value) =>
             {
-                if (!string.IsNullOrEmpty(value)) return Result.Ok();
-                return Result.InvalidParameter(errorMessage?.Invoke() ?? "不可为空或空白");
+                if (!string.IsNullOrEmpty(value)) return Result.Success();
+                return Result.Error(errorMessage?.Invoke() ?? "不可为空或空白");
             });
 
             return property;
@@ -119,8 +119,8 @@ public static class NotifyPropertyExtensions
         {
             property.OnValidate((_, value) =>
             {
-                if (!string.IsNullOrWhiteSpace(value)) return Result.Ok();
-                return Result.InvalidParameter(errorMessage?.Invoke() ?? "不可为空或空白字符");
+                if (!string.IsNullOrWhiteSpace(value)) return Result.Success();
+                return Result.Error(errorMessage?.Invoke() ?? "不可为空或空白字符");
             });
 
             return property;
@@ -133,8 +133,8 @@ public static class NotifyPropertyExtensions
         {
             property.OnValidate((_, value) =>
             {
-                if (!string.IsNullOrEmpty(value)) return Result.Ok();
-                return Result.InvalidParameter(errorMessage?.Invoke() ?? "不可为空白");
+                if (!string.IsNullOrEmpty(value)) return Result.Success();
+                return Result.Error(errorMessage?.Invoke() ?? "不可为空白");
             });
 
             return property;
@@ -144,8 +144,8 @@ public static class NotifyPropertyExtensions
         {
             property.OnValidate((_, value) =>
             {
-                if (!string.IsNullOrWhiteSpace(value)) return Result.Ok();
-                return Result.InvalidParameter(errorMessage?.Invoke() ?? "不可为空白字符");
+                if (!string.IsNullOrWhiteSpace(value)) return Result.Success();
+                return Result.Error(errorMessage?.Invoke() ?? "不可为空白字符");
             });
 
             return property;
@@ -161,15 +161,15 @@ public static class NotifyPropertyExtensions
 #if NET8_0_OR_GREATER
                 if (!Enum.IsDefined(value))
                 {
-                    return Result.InvalidParameter(messageGetter?.Invoke(value) ?? $"不支持的值 [{value}]");
+                    return Result.Error(messageGetter?.Invoke(value) ?? $"不支持的值 [{value}]");
                 }
 #else
                 if (!Enum.IsDefined(typeof(T), value))
                 {
-                    return Result.InvalidParameter(messageGetter?.Invoke(value) ?? $"不支持的值 [{value}]");
+                    return Result.Error(messageGetter?.Invoke(value) ?? $"不支持的值 [{value}]");
                 }
 #endif
-                return Result.Ok();
+                return Result.Success();
             });
 
             return property;
@@ -179,8 +179,8 @@ public static class NotifyPropertyExtensions
         {
             property.OnValidate((_, value) =>
             {
-                if (value.HasFlag(flag)) return Result.Ok();
-                return Result.InvalidParameter(messageGetter?.Invoke(value) ?? $"不支持该值 [{flag}]");
+                if (value.HasFlag(flag)) return Result.Success();
+                return Result.Error(messageGetter?.Invoke(value) ?? $"不支持该值 [{flag}]");
             });
 
             return property;
@@ -194,8 +194,8 @@ public static class NotifyPropertyExtensions
         {
             property.OnValidate((_, value) =>
             {
-                if (value >= min && value <= max) return Result.Ok();
-                return Result.InvalidParameter(messageGetter?.Invoke(value) ?? $"范围必须在 [{min}-{max}] 之间");
+                if (value >= min && value <= max) return Result.Success();
+                return Result.Error(messageGetter?.Invoke(value) ?? $"范围必须在 [{min}-{max}] 之间");
             });
 
             return property;

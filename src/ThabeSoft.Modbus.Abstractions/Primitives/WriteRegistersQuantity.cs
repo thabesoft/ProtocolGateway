@@ -31,10 +31,10 @@ public readonly record struct WriteRegistersQuantity
     {
         if (value is < MIN or > MAX)
         {
-            return Result.Error<WriteRegistersQuantity>(ErrorType.InvalidParameter, MESSAGE);
+            return Result.Error<WriteRegistersQuantity>(MESSAGE);
         }
 
-        return Result.Ok(new WriteRegistersQuantity((ushort)value));
+        return Result.Success(new WriteRegistersQuantity((ushort)value));
     }
 
 

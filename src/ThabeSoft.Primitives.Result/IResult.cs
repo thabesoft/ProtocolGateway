@@ -6,17 +6,15 @@
 /// </summary>
 public interface IResult
 {
-    /// <summary> 是否成功 </summary>
-    public bool IsSuccess { get; }
-    /// <summary> 错误类型 </summary>
-    ErrorType ErrorType { get; }
+    /// <summary> 等级 </summary>
+    ResultLevel Level { get; }
     /// <summary> 消息 </summary>
     string? Message { get; }
 
     /// <summary>
     /// 传播错误到指定类型
     /// </summary>
-    Result<U> PropagateError<U>();
+    Result<U> Cast<U>();
 }
 
 /// <summary>

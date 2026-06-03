@@ -47,10 +47,10 @@ public readonly record struct RtuWriteMultipleResponseHeader
     public static Result<RtuWriteMultipleResponseHeader> Coils(byte slaveId, ushort address, int quantity, ushort crc)
     {
         var quantity_result = ReadCoilsQuantity.Create(quantity);
-        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<RtuWriteMultipleResponseHeader>();
+        if (!quantity_result.IsSuccess) return quantity_result.Cast<RtuWriteMultipleResponseHeader>();
 
         var value = new RtuWriteMultipleResponseHeader(slaveId, FunctionCode.WriteMultipleCoils, address, quantity_result.Value, crc);
-        return Result.Ok(value);
+        return Result.Success(value);
     }
     public static RtuWriteMultipleResponseHeader Coils(byte slaveId, ushort address, ReadCoilsQuantity quantity, ushort crc)
     {
@@ -61,10 +61,10 @@ public readonly record struct RtuWriteMultipleResponseHeader
     public static Result<RtuWriteMultipleResponseHeader> Registers(byte slaveId, ushort address, int quantity, ushort crc)
     {
         var quantity_result = ReadRegistersQuantity.Create(quantity);
-        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<RtuWriteMultipleResponseHeader>();
+        if (!quantity_result.IsSuccess) return quantity_result.Cast<RtuWriteMultipleResponseHeader>();
 
         var value = new RtuWriteMultipleResponseHeader(slaveId, FunctionCode.WriteMultipleRegisters, address, quantity_result.Value, crc);
-        return Result.Ok(value);
+        return Result.Success(value);
     }
     public static RtuWriteMultipleResponseHeader Registers(byte slaveId, ushort address, ReadRegistersQuantity quantity, ushort crc)
     {

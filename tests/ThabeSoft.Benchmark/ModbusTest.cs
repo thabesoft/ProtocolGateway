@@ -1,5 +1,6 @@
 ﻿using ThabeSoft.Modbus;
 using ThabeSoft.Ports;
+using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway;
 
 namespace ThabeSoft.Benchmark;

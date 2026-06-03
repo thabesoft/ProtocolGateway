@@ -42,7 +42,7 @@ public sealed class RtuMasterWriteMultipleCodec : IMasterWriteMultipleCodec
     {
         var layout_result = WriteCoilsQuantity.Create(values.Length)
             .Map(RtuWriteMultipleRequestLayout.FromQuantity);
-        if (!layout_result.IsSuccess) return layout_result.PropagateError<int>();
+        if (!layout_result.IsSuccess) return layout_result.Cast<int>();
 
         return EncodeCoilsRequest(destination, header, values, layout_result.Value).Then(layout_result.Value.TotalLength);
     }
@@ -50,11 +50,11 @@ public sealed class RtuMasterWriteMultipleCodec : IMasterWriteMultipleCodec
     {
         // 协议布局无效
         if (layout == RtuWriteMultipleRequestLayout.Empty)
-            return Result.InvalidParameter($"写多个线圈帧布局不可为空");
+            return Result.Error($"写多个线圈帧布局不可为空");
 
         // 缺少请求头
         if (header == WriteMultipleRequestHeader.Empty)
-            return Result.InvalidParameter($"写多个线圈请求头不可为空");
+            return Result.Error($"写多个线圈请求头不可为空");
 
         // 缓冲区长度不足
         if (destination.Length < layout.TotalLength)
@@ -63,7 +63,7 @@ public sealed class RtuMasterWriteMultipleCodec : IMasterWriteMultipleCodec
         // 参数数量超过预期
         var data_quantity = (ushort)values.Length;
         if (data_quantity > layout.DataQuantity)
-            return Result.InvalidParameter($"读取数量 {data_quantity} 超过协议允许的最大值 {layout.DataQuantity}");
+            return Result.Error($"读取数量 {data_quantity} 超过协议允许的最大值 {layout.DataQuantity}");
 
 
         // 数据帧暂存
@@ -97,7 +97,7 @@ public sealed class RtuMasterWriteMultipleCodec : IMasterWriteMultipleCodec
 
         // 返回数据
         buffer.CopyTo(destination);
-        return Result.Ok();
+        return Result.Success();
     }
 
 
@@ -105,7 +105,7 @@ public sealed class RtuMasterWriteMultipleCodec : IMasterWriteMultipleCodec
     {
         var layout_result = WriteRegistersQuantity.Create(values.Length)
             .Map(RtuWriteMultipleRequestLayout.FromQuantity);
-        if (!layout_result.IsSuccess) return layout_result.PropagateError<int>();
+        if (!layout_result.IsSuccess) return layout_result.Cast<int>();
 
         return EncodeRegistersRequest(destination, header, values, layout_result.Value).Then(layout_result.Value.TotalLength);
     }
@@ -116,11 +116,11 @@ public sealed class RtuMasterWriteMultipleCodec : IMasterWriteMultipleCodec
 
         // 协议布局无效
         if (layout == RtuWriteMultipleRequestLayout.Empty)
-            return Result.InvalidParameter($"写多个寄存器帧布局不可为空");
+            return Result.Error($"写多个寄存器帧布局不可为空");
 
         // 缺少请求头
         if (header == WriteMultipleRequestHeader.Empty)
-            return Result.InvalidParameter($"写多个寄存器请求头不可为空");
+            return Result.Error($"写多个寄存器请求头不可为空");
 
         // 构建缓冲区长度不足
         if (destination.Length < layout.TotalLength)
@@ -128,7 +128,7 @@ public sealed class RtuMasterWriteMultipleCodec : IMasterWriteMultipleCodec
 
         // 参数数量超过预期
         if (data_quantity > layout.DataQuantity)
-            return Result.InvalidParameter($"写寄存器数量 {data_quantity} 超出最大值 {layout.DataQuantity}");
+            return Result.Error($"写寄存器数量 {data_quantity} 超出最大值 {layout.DataQuantity}");
 
 
         // 数据帧暂存
@@ -156,7 +156,7 @@ public sealed class RtuMasterWriteMultipleCodec : IMasterWriteMultipleCodec
 
         // 返回数据
         buffer.CopyTo(destination);
-        return Result.Ok();
+        return Result.Success();
     }
 
 
@@ -172,27 +172,27 @@ public sealed class RtuMasterWriteMultipleCodec : IMasterWriteMultipleCodec
         var function_code_result = FunctionCode
             .FromCode(source[layout.FunctionCodeIndex])
             .Where(x => FunctionCode.WriteMultipleCoils == x);
-        if (!function_code_result.IsSuccess) return function_code_result.PropagateError<RtuWriteMultipleResponseHeader>();
+        if (!function_code_result.IsSuccess) return function_code_result.Cast<RtuWriteMultipleResponseHeader>();
 
         // Crc
         var crc_result = source[layout.CrcRange]
             .ToWord(Endianness.LittleEndian);
-        if (!crc_result.IsSuccess) return crc_result.PropagateError<RtuWriteMultipleResponseHeader>();
+        if (!crc_result.IsSuccess) return crc_result.Cast<RtuWriteMultipleResponseHeader>();
 
         // 验证
         var validate_result = Crc16.Validate(source[layout.PayloadRange], crc_result.Value);
-        if (!validate_result.IsSuccess) return validate_result.PropagateError<RtuWriteMultipleResponseHeader>();
+        if (!validate_result.IsSuccess) return validate_result.Cast<RtuWriteMultipleResponseHeader>();
 
         // 从站
         var slave_id = source[layout.SlaveIdIndex];
         // 地址
         var address_result = source[layout.AddressRange]
             .ToWord(Endianness.BigEndian);
-        if (!address_result.IsSuccess) return address_result.PropagateError<RtuWriteMultipleResponseHeader>();
+        if (!address_result.IsSuccess) return address_result.Cast<RtuWriteMultipleResponseHeader>();
         // 数据数量
         var quantity_result = source[layout.QuantityRange]
             .ToWord(Endianness.BigEndian);
-        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<RtuWriteMultipleResponseHeader>();
+        if (!quantity_result.IsSuccess) return quantity_result.Cast<RtuWriteMultipleResponseHeader>();
 
         // 构建
         return RtuWriteMultipleResponseHeader.Coils(
@@ -214,27 +214,27 @@ public sealed class RtuMasterWriteMultipleCodec : IMasterWriteMultipleCodec
         var function_code_result = FunctionCode
             .FromCode(source[layout.FunctionCodeIndex])
             .Where(x => FunctionCode.WriteMultipleRegisters == x);
-        if (!function_code_result.IsSuccess) return function_code_result.PropagateError<RtuWriteMultipleResponseHeader>();
+        if (!function_code_result.IsSuccess) return function_code_result.Cast<RtuWriteMultipleResponseHeader>();
 
         // Crc
         var crc_result = source[layout.CrcRange]
             .ToWord(Endianness.LittleEndian);
-        if (!crc_result.IsSuccess) return crc_result.PropagateError<RtuWriteMultipleResponseHeader>();
+        if (!crc_result.IsSuccess) return crc_result.Cast<RtuWriteMultipleResponseHeader>();
 
         // 验证
         var validate_result = Crc16.Validate(source[layout.PayloadRange], crc_result.Value);
-        if (!validate_result.IsSuccess) return validate_result.PropagateError<RtuWriteMultipleResponseHeader>();
+        if (!validate_result.IsSuccess) return validate_result.Cast<RtuWriteMultipleResponseHeader>();
 
         // 从站
         var slave_id = source[layout.SlaveIdIndex];
         // 地址
         var address_result = source[layout.AddressRange]
             .ToWord(Endianness.BigEndian);
-        if (!address_result.IsSuccess) return address_result.PropagateError<RtuWriteMultipleResponseHeader>();
+        if (!address_result.IsSuccess) return address_result.Cast<RtuWriteMultipleResponseHeader>();
         // 数据数量
         var quantity_result = source[layout.QuantityRange]
             .ToWord(Endianness.BigEndian);
-        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<RtuWriteMultipleResponseHeader>();
+        if (!quantity_result.IsSuccess) return quantity_result.Cast<RtuWriteMultipleResponseHeader>();
 
         // 构建
         return RtuWriteMultipleResponseHeader.Registers(
@@ -246,8 +246,8 @@ public sealed class RtuMasterWriteMultipleCodec : IMasterWriteMultipleCodec
 
 
 
-    private static Result BufferTooSmall(string actionName, int required, int actual) => Result.InvalidParameter(
+    private static Result BufferTooSmall(string actionName, int required, int actual) => Result.Error(
         $"[{actionName}] 编码所需建缓冲区不足，需要 {required} 字节，实际 {actual} 字节");
-    private static Result<T> BufferTooSmall<T>(string actionName, int required, int actual) => Result.InvalidParameter<T>(
+    private static Result<T> BufferTooSmall<T>(string actionName, int required, int actual) => Result.Error<T>(
         $"[{actionName}] 编码所需建缓冲区不足，需要 {required} 字节，实际 {actual} 字节");
 }

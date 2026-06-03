@@ -40,7 +40,7 @@ public static class ByteExtensions
             }
 
             buffer.CopyTo(destination);
-            return Result.Ok();
+            return Result.Success();
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ public static class ByteExtensions
                 byte_value |= (byte)(1 << bitIndex);
             }
 
-            return Result.Ok(byte_value);
+            return Result.Success(byte_value);
         }
     }
 
@@ -91,16 +91,16 @@ public static class ByteExtensions
             var (offset, length) = bitRange.GetOffsetAndLength(8);
 
             if (length <= 0 || length > 8)
-                return Result.InvalidParameter<bool>($"位范围长度必须在 1~8 之间");
+                return Result.Error<bool>("位范围长度必须在 1~8 之间");
 
             if (index < 0 || index >= length)
-                return Result.InvalidParameter<bool>($"索引必须在 0~{length - 1} 之间");
+                return Result.Error<bool>($"索引必须在 0~{length - 1} 之间");
 
             int bitIndex = bitOrder == BitOrder.LSB0
                 ? offset + index           // LSB0: 偏移 + 索引
                 : offset + (length - 1 - index);  // MSB0: 反向
 
-            return Result.Ok((source & (1 << bitIndex)) != 0);
+            return Result.Success((source & (1 << bitIndex)) != 0);
 
         }
         /// <summary>
@@ -126,13 +126,13 @@ public static class ByteExtensions
             for (int i = 0; i < length; i++)
             {
                 var result = source.GetBit(i, 0..length, bitOrder);
-                if (!result.IsSuccess) return result.PropagateError<int>();
+                if (!result.IsSuccess) return result.Cast<int>();
 
                 buffer[i] = result.Value;
             }
 
             buffer.CopyTo(destination);
-            return Result.Ok(length);
+            return Result.Success(length);
         }
     }
     /// <summary>
@@ -148,17 +148,17 @@ public static class ByteExtensions
         {
             if (source.Length < 2)
             {
-                return Result.InvalidParameter<ushort>(
+                return Result.Error<ushort>(
                     $"Byte[] 转 Word 失败，至少需要 2 字节，实际 {source.Length} 字节");
             }
 
             if (endianness == Endianness.BigEndian)
             {
-                return Result.Ok((ushort)(source[0] << 8 | source[1]));
+                return Result.Success((ushort)(source[0] << 8 | source[1]));
             }
 
             var value = (ushort)(source[1] << 8 | source[0]);
-            return Result.Ok(value);
+            return Result.Success(value);
         }
         /// <summary>
         /// 将字节组转换为 双字 (32 bit)
@@ -168,18 +168,18 @@ public static class ByteExtensions
         {
             if (source.Length < 4)
             {
-                return Result.Error<uint>(ErrorType.InvalidParameter, 
+                return Result.Error<uint>(
                     $"Byte[] 转 DWord 失败，至少需要 4 字节，实际 {source.Length} 字节");
             }
             else if (layout == Endianness.BigEndian)
             {
                 var value = (uint)((source[0] << 24) | (source[1] << 16) | (source[2] << 8) | source[3]);
-                return Result.Ok(value);
+                return Result.Success(value);
             }
             else
             {
                 var value = (uint)((source[3] << 24) | (source[2] << 16) | (source[1] << 8) | source[0]);
-                return Result.Ok(value);
+                return Result.Success(value);
             }
         }
         /// <summary>
@@ -190,7 +190,7 @@ public static class ByteExtensions
         {
             if (source.Length < 8)
             {
-                return Result.Error<ulong>(ErrorType.InvalidParameter, 
+                return Result.Error<ulong>(
                     $"Byte[] 转 QWord 失败，至少需要 8 字节，实际 {source.Length} 字节");
             }
 
@@ -201,7 +201,7 @@ public static class ByteExtensions
                        ((ulong)source[4] << 24) | ((ulong)source[5] << 16) |
                        ((ulong)source[6] << 8) | source[7];
 
-                return Result.Ok(value);
+                return Result.Success(value);
             }
             else
             {
@@ -210,7 +210,7 @@ public static class ByteExtensions
                            ((ulong)source[3] << 24) | ((ulong)source[2] << 16) |
                            ((ulong)source[1] << 8) | source[0];
 
-                return Result.Ok(value);
+                return Result.Success(value);
             }
         }
 
@@ -240,7 +240,7 @@ public static class ByteExtensions
             }
 
             buffer.CopyTo(destination);
-            return Result.Ok();
+            return Result.Success();
         }
         /// <summary>
         /// 将字节序转为16位无符号整数序
@@ -260,13 +260,13 @@ public static class ByteExtensions
                 var span = source.Slice(begin, length);
 
                 var result = span.ToWord(endianness);
-                if(!result.IsSuccess) return result;
+                if (!result.IsSuccess) return result;
 
                 buffer[i] = result.Value;
             }
 
             buffer.CopyTo(destination);
-            return Result.Ok();
+            return Result.Success();
         }
     }
 
@@ -291,8 +291,7 @@ public static class ByteExtensions
 
             if (destination.Length < source_byte_count)
             {
-                return Result.Error(ErrorType.InvalidParameter,
-                    $"Word[] 转 Byte[] 失败, Byte[] 缓冲区不足，至少需要 {source_byte_count} 字节，实际 {destination.Length} 字节");
+                return Result.Error($"Word[] 转 Byte[] 失败, Byte[] 缓冲区不足，至少需要 {source_byte_count} 字节，实际 {destination.Length} 字节");
             }
 
             // 暂存数据
@@ -310,19 +309,19 @@ public static class ByteExtensions
 
             // 全部拷贝至目标
             buffer.CopyTo(destination);
-            return Result.Ok();
+            return Result.Success();
         }
-    
+
         public Result<uint> ToDWord(DWordLayout layout = default)
         {
-            if(source.Length < 4)
+            if (source.Length < 4)
             {
-                return Result.InvalidParameter<uint>("字组转双字失败, 至少需要4个字节");
+                return Result.Error<uint>("字组转双字失败, 至少需要4个字节");
             }
 
             Span<byte> buffer = stackalloc byte[4];
             var to_result = source.ToBytes(buffer);
-            if (!to_result.IsSuccess) return to_result.PropagateError<uint>();
+            if (!to_result.IsSuccess) return to_result.Cast<uint>();
 
             return buffer.ToDWord(layout);
         }
@@ -331,12 +330,12 @@ public static class ByteExtensions
         {
             if (source.Length < 8)
             {
-                return Result.InvalidParameter<ulong>("字组转双字失败, 至少需要8个字节");
+                return Result.Error<ulong>("字组转双字失败, 至少需要8个字节");
             }
 
             Span<byte> buffer = stackalloc byte[8];
             var to_result = source.ToBytes(buffer);
-            if (!to_result.IsSuccess) return to_result.PropagateError<ulong>();
+            if (!to_result.IsSuccess) return to_result.Cast<ulong>();
 
             return buffer.ToQWord(layout);
         }
@@ -354,7 +353,7 @@ public static class ByteExtensions
         {
             if (destination.Length < 2)
             {
-                return Result.Error(ErrorType.InvalidParameter,
+                return Result.Error(
                     $"Word 转 Byte[] 失败, Byte[] 缓冲区不足，至少需要 2 字节, 实际 {destination.Length} 字节");
             }
 
@@ -369,7 +368,7 @@ public static class ByteExtensions
                 destination[1] = (byte)(source >> 8);
             }
 
-            return Result.Ok();
+            return Result.Success();
         }
     }
 
@@ -394,7 +393,7 @@ public static class ByteExtensions
 
             if (destination.Length < source_byte_count)
             {
-                return Result.Error(ErrorType.InvalidParameter,
+                return Result.Error(
                     $"DWord[] 转 Byte[] 失败, Byte[] 缓冲区不足，至少需要 {source_byte_count} 字节，实际 {destination.Length} 字节");
             }
 
@@ -413,7 +412,7 @@ public static class ByteExtensions
 
             // 全部拷贝至目标
             buffer.CopyTo(destination);
-            return Result.Ok();
+            return Result.Success();
         }
 
 
@@ -421,12 +420,12 @@ public static class ByteExtensions
         {
             if (source.Length < 8)
             {
-                return Result.InvalidParameter<ulong>("字组转双字失败, 至少需要8个字节");
+                return Result.Error<ulong>("字组转双字失败, 至少需要8个字节");
             }
 
             Span<byte> buffer = stackalloc byte[8];
             var to_result = source.ToBytes(buffer);
-            if (!to_result.IsSuccess) return to_result.PropagateError<ulong>();
+            if (!to_result.IsSuccess) return to_result.Cast<ulong>();
 
             return buffer.ToQWord(layout);
         }
@@ -444,16 +443,12 @@ public static class ByteExtensions
         {
             if (destination.Length < 4)
             {
-                return Result.Error(ErrorType.InvalidParameter,
+                return Result.Error(
                     $"DWord 转 Byte[] 失败, Byte[] 缓冲区不足，至少需要 4 字节, 实际 {destination.Length} 字节");
             }
 
             // 大端解析
-            Span<byte> buffer = stackalloc byte[4];
-            buffer[0] = (byte)(source >> 24);
-            buffer[1] = (byte)(source >> 16);
-            buffer[2] = (byte)(source >> 8);
-            buffer[3] = (byte)source;
+            Span<byte> buffer = [(byte)(source >> 24), (byte)(source >> 16), (byte)(source >> 8), (byte)source];
 
             // 调换字序
             var result = buffer.Swap(layout);
@@ -463,7 +458,7 @@ public static class ByteExtensions
             if (layout == Endianness.LittleEndian) buffer.Reverse();
             buffer.CopyTo(destination);
 
-            return Result.Ok();
+            return Result.Success();
         }
     }
 
@@ -479,8 +474,9 @@ public static class ByteExtensions
         public Result ToBytes(Span<byte> destination, QWordLayout layout = default)
         {
             if (destination.Length < 8)
-                return Result.Error(ErrorType.InvalidParameter,
-                    $"QWord 转 Byte[] 失败, Byte[] 缓冲区不足，至少需要 8 字节, 实际 {destination.Length} 字节");
+            {
+                return Result.Error($"QWord 转 Byte[] 失败, Byte[] 缓冲区不足，至少需要 8 字节, 实际 {destination.Length} 字节");
+            }
 
             if (layout == Endianness.BigEndian)
             {
@@ -505,7 +501,7 @@ public static class ByteExtensions
                 destination[7] = (byte)(source >> 56);
             }
 
-            return Result.Ok();
+            return Result.Success();
         }
     }
 }

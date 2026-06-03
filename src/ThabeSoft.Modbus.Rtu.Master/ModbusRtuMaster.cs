@@ -103,18 +103,18 @@ public sealed class ModbusRtuMaster(ITransport transport) : IModbusMaster
             var span = buffer.AsSpan(0, layout.TotalLength);
             var header = new WriteSingleCoilHeader(slaveId, address, value);
             var encode_result = RtuMasterWriteSingleCodec.EncodeCoilRequest(span, header, layout);
-            if (!encode_result.IsSuccess) return encode_result.PropagateError<WriteSingleCoilHeader>();
+            if (!encode_result.IsSuccess) return encode_result.Cast<WriteSingleCoilHeader>();
 
             // 发送请求
             var send_mem = buffer.AsMemory(0, layout.TotalLength);
             var request_result = await transport.WriteAsync(send_mem, cancellationToken);
-            if (!request_result.IsSuccess) return request_result.PropagateError<WriteSingleCoilHeader>();
+            if (!request_result.IsSuccess) return request_result.Cast<WriteSingleCoilHeader>();
 
 
             // 读取响应
             var receive_mem = buffer.AsMemory(layout.TotalLength, layout.TotalLength);
             var receive_result = await GetResponseAsync(receive_mem, cancellationToken);
-            if (!receive_result.IsSuccess) return receive_result.PropagateError<WriteSingleCoilHeader>();
+            if (!receive_result.IsSuccess) return receive_result.Cast<WriteSingleCoilHeader>();
 
             // 响应解码
             return RtuMasterWriteSingleCodec.DecodeCoilResponse(receive_mem.Span, layout);
@@ -311,7 +311,7 @@ public sealed class ModbusRtuMaster(ITransport transport) : IModbusMaster
     {
         // 线圈数量
         var quantity_result = ReadRegistersQuantity.Create(destination.Length);
-        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<ReadResponseHeader>();
+        if (!quantity_result.IsSuccess) return quantity_result.Cast<ReadResponseHeader>();
 
         // 帧布局
         var request_layout = RtuReadRequestLayout.Instance;
@@ -325,18 +325,18 @@ public sealed class ModbusRtuMaster(ITransport transport) : IModbusMaster
             // 请求编码
             var span = buffer.AsSpan(0, request_layout.TotalLength);
             var encode_result = encoderHandler(span, requestHeader);
-            if (!encode_result.IsSuccess) return encode_result.PropagateError<ReadResponseHeader>();
+            if (!encode_result.IsSuccess) return encode_result.Cast<ReadResponseHeader>();
 
             // 发送请求
             var send_mem = buffer.AsMemory(0, request_layout.TotalLength);
             var request_result = await transport.WriteAsync(send_mem, cancellationToken);
-            if (!request_result.IsSuccess) return request_result.PropagateError<ReadResponseHeader>();
+            if (!request_result.IsSuccess) return request_result.Cast<ReadResponseHeader>();
 
 
             // 读取响应
             var receive_mem = buffer.AsMemory(request_layout.TotalLength, response_layout.TotalLength);
             var receive_result = await GetResponseAsync(receive_mem, cancellationToken);
-            if (!receive_result.IsSuccess) return receive_result.PropagateError<ReadResponseHeader>();
+            if (!receive_result.IsSuccess) return receive_result.Cast<ReadResponseHeader>();
 
             // 响应解码
             return decoderHandler(receive_mem.Span, destination.Span);
@@ -393,7 +393,7 @@ public sealed class ModbusRtuMaster(ITransport transport) : IModbusMaster
         {
             // 不是异常
             var err_func_result = ErrorFunctionCode.FromCode(function_code);
-            if (!err_func_result.IsSuccess) return Result.InvalidData("无法识别的响应");
+            if (!err_func_result.IsSuccess) return Result.Error("无法识别的响应");
 
             // 错误码
             var error_code = destination.Span[RtuErrorResponseLayout.ErrorCodeIndex];
@@ -401,9 +401,9 @@ public sealed class ModbusRtuMaster(ITransport transport) : IModbusMaster
             var crc_result = destination.Span[RtuErrorResponseLayout.CrcRange].ToWord(Endianness.LittleEndian);
             if (!crc_result.IsSuccess) return crc_result;
             // 校验异常
-            if (!Crc16.Validate(destination.Span[RtuErrorResponseLayout.PayloadRange], crc_result.Value).IsSuccess) return Result.InvalidData("响应Crc校验失败");
+            if (!Crc16.Validate(destination.Span[RtuErrorResponseLayout.PayloadRange], crc_result.Value).IsSuccess) return Result.Error("响应Crc校验失败");
 
-            return Result.InvalidData($"从站响应错误, 功能码:{err_func_result.Value.FunctionCode}, 异常码: {error_code}");
+            return Result.Error($"从站响应错误, 功能码:{err_func_result.Value.FunctionCode}, 异常码: {error_code}");
         }
 
         // 读取功能码

@@ -24,8 +24,8 @@ public sealed class ModbusChannel(IModbusMaster master) : IReadWriteChannel
     public async ValueTask<Result<TValue>> ReadAsync<TValue>(ITag<TValue> tag, CancellationToken cancellationToken = default)
         where TValue : unmanaged
     {
-        if (tag.Address is not ModbusAddress address) return Result.Error<TValue>(ErrorType.InvalidOperation, "无效地址");
-        if (!address.FunctionCode.IsRead) Result.Error<TValue>(ErrorType.InvalidOperation, "不是有效的 Modbus 读值地址");
+        if (tag.Address is not ModbusAddress address) return Result.Error<TValue>( "无效地址");
+        if (!address.FunctionCode.IsRead) Result.Error<TValue>( "不是有效的 Modbus 读值地址");
 
         var byte_count = address.FunctionCode.IsReadCoils ? 1 : tag.Length;
         var buffer = ArrayPool<byte>.Shared.Rent(byte_count);
@@ -65,15 +65,15 @@ public sealed class ModbusChannel(IModbusMaster master) : IReadWriteChannel
             ArrayPool<byte>.Shared.Return(buffer);
         }
 
-        return Result.NotSupported<TValue>("Modbus 无法识别的读取操作");
+        return Result.Error<TValue>("Modbus 无法识别的读取操作");
     }
     /// <summary>
     /// 写入
     /// </summary>
     public async ValueTask<Result> WriteAsync<TValue>(ITag<TValue> tag, TValue value, CancellationToken cancellationToken = default) where TValue : unmanaged
     {
-        if (tag.Address is not ModbusAddress address) return Result.InvalidOperation("无效地址");
-        if (!address.FunctionCode.IsWrite) Result.Error<TValue>(ErrorType.InvalidOperation, "不是有效的 Modbus 写值地址");
+        if (tag.Address is not ModbusAddress address) return Result.Error("无效地址");
+        if (!address.FunctionCode.IsWrite) Result.Error<TValue>( "不是有效的 Modbus 写值地址");
 
 
         if (address.FunctionCode == FunctionCode.WriteMultipleCoils)
@@ -87,7 +87,7 @@ public sealed class ModbusChannel(IModbusMaster master) : IReadWriteChannel
 
         if (address.FunctionCode == FunctionCode.WriteMultipleRegisters)
         {
-            return Result.Ok();
+            return Result.Success();
         }
 
         if (address.FunctionCode == FunctionCode.WriteSingleCoil)
@@ -99,11 +99,11 @@ public sealed class ModbusChannel(IModbusMaster master) : IReadWriteChannel
 
         if (address.FunctionCode == FunctionCode.WriteSingleRegister)
         {
-            return Result.Ok();
+            return Result.Success();
         }
 
 
-        return Result.NotSupported<TValue>("Modbus 无法识别的写取操作");
+        return Result.Error<TValue>("Modbus 无法识别的写取操作");
     }
 
 
@@ -147,7 +147,7 @@ public sealed class ModbusChannel(IModbusMaster master) : IReadWriteChannel
     private static async ValueTask<Result> ReadRegistersToByteAsync(Memory<byte> destination, byte slaveId, ushort address, ReadRegistersHandler readHandler, Endianness endianness = Endianness.BigEndian, CancellationToken ct = default)
     {
         var byte_count = destination.Length;
-        if (byte_count % 2 != 0) return Result.InvalidParameter($"读取寄存器失败,需要偶数字节,实际:{byte_count}");
+        if (byte_count % 2 != 0) return Result.Error($"读取寄存器失败,需要偶数字节,实际:{byte_count}");
 
         var word_count = destination.Length / 2;
         var word_buffer = ArrayPool<ushort>.Shared.Rent(word_count);

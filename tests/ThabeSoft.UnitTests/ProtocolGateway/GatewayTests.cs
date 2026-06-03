@@ -62,10 +62,10 @@ public class GatewayTests
                     data.CopyTo(buffer);
 
                     read_index += buffer.Length;
-                    return new ValueTask<Result>(Result.Ok());
+                    return new ValueTask<Result>(Result.Success());
                 });
             mock_port.Setup(x => x.WriteAsync(It.IsAny<ReadOnlyMemory<byte>>(), It.IsAny<CancellationToken>()))
-                .Returns(() => ValueTask.FromResult(Result.Ok()));
+                .Returns(() => ValueTask.FromResult(Result.Success()));
 
             return mock_port;
         }
@@ -122,11 +122,11 @@ public class GatewayTests
                     data.CopyTo(buffer);
 
                     read_index += buffer.Length;
-                    var result = Result.Ok(buffer.Length);
-                    return new ValueTask<Result>(Result.Ok());
+                    var result = Result.Success(buffer.Length);
+                    return new ValueTask<Result>(Result.Success());
                 });
             mock_port.Setup(x => x.WriteAsync(It.IsAny<ReadOnlyMemory<byte>>(), It.IsAny<CancellationToken>()))
-                .Returns(() => ValueTask.FromResult(Result.Ok()));
+                .Returns(() => ValueTask.FromResult(Result.Success()));
 
             return mock_port;
         }
@@ -158,10 +158,10 @@ public class GatewayTests
                 data.CopyTo(buffer);
 
                 read_index += buffer.Length;
-                return new ValueTask<Result>(Result.Ok());
+                return new ValueTask<Result>(Result.Success());
             });
         mock_port.Setup(x => x.WriteAsync(It.IsAny<ReadOnlyMemory<byte>>(), It.IsAny<CancellationToken>()))
-            .Returns(() => ValueTask.FromResult(Result.Ok()));
+            .Returns(() => ValueTask.FromResult(Result.Success()));
 
         return mock_port;
     }

@@ -66,7 +66,7 @@ public readonly record struct FunctionCode : IEquatable<FunctionCode>
 
     #region --预设值--
 
-    public static FunctionCode Empty = default;
+    public static readonly FunctionCode Empty = default;
 
 
     #region --- 读操作 ---
@@ -133,16 +133,15 @@ public readonly record struct FunctionCode : IEquatable<FunctionCode>
 
         if(function_code == Empty)
         {
-            return Result.InvalidParameter<FunctionCode>($"无法识别的功能码: {code}");
+            return Result.Error<FunctionCode>($"无法识别的功能码: {code}");
         }
 
-        return Result.Ok(function_code);
+        return Result.Success(function_code);
     }
 
     /// <summary>
     /// 尝试从功能码值创建
     /// </summary>
-    [Obsolete]
     public static bool TryFromCode(byte code, out FunctionCode result)
     {
         result = code switch

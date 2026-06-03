@@ -41,7 +41,7 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
     {
         // 缺少请求头
         if (header == ReadRequestHeader.Empty)
-            return Result.InvalidParameter("读请求头不可为空");
+            return Result.Error("读请求头不可为空");
 
         // 缓冲区不足
         if (destination.Length < layout.TotalLength)
@@ -62,22 +62,22 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
 
         // 数量
         var quantity_result = header.Quantity.ToBytes(buffer[layout.QuantityRange], Endianness.BigEndian);
-        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<int>();
+        if (!quantity_result.IsSuccess) return quantity_result.Cast<int>();
 
         // 验证
         var crc = Crc16.Validate(buffer[layout.PayloadRange]);
         var crc_result = crc.ToBytes(buffer[layout.CrcRange], Endianness.LittleEndian);
-        if (!crc_result.IsSuccess) return crc_result.PropagateError<int>();
+        if (!crc_result.IsSuccess) return crc_result.Cast<int>();
 
         buffer.CopyTo(destination);
-        return Result.Ok();
+        return Result.Success();
     }
 
 
     public static Result<RtuReadResponseHeader> DecodeCoilsResponse(ReadOnlySpan<byte> source, Span<bool> destination)
     {
         var layout_result = ReadCoilsQuantity.Create(destination.Length).Map(RtuReadResponseLayout.FromQuantity);
-        if (!layout_result.IsSuccess) return layout_result.PropagateError<RtuReadResponseHeader>();
+        if (!layout_result.IsSuccess) return layout_result.Cast<RtuReadResponseHeader>();
 
         return DecodeCoilsResponse(source, destination, layout_result.Value);
     }
@@ -90,7 +90,7 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
         // 功能码校验
         var function_code = result.Value.FunctionCode;
         if (!function_code.IsReadCoils)
-            return Result.InvalidData<RtuReadResponseHeader>($"不是有效的读线圈器功能码, 当前:{function_code}");
+            return Result.Error<RtuReadResponseHeader>($"不是有效的读线圈器功能码, 当前:{function_code}");
 
         // 数据校验
         var data_result = source[layout.DataRange].ToBits(destination, BitOrder.LSB0);
@@ -103,7 +103,7 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
     public static Result<RtuReadResponseHeader> DecodeRegistersResponse(ReadOnlySpan<byte> source, Span<ushort> destination)
     {
         var layout_result = ReadRegistersQuantity.Create(destination.Length).Map(RtuReadResponseLayout.FromQuantity);
-        if (!layout_result.IsSuccess) return layout_result.PropagateError<RtuReadResponseHeader>();
+        if (!layout_result.IsSuccess) return layout_result.Cast<RtuReadResponseHeader>();
 
         return DecodeRegistersResponse(source, destination, layout_result.Value);
     }
@@ -116,7 +116,7 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
         // 功能码校验
         var function_code = result.Value.FunctionCode;
         if (!function_code.IsReadRegisters)
-            return Result.InvalidData<RtuReadResponseHeader>($"不是有效的读寄存器码, 当前:{function_code}");
+            return Result.Error<RtuReadResponseHeader>($"不是有效的读寄存器码, 当前:{function_code}");
 
         // 数据校验
         var data_result = source[layout.DataRange].ToWords(destination);
@@ -135,11 +135,11 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
         // Crc
         var crc_result = source[layout.CrcRange]
             .ToWord(Endianness.LittleEndian);
-        if (!crc_result.IsSuccess) return crc_result.PropagateError<RtuReadResponseHeader>();
+        if (!crc_result.IsSuccess) return crc_result.Cast<RtuReadResponseHeader>();
 
         // 验证
         var validate_result = Crc16.Validate(source[layout.PayloadRange], crc_result.Value);
-        if (!validate_result.IsSuccess) return validate_result.PropagateError<RtuReadResponseHeader>();
+        if (!validate_result.IsSuccess) return validate_result.Cast<RtuReadResponseHeader>();
 
 
         // 从站
@@ -147,7 +147,7 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
 
         // 功能码
         var function_code_result = FunctionCode.FromCode(source[RtuReadResponseLayout.FunctionCodeIndex]).Where(x => x.IsRead);
-        if (!function_code_result.IsSuccess) return function_code_result.PropagateError<RtuReadResponseHeader>();
+        if (!function_code_result.IsSuccess) return function_code_result.Cast<RtuReadResponseHeader>();
 
         // 数据长度
         var data_length = source[RtuReadResponseLayout.DataLengthIndex];
@@ -162,8 +162,8 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
     }
 
 
-    private static Result BufferTooSmall(int required, int actual) => Result.InvalidParameter(
+    private static Result BufferTooSmall(int required, int actual) => Result.Error(
         $"读响应编码所需建缓冲区不足，需要 {required} 字节，实际 {actual} 字节");
-    private static Result<T> BufferTooSmall<T>(int required, int actual) => Result.InvalidParameter<T>(
+    private static Result<T> BufferTooSmall<T>(int required, int actual) => Result.Error<T>(
         $"读响应编码所需建缓冲区不足，需要 {required} 字节，实际 {actual} 字节");
 }

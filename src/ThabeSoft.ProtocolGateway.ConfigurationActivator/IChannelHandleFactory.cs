@@ -24,6 +24,6 @@ internal sealed class ChannelHandleFactory(IEnumerable<IChannelHandleProvider> p
     public Result<IChannelHandle> GetHandle(ChannelConfig config)
     {
         var provider = _buffer.FirstOrDefault(x => x.CanCreate(config));
-        return provider?.Create(config) ?? Result.InvalidOperation<IChannelHandle>($"无法创建通道句柄, 未知的配置类型: {config.GetType().Name}");
+        return provider?.Create(config) ?? Result.Error<IChannelHandle>($"无法创建通道句柄, 未知的配置类型: {config.GetType().Name}");
     }
 }

@@ -9,16 +9,16 @@ public class ThenTests
     [TestMethod(DisplayName = "Result")]
     public async Task FromResult()
     {
-        var value = 123456;
+        const int value = 123456;
         var task_value = Task.Run(() => "Task_Value");
         var value_task_value = new ValueTask<double>(3.14);
 
-        var result = Result.Ok(10);
-        var task_result = Task.Run(() => Result.Ok(3.14));
-        var value_task_result = new ValueTask<Result<string>>(Result.Ok("Abc"));
+        var result = Result.Success(10);
+        var task_result = Task.Run(() => Result.Success(3.14));
+        var value_task_result = new ValueTask<Result<string>>(Result.Success("Abc"));
 
 
-        Result test_result = Result.Ok();
+        Result test_result = Result.Success();
 
         test_result.Then(value).AssertIsTrue();
         test_result.Then(() => value).AssertIsTrue();
@@ -27,7 +27,7 @@ public class ThenTests
         test_result.Then(() => result).AssertIsTrue();
 
         await test_result.ThenAsync(() => task_value);
-        await test_result.ThenAsync(_ => task_value);
+        await test_result.ThenAsync(_ => task_value, TestContext.CancellationToken);
 
         test_result.Then(() => result);
 
@@ -41,7 +41,7 @@ public class ThenTests
         await test_result.ThenAsync(ct => value_task_result).AssertIsTrue();
 
 
-        Result<int> test_result2 = Result.Ok(10);
+        Result<int> test_result2 = Result.Success(10);
 
 
         test_result2.Then(value).AssertIsTrue();
@@ -68,13 +68,13 @@ public class ThenTests
     {
         var value = 123456;
         var task_value = Task.Run(() => "Task_Value");
-        var value_task_value = new ValueTask<Result<double>>(Result.Ok(3.14));
+        var value_task_value = new ValueTask<Result<double>>(Result.Success(3.14));
 
-        var result = Result.Ok(10);
-        var task_result = Task.Run(() => Result.Ok(3.14));
-        var value_task_result = new ValueTask<Result<string>>(Result.Ok("Abc"));
+        var result = Result.Success(10);
+        var task_result = Task.Run(() => Result.Success(3.14));
+        var value_task_result = new ValueTask<Result<string>>(Result.Success("Abc"));
 
-        Task<Result> test_result = Task.Run(Result.Ok);
+        Task<Result> test_result = Task.Run(Result.Success);
 
         await test_result.ThenAsync(value).AssertIsTrue();
         await test_result.ThenAsync(() => value).AssertIsTrue();
@@ -97,7 +97,7 @@ public class ThenTests
         await test_result.ThenAsync(ct => value_task_result).AssertIsTrue();
 
 
-        Result<int> test_result2 = Result.Ok(10);
+        Result<int> test_result2 = Result.Success(10);
 
 
         test_result2.Then(value).AssertIsTrue();
@@ -124,13 +124,13 @@ public class ThenTests
     {
         var value = 123456;
         var task_value = Task.Run(() => "Task_Value");
-        var value_task_value = new ValueTask<Result<double>>(Result.Ok(3.14));
+        var value_task_value = new ValueTask<Result<double>>(Result.Success(3.14));
 
-        var result = Result.Ok(10);
-        var task_result = Task.Run(() => Result.Ok(3.14));
-        var value_task_result = new ValueTask<Result<string>>(Result.Ok("Abc"));
+        var result = Result.Success(10);
+        var task_result = Task.Run(() => Result.Success(3.14));
+        var value_task_result = new ValueTask<Result<string>>(Result.Success("Abc"));
 
-        ValueTask<Result> test_result = new ValueTask<Result>(Result.Ok());
+        ValueTask<Result> test_result = new ValueTask<Result>(Result.Success());
 
         await test_result.ThenAsync(value).AssertIsTrue();
         await test_result.ThenAsync(() => value).AssertIsTrue();
@@ -153,7 +153,7 @@ public class ThenTests
         await test_result.ThenAsync(ct => value_task_result).AssertIsTrue();
 
 
-        Result<int> test_result2 = Result.Ok(10);
+        Result<int> test_result2 = Result.Success(10);
 
 
         test_result2.Then(value).AssertIsTrue();
@@ -174,4 +174,6 @@ public class ThenTests
         await test_result2.ThenAsync(() => value_task_value).AssertIsTrue();
         await test_result2.ThenAsync(ct => value_task_value).AssertIsTrue();
     }
+
+    public TestContext TestContext { get; set; }
 }

@@ -46,7 +46,7 @@ public static class GatewayExtensions
         public ValueTask<Result<object>> ReadObjectAsync(ITag tag, CancellationToken cancellationToken = default)
         {
             var handler = _caches.GetOrAdd(tag.ValueType, CreateReaderDelegate);
-            if (handler is null) return new ValueTask<Result<object>>(Result.InvalidOperation<object>($"无法读取的标签: {tag.ValueType}"));
+            if (handler is null) return new ValueTask<Result<object>>(Result.Error<object>($"无法读取的标签: {tag.ValueType}"));
 
             return handler.Invoke(gateway, tag, cancellationToken);
         }

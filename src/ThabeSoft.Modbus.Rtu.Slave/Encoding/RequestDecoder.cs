@@ -149,13 +149,13 @@
 //        // 数据长度
 //        var data_length = source[layout.DataLengthIndex];
 //        if (data_length != layout.DataLength)
-//            return Result.Error<WriteMultipleResponseHeader>(ErrorType.InvalidData, "数据长度不匹配");
+//            return Result.Error<WriteMultipleResponseHeader>( "数据长度不匹配");
 //        // Crc
 //        var crc_result = source[layout.CrcRange].ToWord(Endianness.LittleEndian);
 //        if (!crc_result) return crc_result.PropagateError<WriteMultipleResponseHeader>();
 //        // 验证
 //        if (!CrcCalculator.Validate(source[layout.PayloadRange], crc_result.Value))
-//            return Result.Error<WriteMultipleResponseHeader>(ErrorType.InvalidData, "Crc校验失败");
+//            return Result.Error<WriteMultipleResponseHeader>( "Crc校验失败");
 //        // 数据
 //        Span<bool> buffer = stackalloc bool[layout.DataQuantity];
 //        var value_result = source[layout.DataRange].ToBits(buffer, BitOrder.LSB0);

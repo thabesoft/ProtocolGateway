@@ -8,15 +8,8 @@ namespace ThabeSoft.Primitives;
 /// </summary>
 public sealed class ResultException : Exception
 {
-    public ErrorType ErrorType { get; } = ErrorType.None;
-
-
     public ResultException()
     {
-    }
-    public ResultException(ErrorType errorType, string? message = null) : base(message)
-    {
-        ErrorType = errorType;
     }
     public ResultException(string? message) : base(message)
     {
@@ -29,14 +22,14 @@ public sealed class ResultException : Exception
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static void ThrowIfDebugger(ErrorType errorType, string? message = null)
+    internal static void ThrowIfDebugger(string? message = null)
     {
 #if DEBUG
-        Debug.WriteLine($"[RESULT_ERROR] {errorType}: {message}");
+        Debug.WriteLine($"[RESULT_ERROR]: {message}");
 
         // 调试状态下直接异常
         if (!Debugger.IsAttached) return;
-        throw new ResultException($"[{errorType}]: {message}");
+        throw new ResultException(message);
 #endif
     }
 }

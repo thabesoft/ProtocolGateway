@@ -2,7 +2,6 @@
 using ThabeSoft.Modbus;
 using ThabeSoft.Ports;
 using ThabeSoft.ProtocolGateway.Configuration;
-using ThabeSoft.ProtocolGateway.Infrastructure.JsonConverters;
 
 namespace ThabeSoft.ProtocolGateway.JsonConverters;
 

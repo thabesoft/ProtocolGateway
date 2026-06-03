@@ -11,9 +11,9 @@ public static partial class ResultExtensions
     {
         public Result<U> Map<U>(Func<T, U> valueMapper)
         {
-            if (result.IsSuccess) return Result.Ok(valueMapper(result.Value));
+            if (result.IsSuccess) return Result.Success(valueMapper(result.Value));
 
-            return Result.Error<U>(result.ErrorType, result.Message!);
+            return result.Cast<U>();
         }
     }
     // Task
@@ -22,9 +22,9 @@ public static partial class ResultExtensions
         public async Task<Result<U>> MapAsync<U>(Func<T, U> valueMapper)
         {
             var result = await task;
-            if (result.IsSuccess) return Result.Ok(valueMapper(result.Value));
+            if (result.IsSuccess) return Result.Success(valueMapper(result.Value));
 
-            return Result.Error<U>(result.ErrorType, result.Message!);
+            return result.Cast<U>();
         }
     }
     // ValueTask
@@ -33,9 +33,9 @@ public static partial class ResultExtensions
         public async ValueTask<Result<U>> MapAsync<U>(Func<T, U> valueMapper)
         {
             var result = await task;
-            if (result.IsSuccess) return Result.Ok(valueMapper(result.Value));
+            if (result.IsSuccess) return Result.Success(valueMapper(result.Value));
 
-            return Result.Error<U>(result.ErrorType, result.Message!);
+            return result.Cast<U>();
         }
     }
 }

@@ -7,7 +7,7 @@ public class TapTests
     [TestMethod(DisplayName = "Result")]
     public async Task FromResult()
     {
-        Result<int> test_result = Result.Ok(10);
+        Result<int> test_result = Result.Success(10);
 
         test_result.Tap(x => Console.WriteLine($"同步方法: {x}")).AssertIsTrue();
         await test_result.TapAsync(async x => Console.WriteLine($"异步方法: {x}")).AssertIsTrue();
@@ -17,7 +17,7 @@ public class TapTests
     [TestMethod(DisplayName = "Task<Result>")]
     public async Task FromTaskResult()
     {
-        Task<Result<int>> test_result = Task.Run(() => Result.Ok(10));
+        Task<Result<int>> test_result = Task.Run(() => Result.Success(10));
 
         await test_result.TapAsync(x => Console.WriteLine($"同步方法: {x}")).AssertIsTrue();
         await test_result.TapAsync(async x => Console.WriteLine($"异步方法: {x}")).AssertIsTrue();
@@ -27,7 +27,7 @@ public class TapTests
     [TestMethod(DisplayName = "ValueTask<Result>")]
     public async Task FromValueTaskResult()
     {
-        ValueTask<Result<int>> test_result = new ValueTask<Result<int>>(Result.Ok(10));
+        ValueTask<Result<int>> test_result = new ValueTask<Result<int>>(Result.Success(10));
 
         await test_result.TapAsync(x => Console.WriteLine($"同步方法: {x}")).AssertIsTrue();
         await test_result.TapAsync(async x => Console.WriteLine($"异步方法: {x}")).AssertIsTrue();

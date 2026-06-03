@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using System.Diagnostics;
 using ThabeSoft.Mvvm;
+using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Messages;
 using ThabeSoft.ProtocolGateway.Services;
 using ThabeSoft.ProtocolGateway.Services.Channel;
@@ -39,7 +40,7 @@ public sealed partial class ChannelPageViewModel : ViewModelBase, IDisposable
     }
     public IChannelRuntimeService? ChannelRuntimeService
     {
-        get; set => Change(field, value, x =>
+        get; set => Change(field, value, _ =>
             {
                 if (field is not null)
                 {

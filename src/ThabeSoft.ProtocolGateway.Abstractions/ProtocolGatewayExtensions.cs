@@ -13,9 +13,9 @@ public static class ProtocolGatewayExtensions
             if (!name_result.IsSuccess) return name_result;
 
             var result = gateway.AddChannel(name_result.Value, channel);
-            if(!result.IsSuccess) return result.PropagateError<ChannelName>();
+            if(!result.IsSuccess) return result.Cast<ChannelName>();
 
-            return Result.Ok(name_result.Value);
+            return Result.Success(name_result.Value);
         }
     }
 }

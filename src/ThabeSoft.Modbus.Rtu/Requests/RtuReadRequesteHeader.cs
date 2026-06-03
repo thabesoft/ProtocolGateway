@@ -36,10 +36,10 @@ public readonly struct RtuReadRequesteHeader : IReadRequestHeader, ICrcable
 
     public static Result<RtuReadRequesteHeader> AnyCoils(byte slaveId, FunctionCode functionCode, ushort address, int quantity, ushort crc)
     {
-        if (!functionCode.IsReadCoils) return Result.InvalidParameter<RtuReadRequesteHeader>("无效功能吗");
+        if (!functionCode.IsReadCoils) return Result.Error<RtuReadRequesteHeader>("无效功能吗");
 
         var quantity_result = ReadCoilsQuantity.Create(quantity);
-        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<RtuReadRequesteHeader>();
+        if (!quantity_result.IsSuccess) return quantity_result.Cast<RtuReadRequesteHeader>();
 
         var value =  new RtuReadRequesteHeader(
             slaveId: slaveId,
@@ -48,14 +48,14 @@ public readonly struct RtuReadRequesteHeader : IReadRequestHeader, ICrcable
             quantity: quantity_result.Value,
             crc: crc);
 
-        return Result.Ok(value);
+        return Result.Success(value);
     }
     public static Result<RtuReadRequesteHeader> AnyRegister(byte slaveId, FunctionCode functionCode, ushort address, int quantity, ushort crc)
     {
-        if (!functionCode.IsReadRegisters) return Result.InvalidParameter<RtuReadRequesteHeader>("无效功能吗");
+        if (!functionCode.IsReadRegisters) return Result.Error<RtuReadRequesteHeader>("无效功能吗");
 
         var quantity_result = ReadCoilsQuantity.Create(quantity);
-        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<RtuReadRequesteHeader>();
+        if (!quantity_result.IsSuccess) return quantity_result.Cast<RtuReadRequesteHeader>();
 
         var value = new RtuReadRequesteHeader(
             slaveId: slaveId,
@@ -64,7 +64,7 @@ public readonly struct RtuReadRequesteHeader : IReadRequestHeader, ICrcable
             quantity: quantity_result.Value,
             crc: crc);
 
-        return Result.Ok(value);
+        return Result.Success(value);
     }
 
     public static Result<RtuReadRequesteHeader> Create(byte slaveId, FunctionCode functionCode, ushort address, int quantity, ushort crc)
@@ -72,17 +72,17 @@ public readonly struct RtuReadRequesteHeader : IReadRequestHeader, ICrcable
         if (functionCode.IsReadCoils) return AnyCoils(slaveId, functionCode, address, quantity, crc);
         if (functionCode.IsReadRegisters) return AnyRegister(slaveId, functionCode, address, quantity, crc);
 
-        return Result.InvalidOperation<RtuReadRequesteHeader>("无效的功能码, 无法创建");
+        return Result.Error<RtuReadRequesteHeader>("无效的功能码, 无法创建");
     }
 
 
     public static Result<RtuReadRequesteHeader> Coils(byte slaveId, ushort address, int quantity, ushort crc)
     {
         var quantity_result = ReadCoilsQuantity.Create(quantity);
-        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<RtuReadRequesteHeader>();
+        if (!quantity_result.IsSuccess) return quantity_result.Cast<RtuReadRequesteHeader>();
 
         var value = new RtuReadRequesteHeader(slaveId, FunctionCode.ReadCoils, address, quantity_result.Value, crc);
-        return Result.Ok(value);
+        return Result.Success(value);
     }
     public static RtuReadRequesteHeader Coils(byte slaveId, ushort address, ReadCoilsQuantity quantity, ushort crc)
     {
@@ -93,10 +93,10 @@ public readonly struct RtuReadRequesteHeader : IReadRequestHeader, ICrcable
     public static Result<RtuReadRequesteHeader> DiscreteInputs(byte slaveId, ushort address, int quantity, ushort crc)
     {
         var quantity_result = ReadCoilsQuantity.Create(quantity);
-        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<RtuReadRequesteHeader>();
+        if (!quantity_result.IsSuccess) return quantity_result.Cast<RtuReadRequesteHeader>();
 
         var value = new RtuReadRequesteHeader(slaveId, FunctionCode.ReadDiscreteInputs, address, quantity_result.Value, crc);
-        return Result.Ok(value);
+        return Result.Success(value);
     }
     public static RtuReadRequesteHeader DiscreteInputs(byte slaveId, ushort address, ReadCoilsQuantity quantity, ushort crc)
     {
@@ -107,10 +107,10 @@ public readonly struct RtuReadRequesteHeader : IReadRequestHeader, ICrcable
     public static Result<RtuReadRequesteHeader> HoldingRegisters(byte slaveId, ushort address, int quantity, ushort crc)
     {
         var quantity_result = ReadRegistersQuantity.Create(quantity);
-        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<RtuReadRequesteHeader>();
+        if (!quantity_result.IsSuccess) return quantity_result.Cast<RtuReadRequesteHeader>();
 
         var value =  new RtuReadRequesteHeader(slaveId, FunctionCode.ReadHoldingRegisters, address, quantity_result.Value, crc);
-        return Result.Ok(value);
+        return Result.Success(value);
     }
     public static RtuReadRequesteHeader HoldingRegisters(byte slaveId, ushort address, ReadRegistersQuantity quantity, ushort crc)
     {
@@ -120,10 +120,10 @@ public readonly struct RtuReadRequesteHeader : IReadRequestHeader, ICrcable
     public static Result<RtuReadRequesteHeader> InputRegisters(byte slaveId, ushort address, int quantity, ushort crc)
     {
         var quantity_result = ReadRegistersQuantity.Create(quantity);
-        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<RtuReadRequesteHeader>();
+        if (!quantity_result.IsSuccess) return quantity_result.Cast<RtuReadRequesteHeader>();
 
         var value = new RtuReadRequesteHeader(slaveId, FunctionCode.ReadInputRegisters, address, quantity_result.Value, crc);
-        return Result.Ok(value);
+        return Result.Success(value);
     }
     public static RtuReadRequesteHeader InputRegisters(byte slaveId, ushort address, ReadRegistersQuantity quantity, ushort crc)
     {

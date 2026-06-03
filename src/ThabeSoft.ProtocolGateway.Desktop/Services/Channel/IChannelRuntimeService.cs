@@ -66,7 +66,7 @@ internal sealed class ChannelRuntimeService : IChannelRuntimeService
             }
         }
 
-        return Result.Ok<IReadOnlyList<ChannelRuntimeContext>>(activated);
+        return Result.Success<IReadOnlyList<ChannelRuntimeContext>>(activated);
     }
 
     private async Task<Result<ChannelRuntimeContext>> ActivateChannelAsync(ChannelConfig config)
@@ -74,14 +74,14 @@ internal sealed class ChannelRuntimeService : IChannelRuntimeService
         // 检查是否已激活
         if (_contexts.TryGetValue(config.Name, out var existing))
         {
-            return Result.Ok(existing);
+            return Result.Success(existing);
         }
 
         // 创建 Handle
         var handleResult = _handleFactory.GetHandle(config);
         if (!handleResult.IsSuccess)
         {
-            return handleResult.PropagateError<ChannelRuntimeContext>();
+            return handleResult.Cast<ChannelRuntimeContext>();
         }
 
         var context = new ChannelRuntimeContext
@@ -93,7 +93,7 @@ internal sealed class ChannelRuntimeService : IChannelRuntimeService
         _contexts[config.Name] = context;
         ChannelActivated?.Invoke(this, context);
 
-        return Result.Ok(context);
+        return Result.Success(context);
     }
 
     public async Task<Result> DeactivateChannelAsync(ChannelName name)
@@ -104,6 +104,6 @@ internal sealed class ChannelRuntimeService : IChannelRuntimeService
              ChannelDeactivated?.Invoke(this, name);
         }
 
-        return Result.Ok();
+        return Result.Success();
     }
 }

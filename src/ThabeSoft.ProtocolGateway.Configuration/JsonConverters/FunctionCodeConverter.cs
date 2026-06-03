@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using ThabeSoft.Modbus;
+using ThabeSoft.Primitives;
 
 namespace ThabeSoft.ProtocolGateway.JsonConverters;
 

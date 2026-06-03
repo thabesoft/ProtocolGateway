@@ -31,10 +31,10 @@ public readonly record struct ReadRegistersQuantity
     {
         if (value is < MIN or > MAX)
         {
-            return Result.Error<ReadRegistersQuantity>(ErrorType.InvalidParameter, MESSAGE);
+            return Result.Error<ReadRegistersQuantity>( MESSAGE);
         }
 
-        return Result.Ok(new ReadRegistersQuantity((ushort)value));
+        return Result.Success(new ReadRegistersQuantity((ushort)value));
     }
 
 

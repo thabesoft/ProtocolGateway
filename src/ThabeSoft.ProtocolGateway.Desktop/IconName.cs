@@ -29,11 +29,11 @@ public readonly record struct IconName
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            return Result.InvalidParameter<IconName>("图标名称不可为空");
+            return Result.Error<IconName>("图标名称不可为空");
         }
 
         var value = new IconName(name);
-        return Result.Ok(value);
+        return Result.Success(value);
     }
 
 

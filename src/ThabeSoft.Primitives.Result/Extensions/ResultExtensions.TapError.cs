@@ -14,9 +14,9 @@ public static partial class ResultExtensions
             if (!result.IsSuccess) handler();
             return result;
         }
-        public T TapError(Action<ErrorType, string> handler)
+        public T TapError(Action<ResultLevel, string> handler)
         {
-            if (!result.IsSuccess) handler(result.ErrorType, result.Message!);
+            if (!result.IsSuccess) handler(result.Level, result.Message!);
             return result;
         }
 

@@ -38,8 +38,8 @@ public static class Crc16
     public static Result Validate(ReadOnlySpan<byte> data, ushort crcCode)
     {
         var calculated = Validate(data);
-        if (calculated == crcCode) return Result.Ok();
+        if (calculated == crcCode) return Result.Success();
 
-        return Result.Error(ErrorType.InvalidData, $"CRC校验失败，计算值: 0x{calculated:X4}，接收值: 0x{crcCode:X4}");
+        return Result.Error($"CRC校验失败，计算值: 0x{calculated:X4}，接收值: 0x{crcCode:X4}");
     }
 }

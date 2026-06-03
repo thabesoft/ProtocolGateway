@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using ThabeSoft.ProtocolGateway;
-using ThabeSoft.ProtocolGateway.Infrastructure.JsonConverters;
 using ThabeSoft.ProtocolGateway.JsonConverters;
 using ThabeSoft.ProtocolGateway.Options;
 

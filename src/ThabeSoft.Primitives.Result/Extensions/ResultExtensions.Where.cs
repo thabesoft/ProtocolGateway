@@ -13,7 +13,7 @@ public static partial class ResultExtensions
         {
             if (result.IsSuccess && matcher(result.Value)) return result;
 
-            return Result.InvalidParameter<T>(errorMessage ?? "条件比较失败");
+            return Result.Error<T>(errorMessage ?? "条件比较失败");
         }
     }
     // Task
@@ -24,7 +24,7 @@ public static partial class ResultExtensions
             var result = await task;
             if (result.IsSuccess && matcher(result.Value)) return result;
 
-            return Result.InvalidParameter<T>(errorMessage ?? "条件比较失败");
+            return Result.Error<T>(errorMessage ?? "条件比较失败");
         }
     }
     // ValueTask
@@ -35,7 +35,7 @@ public static partial class ResultExtensions
             var result = await task;
             if (result.IsSuccess && matcher(result.Value)) return result;
 
-            return Result.InvalidParameter<T>(errorMessage ?? "条件比较失败");
+            return Result.Error<T>(errorMessage ?? "条件比较失败");
         }
     }
 }

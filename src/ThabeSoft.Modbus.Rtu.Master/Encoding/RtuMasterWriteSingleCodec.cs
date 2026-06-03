@@ -56,18 +56,18 @@ public sealed class RtuMasterWriteSingleCodec : IMasterWriteSingleCodec
         buffer[layout.FunctionCodeIndex] = header.FunctionCode;
         // 起始地址
         var address_result = header.Address.ToBytes(buffer[layout.AddressRange], Endianness.BigEndian);
-        if (!address_result.IsSuccess) return address_result.PropagateError<int>();
+        if (!address_result.IsSuccess) return address_result.Cast<int>();
         // 值
         var value = header.Value.ToModbusWordValue();
         var value_result = value.ToBytes(buffer[layout.DataRange], Endianness.BigEndian);
-        if (!value_result.IsSuccess) return value_result.PropagateError<int>();
+        if (!value_result.IsSuccess) return value_result.Cast<int>();
         // 验证
         var crc = Crc16.Validate(buffer[layout.PayloadRange]);
         var crc_result = crc.ToBytes(buffer[layout.CrcRange], Endianness.LittleEndian);
-        if (!crc_result.IsSuccess) return crc_result.PropagateError<int>();
+        if (!crc_result.IsSuccess) return crc_result.Cast<int>();
 
         buffer.CopyTo(destination);
-        return Result.Ok();
+        return Result.Success();
     }
     public static Result EncodeRegisterRequest(Span<byte> destination, in WriteSingleRegisterHeader header, in RtuWriteSingleLayout layout)
     {
@@ -83,17 +83,17 @@ public sealed class RtuMasterWriteSingleCodec : IMasterWriteSingleCodec
         buffer[layout.FunctionCodeIndex] = header.FunctionCode;
         // 起始地址
         var address_result = header.Address.ToBytes(buffer[layout.AddressRange], Endianness.BigEndian);
-        if (!address_result.IsSuccess) return address_result.PropagateError<int>();
+        if (!address_result.IsSuccess) return address_result.Cast<int>();
         // 值
         var value_result = header.Value.ToBytes(buffer[layout.DataRange], Endianness.BigEndian);
-        if (!value_result.IsSuccess) return value_result.PropagateError<int>();
+        if (!value_result.IsSuccess) return value_result.Cast<int>();
         // 验证
         var crc = Crc16.Validate(buffer[layout.PayloadRange]);
         var crc_result = crc.ToBytes(buffer[layout.CrcRange], Endianness.LittleEndian);
-        if (!crc_result.IsSuccess) return crc_result.PropagateError<int>();
+        if (!crc_result.IsSuccess) return crc_result.Cast<int>();
 
         buffer.CopyTo(destination);
-        return Result.Ok();
+        return Result.Success();
     }
     public static Result<RtuWriteSingleCoilResponseHeader> DecodeCoilResponse(ReadOnlySpan<byte> source, in RtuWriteSingleLayout layout)
     {
@@ -101,27 +101,27 @@ public sealed class RtuMasterWriteSingleCodec : IMasterWriteSingleCodec
         var function_code_result = FunctionCode
             .FromCode(source[layout.FunctionCodeIndex])
             .Where(x => FunctionCode.WriteSingleCoil == x);
-        if (!function_code_result.IsSuccess) return function_code_result.PropagateError<RtuWriteSingleCoilResponseHeader>();
+        if (!function_code_result.IsSuccess) return function_code_result.Cast<RtuWriteSingleCoilResponseHeader>();
 
         // Crc
         var crc_result = source[layout.CrcRange]
             .ToWord(Endianness.LittleEndian);
-        if (!crc_result.IsSuccess) return crc_result.PropagateError<RtuWriteSingleCoilResponseHeader>();
+        if (!crc_result.IsSuccess) return crc_result.Cast<RtuWriteSingleCoilResponseHeader>();
 
         // 验证
         var validate_result = Crc16.Validate(source[layout.PayloadRange], crc_result.Value);
-        if (!validate_result.IsSuccess) return validate_result.PropagateError<RtuWriteSingleCoilResponseHeader>();
+        if (!validate_result.IsSuccess) return validate_result.Cast<RtuWriteSingleCoilResponseHeader>();
 
         // 从站
         var slave_id = source[layout.SlaveIdIndex];
         // 地址
         var address_result = source[layout.AddressRange]
             .ToWord(Endianness.BigEndian);
-        if (!address_result.IsSuccess) return address_result.PropagateError<RtuWriteSingleCoilResponseHeader>();
+        if (!address_result.IsSuccess) return address_result.Cast<RtuWriteSingleCoilResponseHeader>();
         // 数据
         var value_result = source[layout.DataRange].ToWord()
             .Bind(ModbusHelper.ToModbusCoilValue);
-        if (!value_result.IsSuccess) return value_result.PropagateError<RtuWriteSingleCoilResponseHeader>();
+        if (!value_result.IsSuccess) return value_result.Cast<RtuWriteSingleCoilResponseHeader>();
 
         // 拷贝数据
         var value = new RtuWriteSingleCoilResponseHeader(
@@ -129,7 +129,7 @@ public sealed class RtuMasterWriteSingleCodec : IMasterWriteSingleCodec
             address: address_result.Value,
             value: value_result.Value,
             crc: crc_result.Value);
-        return Result.Ok(value);
+        return Result.Success(value);
     }
     public static Result<RtuWriteSingleRegisterResponseHeader> DecodeRegisterResponse(ReadOnlySpan<byte> source, in RtuWriteSingleLayout layout)
     {
@@ -137,27 +137,27 @@ public sealed class RtuMasterWriteSingleCodec : IMasterWriteSingleCodec
         var function_code_result = FunctionCode
             .FromCode(source[layout.FunctionCodeIndex])
             .Where(x => FunctionCode.WriteSingleCoil == x);
-        if (!function_code_result.IsSuccess) return function_code_result.PropagateError<RtuWriteSingleRegisterResponseHeader>();
+        if (!function_code_result.IsSuccess) return function_code_result.Cast<RtuWriteSingleRegisterResponseHeader>();
 
         // Crc
         var crc_result = source[layout.CrcRange]
             .ToWord(Endianness.LittleEndian);
-        if (!crc_result.IsSuccess) return crc_result.PropagateError<RtuWriteSingleRegisterResponseHeader>();
+        if (!crc_result.IsSuccess) return crc_result.Cast<RtuWriteSingleRegisterResponseHeader>();
 
         // 验证
         var validate_result = Crc16.Validate(source[layout.PayloadRange], crc_result.Value);
-        if (!validate_result.IsSuccess) return validate_result.PropagateError<RtuWriteSingleRegisterResponseHeader>();
+        if (!validate_result.IsSuccess) return validate_result.Cast<RtuWriteSingleRegisterResponseHeader>();
 
         // 从站
         var slave_id = source[layout.SlaveIdIndex];
         // 地址
         var address_result = source[layout.AddressRange]
             .ToWord(Endianness.BigEndian);
-        if (!address_result.IsSuccess) return address_result.PropagateError<RtuWriteSingleRegisterResponseHeader>();
+        if (!address_result.IsSuccess) return address_result.Cast<RtuWriteSingleRegisterResponseHeader>();
         // 数据
         var value_result = source[layout.DataRange]
             .ToWord(Endianness.BigEndian);
-        if (!value_result.IsSuccess) return value_result.PropagateError<RtuWriteSingleRegisterResponseHeader>();
+        if (!value_result.IsSuccess) return value_result.Cast<RtuWriteSingleRegisterResponseHeader>();
 
         // 拷贝数据
         var value =  new RtuWriteSingleRegisterResponseHeader(
@@ -165,12 +165,12 @@ public sealed class RtuMasterWriteSingleCodec : IMasterWriteSingleCodec
             address: address_result.Value,
             value: value_result.Value,
             crc: crc_result.Value);
-        return Result.Ok(value);
+        return Result.Success(value);
     }
 
 
 
 
-    private static Result BufferTooSmall(int required, int actual) => Result.InvalidParameter(
+    private static Result BufferTooSmall(int required, int actual) => Result.Error(
         $"读响应编码所需建缓冲区不足，需要 {required} 字节，实际 {actual} 字节");
 }

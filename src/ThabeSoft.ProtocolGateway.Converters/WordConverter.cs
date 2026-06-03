@@ -27,7 +27,7 @@ public sealed class WordConverter :
 
     private Result<ushort> From(ReadOnlySpan<byte> source)
     {
-        if (source.Length < 2) return Result.Error<ushort>(ErrorType.InvalidParameter, "字至少需要2字节");
+        if (source.Length < 2) return Result.Error<ushort>( "字至少需要2字节");
         return source.ToWord(_endianness);
     }
     private Result To(ushort value, Span<byte> destination)

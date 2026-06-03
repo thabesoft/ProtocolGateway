@@ -72,43 +72,43 @@ public class Benchmark
     [Benchmark]
     public void Pipe()
     {
-        var result = Result.Ok(10)
-            .Bind(x => Result.Ok<double>(x))
-            .Bind(x => Result.Ok(x.ToString()))
-            .Bind(x => Result.Ok(x.Length))
-            .Bind(x => Result.Ok());
+        var result = Result.Success(10)
+            .Bind(x => Result.Success<double>(x))
+            .Bind(x => Result.Success(x.ToString()))
+            .Bind(x => Result.Success(x.Length))
+            .Bind(x => Result.Success());
     }
 
     [Benchmark]
     public async Task PipeAsync()
     {
         var result = TestResult1Async()
-            .BindAsync(x => ValueTask.FromResult(Result.Ok<double>(x)))
-            .BindAsync(x => ValueTask.FromResult(Result.Ok(x.ToString())))
-            .BindAsync(x => ValueTask.FromResult(Result.Ok(x.Length)))
-            .BindAsync(x => ValueTask.FromResult(Result.Ok()));
+            .BindAsync(x => ValueTask.FromResult(Result.Success<double>(x)))
+            .BindAsync(x => ValueTask.FromResult(Result.Success(x.ToString())))
+            .BindAsync(x => ValueTask.FromResult(Result.Success(x.Length)))
+            .BindAsync(x => ValueTask.FromResult(Result.Success()));
     }
 
 
     private static ValueTask<Result<int>> TestResult1Async()
     {
-        return ValueTask.FromResult(Result.Ok(10));
+        return ValueTask.FromResult(Result.Success(10));
     }
     private static ValueTask<Result<double>> TestResult2Async(int x)
     {
-        return ValueTask.FromResult(Result.Ok<double>(x));
+        return ValueTask.FromResult(Result.Success<double>(x));
     }
     private static ValueTask<Result<string>> TestResult3Async(double x)
     {
-        return ValueTask.FromResult(Result.Ok(x.ToString()));
+        return ValueTask.FromResult(Result.Success(x.ToString()));
     }
     private static ValueTask<Result<int>> TestResult4Async(string x)
     {
-        return ValueTask.FromResult(Result.Ok(x.Length));
+        return ValueTask.FromResult(Result.Success(x.Length));
     }
     private static ValueTask<Result> TestResult5Async(int _)
     {
-        return ValueTask.FromResult(Result.Ok());
+        return ValueTask.FromResult(Result.Success());
     }
 
 
@@ -116,22 +116,22 @@ public class Benchmark
 
     private static Result<int> TestResult1()
     {
-        return Result.Ok(10);
+        return Result.Success(10);
     }
     private static Result<double> TestResult2(int x)
     {
-        return Result.Ok<double>(x);
+        return Result.Success<double>(x);
     }
     private static Result<string> TestResult3(double x)
     {
-        return Result.Ok(x.ToString());
+        return Result.Success(x.ToString());
     }
     private static Result<int> TestResult4(string x)
     {
-        return Result.Ok(x.Length);
+        return Result.Success(x.Length);
     }
     private static Result TestResult5(int _)
     {
-        return Result.Ok();
+        return Result.Success();
     }
 }

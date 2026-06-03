@@ -16,8 +16,8 @@ public static partial class ResultPipeExtensions
                 var (pipe, handler) = data;
 
                 var result =  pipe.Execute();
-                if (!result.IsSuccess) return Result.Ok(handler(result.Value));
-                return result.PropagateError<U>();
+                if (!result.IsSuccess) return Result.Success(handler(result.Value));
+                return result.Cast<U>();
             }
 
             return Create((pipe, handler), Handler);
@@ -38,9 +38,9 @@ public static partial class ResultPipeExtensions
                 var (pipe, handler) = data;
 
                 var result = await pipe.ExecuteAsync(ct);
-                if (!result.IsSuccess) return Result.Ok(handler(result.Value));
+                if (!result.IsSuccess) return Result.Success(handler(result.Value));
 
-                return result.PropagateError<U>();
+                return result.Cast<U>();
             }
 
             return Create((pipe, handler), Handler);

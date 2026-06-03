@@ -26,19 +26,19 @@ public readonly struct ByteConverter :
 
     public Result<byte> From(ReadOnlySpan<byte> source)
     {
-        if (source.Length < 1) return Result.InvalidParameter<byte>("至少需要1字节");
+        if (source.Length < 1) return Result.Error<byte>("至少需要1字节");
         Span<bool> bits = stackalloc bool[8];
         var bits_result = source.ToBits(bits, _bitOrder);
 
         //TODO: 实现一个字节位反转
-        if (!bits_result.IsSuccess) return bits_result.PropagateError<byte>();
+        if (!bits_result.IsSuccess) return bits_result.Cast<byte>();
         return bits.ToByte();
     }
     public  Result To(byte source, Span<byte> destination)
     {
-        if (destination.Length < 1) return Result.InvalidParameter("缓冲区至少需要1字节");
+        if (destination.Length < 1) return Result.Error("缓冲区至少需要1字节");
         destination[0] = source;
-        return Result.Ok();
+        return Result.Success();
     }
 
 

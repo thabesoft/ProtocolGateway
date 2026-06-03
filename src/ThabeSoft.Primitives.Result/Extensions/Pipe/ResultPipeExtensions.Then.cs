@@ -61,7 +61,7 @@ public static partial class ResultPipeExtensions
                 var result = pipe.Execute();
                 if (!result.IsSuccess) return next.Invoke();
 
-                return result.PropagateError<T>();
+                return result.Cast<T>();
             }
 
             return Create((pipe, next), Handler);
@@ -82,7 +82,7 @@ public static partial class ResultPipeExtensions
                 var result = pipe.Execute();
                 if (!result.IsSuccess) return next.Invoke();
 
-                return result.PropagateError<U>();
+                return result.Cast<U>();
             }
 
             return Create((pipe, next), Handler);
@@ -96,7 +96,7 @@ public static partial class ResultPipeExtensions
                 var result = pipe.Execute();
                 if (!result.IsSuccess) return next.Invoke();
 
-                return result.PropagateError<U>();
+                return result.Cast<U>();
             }
 
             return Create((pipe, next), Handler);
@@ -164,7 +164,7 @@ public static partial class ResultPipeExtensions
                 var result = await pipe.ExecuteAsync(ct);
 
                 if (result.IsSuccess) return await next.Invoke();
-                return result.PropagateError<T>();
+                return result.Cast<T>();
             }
 
             return Create((pipe, next), Handler);
@@ -197,7 +197,7 @@ public static partial class ResultPipeExtensions
                 var result = await pipe.ExecuteAsync(ct);
                 if (result.IsSuccess) return await next.Invoke(ct);
 
-                return result.PropagateError<U>();
+                return result.Cast<U>();
             }
 
             return Create((pipe, next), Handler);
@@ -219,7 +219,7 @@ public static partial class ResultPipeExtensions
                 var result = await pipe.ExecuteAsync(ct);
 
                 if (result.IsSuccess) return next.Invoke();
-                return result.PropagateError<T>();
+                return result.Cast<T>();
             }
 
             return Create((pipe, next), Handler);
@@ -234,7 +234,7 @@ public static partial class ResultPipeExtensions
                 var result = await pipe.ExecuteAsync(ct);
 
                 if (result.IsSuccess) return next.Invoke();
-                return result.PropagateError<U>();
+                return result.Cast<U>();
             }
 
             return Create((pipe, next), Handler);
@@ -251,7 +251,7 @@ public static partial class ResultPipeExtensions
                 var result = await pipe.ExecuteAsync(ct);
 
                 if (result.IsSuccess) return next.Invoke(result.Value);
-                return result.PropagateError<T>();
+                return result.Cast<T>();
             }
 
             return Create((pipe, next), Handler);
@@ -267,7 +267,7 @@ public static partial class ResultPipeExtensions
                 var result = await pipe.ExecuteAsync(ct);
 
                 if (result.IsSuccess) return next.Invoke(result.Value);
-                return result.PropagateError<U>();
+                return result.Cast<U>();
             }
 
             return Create((pipe, next), Handler);
@@ -315,7 +315,7 @@ public static partial class ResultPipeExtensions
                 var (pipe, next) = data;
 
                 var result = await pipe.ExecuteAsync(ct);
-                if (!result.IsSuccess) return Result.Error(result.ErrorType, result.Message!);
+                if (!result.IsSuccess) return Result.Error(result.Message!);
 
                 return await next.Invoke(result.Value);
             }
@@ -331,7 +331,7 @@ public static partial class ResultPipeExtensions
                 var (pipe, next) = data;
 
                 var result = await pipe.ExecuteAsync(ct);
-                if (!result.IsSuccess) return Result.Error<U>(result.ErrorType, result.Message!);
+                if (!result.IsSuccess) return Result.Error<U>(result.Message!);
 
                 return await next.Invoke(result.Value);
             }
@@ -349,7 +349,7 @@ public static partial class ResultPipeExtensions
                 var (pipe, next) = data;
 
                 var result = await pipe.ExecuteAsync(ct);
-                if (!result.IsSuccess) return Result.Error(result.ErrorType, result.Message!);
+                if (!result.IsSuccess) return Result.Error(result.Message!);
 
                 return await next.Invoke(result.Value, ct);
             }
@@ -365,7 +365,7 @@ public static partial class ResultPipeExtensions
                 var (pipe, next) = data;
 
                 var result = await pipe.ExecuteAsync(ct);
-                if (!result.IsSuccess) return Result.Error<U>(result.ErrorType, result.Message!);
+                if (!result.IsSuccess) return Result.Error<U>(result.Message!);
 
                 return await next.Invoke(result.Value, ct);
             }

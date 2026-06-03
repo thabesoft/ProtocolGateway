@@ -17,7 +17,7 @@ public sealed class QWordConverter(QWordLayout layout) :
 
     private Result<ulong> From(ReadOnlySpan<byte> source)
     {
-        if (source.Length < 8) return Result.Error<ulong>(ErrorType.InvalidParameter, "四字至少需要8字节");
+        if (source.Length < 8) return Result.Error<ulong>( "四字至少需要8字节");
 
         Span<byte> destination = stackalloc byte[8];
         source.Swap(destination, layout);

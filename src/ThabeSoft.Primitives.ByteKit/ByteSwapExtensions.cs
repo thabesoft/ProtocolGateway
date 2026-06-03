@@ -12,11 +12,11 @@ public static class ByteSwapExtensions
         /// </summary>
         public Result Swap(ByteSwap swap)
         {
-            if (source.Length <= 0) return Result.Error(ErrorType.InvalidParameter, "字节数组为空");
+            if (source.Length <= 0) return Result.Error("字节数组为空");
 
             //if (swap.HasFlag(ByteSwap.SwapQWord))
             //{
-            //    if (source.Length % 16 != 0) return Result.Error(ErrorType.InvalidParameter, "无法调换四字序, 字节数量不是16的倍数");
+            //    if (source.Length % 16 != 0) return Result.Error( "无法调换四字序, 字节数量不是16的倍数");
 
             //    var result = source.SwapQWord();
             //    if (!result) return result;
@@ -24,7 +24,7 @@ public static class ByteSwapExtensions
 
             if (swap.HasFlag(ByteSwap.SwapDWord))
             {
-                if (source.Length % 8 != 0) return Result.Error(ErrorType.InvalidParameter, "无法调换二字序, 字节数量不是8的倍数");
+                if (source.Length % 8 != 0) return Result.Error("无法调换二字序, 字节数量不是8的倍数");
 
                 var result = source.SwapDWord();
                 if (!result.IsSuccess) return result;
@@ -32,7 +32,7 @@ public static class ByteSwapExtensions
 
             if (swap.HasFlag(ByteSwap.SwapWord))
             {
-                if (source.Length % 4 != 0) return Result.Error(ErrorType.InvalidParameter, "无法调换字序, 字节数量不是4的倍数");
+                if (source.Length % 4 != 0) return Result.Error("无法调换字序, 字节数量不是4的倍数");
 
                 var result = source.SwapWord();
                 if (!result.IsSuccess) return result;
@@ -41,11 +41,11 @@ public static class ByteSwapExtensions
             // 调换字节序
             if (swap.HasFlag(ByteSwap.SwapByte))
             {
-                if (source.Length % 2 != 0) return Result.Error(ErrorType.InvalidParameter, "无法调换字节序, 字节数量不是2的倍数");
+                if (source.Length % 2 != 0) return Result.Error("无法调换字节序, 字节数量不是2的倍数");
                 return source.SwapByte();
             }
 
-            return Result.Ok();
+            return Result.Success();
         }
 
 
@@ -72,7 +72,7 @@ public static class ByteSwapExtensions
         {
             if (source.Length == 0)
             {
-                return Result.Error(ErrorType.InvalidParameter, "字节数组为空");
+                return Result.Error("字节数组为空");
             }
 
             for (int i = 0; i < source.Length / 2; i++)
@@ -81,7 +81,7 @@ public static class ByteSwapExtensions
                 (source[i], source[j]) = (source[j], source[i]);
             }
 
-            return Result.Ok();
+            return Result.Success();
         }
 
         /// <summary>
@@ -91,10 +91,10 @@ public static class ByteSwapExtensions
         public Result SwapWord()
         {
             if (source.Length == 0)
-                return Result.Error(ErrorType.InvalidParameter, "字节数组为空");
+                return Result.Error("字节数组为空");
 
             if (source.Length % 4 != 0)
-                return Result.Error(ErrorType.InvalidParameter, $"字交换需要4的倍数长度，当前长度: {source.Length}");
+                return Result.Error($"字交换需要4的倍数长度，当前长度: {source.Length}");
 
             for (int i = 0; i < source.Length; i += 4)
             {
@@ -102,7 +102,7 @@ public static class ByteSwapExtensions
                 (source[i + 1], source[i + 3]) = (source[i + 3], source[i + 1]);
             }
 
-            return Result.Ok();
+            return Result.Success();
         }
 
         /// <summary>
@@ -112,10 +112,10 @@ public static class ByteSwapExtensions
         public Result SwapDWord()
         {
             if (source.Length == 0)
-                return Result.Error(ErrorType.InvalidParameter, "字节数组为空");
+                return Result.Error("字节数组为空");
 
             if (source.Length % 8 != 0)
-                return Result.Error(ErrorType.InvalidParameter, $"双字交换需要8的倍数长度，当前长度: {source.Length}");
+                return Result.Error($"双字交换需要8的倍数长度，当前长度: {source.Length}");
 
             for (int i = 0; i < source.Length; i += 8)
             {
@@ -126,7 +126,7 @@ public static class ByteSwapExtensions
                 }
             }
 
-            return Result.Ok();
+            return Result.Success();
         }
 
         /// <summary>
@@ -136,10 +136,10 @@ public static class ByteSwapExtensions
         public Result SwapQWord()
         {
             if (source.Length == 0)
-                return Result.Error(ErrorType.InvalidParameter, "字节数组为空");
+                return Result.Error("字节数组为空");
 
             if (source.Length % 16 != 0)
-                return Result.Error(ErrorType.InvalidParameter, $"四字交换需要16的倍数长度，当前长度: {source.Length}");
+                return Result.Error($"四字交换需要16的倍数长度，当前长度: {source.Length}");
 
             for (int i = 0; i < source.Length; i += 16)
             {
@@ -150,7 +150,7 @@ public static class ByteSwapExtensions
                 }
             }
 
-            return Result.Ok();
+            return Result.Success();
         }
     }
 
@@ -162,10 +162,10 @@ public static class ByteSwapExtensions
         public Result Swap(Span<byte> destination, ByteSwap swap)
         {
             if (source.Length == 0)
-                return Result.Error(ErrorType.InvalidParameter, "源字节数组为空");
+                return Result.Error("源字节数组为空");
 
             if (destination.Length < source.Length)
-                return Result.Error(ErrorType.InvalidParameter, "目标缓冲区不足");
+                return Result.Error("目标缓冲区不足");
 
             // 先在临时缓冲区操作
             Span<byte> temp = stackalloc byte[source.Length];
@@ -177,7 +177,7 @@ public static class ByteSwapExtensions
 
             // 成功后再拷贝到目标
             temp.CopyTo(destination);
-            return Result.Ok();
+            return Result.Success();
         }
 
 
@@ -188,17 +188,17 @@ public static class ByteSwapExtensions
         public Result SwapByte(Span<byte> destination)
         {
             if (source.Length == 0)
-                return Result.Error(ErrorType.InvalidParameter, "源字节数组为空");
+                return Result.Error("源字节数组为空");
 
             if (destination.Length < source.Length)
-                return Result.Error(ErrorType.InvalidParameter, "目标缓冲区不足");
+                return Result.Error("目标缓冲区不足");
 
             for (int i = 0; i < source.Length; i++)
             {
                 destination[source.Length - 1 - i] = source[i];
             }
 
-            return Result.Ok();
+            return Result.Success();
         }
 
         /// <summary>
@@ -208,13 +208,13 @@ public static class ByteSwapExtensions
         public Result SwapWord(Span<byte> destination)
         {
             if (source.Length == 0)
-                return Result.Error(ErrorType.InvalidParameter, "源字节数组为空");
+                return Result.Error("源字节数组为空");
 
             if (source.Length % 4 != 0)
-                return Result.Error(ErrorType.InvalidParameter, $"字交换需要4的倍数长度，当前长度: {source.Length}");
+                return Result.Error($"字交换需要4的倍数长度，当前长度: {source.Length}");
 
             if (destination.Length < source.Length)
-                return Result.Error(ErrorType.InvalidParameter, "目标缓冲区不足");
+                return Result.Error("目标缓冲区不足");
 
             for (int i = 0; i < source.Length; i += 4)
             {
@@ -224,7 +224,7 @@ public static class ByteSwapExtensions
                 destination[i + 3] = source[i + 1];
             }
 
-            return Result.Ok();
+            return Result.Success();
         }
 
         /// <summary>
@@ -234,13 +234,13 @@ public static class ByteSwapExtensions
         public Result SwapDWord(Span<byte> destination)
         {
             if (source.Length == 0)
-                return Result.Error(ErrorType.InvalidParameter, "源字节数组为空");
+                return Result.Error("源字节数组为空");
 
             if (source.Length % 8 != 0)
-                return Result.Error(ErrorType.InvalidParameter, $"双字交换需要8的倍数长度，当前长度: {source.Length}");
+                return Result.Error($"双字交换需要8的倍数长度，当前长度: {source.Length}");
 
             if (destination.Length < source.Length)
-                return Result.Error(ErrorType.InvalidParameter, "目标缓冲区不足");
+                return Result.Error("目标缓冲区不足");
 
             for (int i = 0; i < source.Length; i += 8)
             {
@@ -255,7 +255,7 @@ public static class ByteSwapExtensions
                 destination[i + 7] = source[i + 3];
             }
 
-            return Result.Ok();
+            return Result.Success();
         }
 
         /// <summary>
@@ -265,13 +265,13 @@ public static class ByteSwapExtensions
         public Result SwapQWord(Span<byte> destination)
         {
             if (source.Length == 0)
-                return Result.Error(ErrorType.InvalidParameter, "源字节数组为空");
+                return Result.Error("源字节数组为空");
 
             if (source.Length % 16 != 0)
-                return Result.Error(ErrorType.InvalidParameter, $"四字交换需要16的倍数长度，当前长度: {source.Length}");
+                return Result.Error($"四字交换需要16的倍数长度，当前长度: {source.Length}");
 
             if (destination.Length < source.Length)
-                return Result.Error(ErrorType.InvalidParameter, "目标缓冲区不足");
+                return Result.Error("目标缓冲区不足");
 
             for (int i = 0; i < source.Length; i += 16)
             {
@@ -282,7 +282,7 @@ public static class ByteSwapExtensions
                 }
             }
 
-            return Result.Ok();
+            return Result.Success();
         }
     }
 }

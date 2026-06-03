@@ -14,12 +14,12 @@ public sealed class ResultTests
         if (Debugger.IsAttached)
         {
             Assert.Throws<ResultException>(() =>
-                Result.InvalidData("调试状态下抛出异常"));
+                Result.Error("调试状态下抛出异常"));
         }
         else
         {
             // 无调试器时，测试 Result 行为
-            var result = Result.InvalidData("错误消息");
+            var result = Result.Error("错误消息");
             Assert.IsFalse(result.IsSuccess);
         }
 #else

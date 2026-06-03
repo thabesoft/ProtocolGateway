@@ -17,7 +17,7 @@ public sealed class DWordConverter(DWordLayout layout) :
 
     private Result<uint> From(ReadOnlySpan<byte> source)
     {
-        if (source.Length < 4) return Result.Error<uint>(ErrorType.InvalidParameter, "双字至少需要4字节");
+        if (source.Length < 4) return Result.Error<uint>( "双字至少需要4字节");
 
         Span<byte> destination = stackalloc byte[4];
         source.Swap(destination, layout);

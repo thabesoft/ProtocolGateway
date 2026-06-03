@@ -31,10 +31,10 @@ public readonly record struct ReadCoilsQuantity
     {
         if (value is < MIN or > MAX)
         {
-            return Result.Error<ReadCoilsQuantity>(ErrorType.InvalidParameter, MESSAGE);
+            return Result.Error<ReadCoilsQuantity>(MESSAGE);
         }
 
-        return Result.Ok(new ReadCoilsQuantity((ushort)value));
+        return Result.Success(new ReadCoilsQuantity((ushort)value));
     }
 
     public static bool IsValid(int value)

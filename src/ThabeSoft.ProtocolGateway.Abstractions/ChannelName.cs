@@ -28,11 +28,11 @@ public readonly struct ChannelName : IEquatable<ChannelName>, IEquatable<string>
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            return Result.InvalidParameter<ChannelName>("通道名称创建失败, 不可为空白或者空白字符");
+            return Result.Error<ChannelName>("通道名称创建失败, 不可为空白或者空白字符");
         }
 
         var trimmed = name!.Trim();
-        return Result.Ok(new ChannelName(trimmed));
+        return Result.Success(new ChannelName(trimmed));
     }
 
 

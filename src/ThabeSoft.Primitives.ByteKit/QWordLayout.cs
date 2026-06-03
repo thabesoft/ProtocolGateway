@@ -44,9 +44,9 @@ public readonly struct QWordLayout
         const ByteSwap ValidSwapMask = ByteSwap.None | ByteSwap.SwapByte | ByteSwap.SwapWord | ByteSwap.SwapDWord;
 
         if ((swap & ~ValidSwapMask) != 0)
-            return Result.InvalidParameter<QWordLayout>($"不支持的字节组合模式: [{endianness}] {swap}");
+            return Result.Error<QWordLayout>($"不支持的字节组合模式: [{endianness}] {swap}");
 
-        return Result.Ok(new QWordLayout(endianness, swap));
+        return Result.Success(new QWordLayout(endianness, swap));
     }
     public static Result<QWordLayout> FromLittleEndian(ByteSwap swap)
     {

@@ -29,10 +29,10 @@ public readonly record struct WriteCoilsQuantity
     {
         if (value is < MIN or > MAX)
         {
-            return Result.Error<WriteCoilsQuantity>(ErrorType.InvalidParameter, MESSAGE);
+            return Result.Error<WriteCoilsQuantity>(MESSAGE);
         }
 
-        return Result.Ok(new WriteCoilsQuantity((ushort)value));
+        return Result.Success(new WriteCoilsQuantity((ushort)value));
     }
 
 

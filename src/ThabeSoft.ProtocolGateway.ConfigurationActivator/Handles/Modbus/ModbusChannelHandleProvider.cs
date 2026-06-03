@@ -31,11 +31,11 @@ internal class ModbusChannelHandleProvider : IChannelHandleProvider
                 var channel = new ModbusChannel(master);
                 var handle = new ModbusRtuChannelHandle(config.Name, channel, options, port);
 
-                return Result.Ok<IChannelHandle>(handle);
+                return Result.Success<IChannelHandle>(handle);
             }
         }
 
-        return Result.NotSupported<IChannelHandle>($"无法获取通道句柄, 不支持的协议类型: {config.Protocol}");
+        return Result.Error<IChannelHandle>($"无法获取通道句柄, 不支持的协议类型: {config.Protocol}");
     }
 
 

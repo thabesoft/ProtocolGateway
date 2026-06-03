@@ -38,14 +38,14 @@ public readonly record struct BaudRate : IEquatable<BaudRate>
     /// </summary>
     public static Result<BaudRate> Create(int baudRate)
     {
-        if (baudRate <= 0) return Result.InvalidParameter<BaudRate>("波特率不可小于等于0");
+        if (baudRate <= 0) return Result.Error<BaudRate>("波特率不可小于等于0");
 
         if (!CommonBaudRate.Contains(baudRate))
         {
             Debug.WriteLine($"警告: 波特率 {baudRate} 不是标准值，请确认硬件支持");
         }
 
-        return Result.Ok(new BaudRate(baudRate));
+        return Result.Success(new BaudRate(baudRate));
     }
 
 

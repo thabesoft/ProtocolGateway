@@ -21,13 +21,13 @@ public sealed class Gateway : IGateway
     {
         if (_channels.TryGetValue(name, out _))
         {
-            return Result.InvalidOperation($"无法添加通道, 名称已存在: {name}");
+            return Result.Error($"无法添加通道, 名称已存在: {name}");
         }
 
         _channels[name] = channel;
         _channelOptions[name] = new();
 
-        return Result.Ok();
+        return Result.Success();
     }
     // 删除
     public Result RemoveChannel(ChannelName name)
@@ -36,10 +36,10 @@ public sealed class Gateway : IGateway
 
         if (!_channels.TryRemove(name, out _))
         {
-            return Result.InvalidOperation("通道不存在, 删除失败");
+            return Result.Error("通道不存在, 删除失败");
         }
 
-        return Result.Ok();
+        return Result.Success();
     }
 
 
@@ -63,7 +63,7 @@ public sealed class Gateway : IGateway
         // 是否启用
         if (_channelOptions.TryGetValue(tag.ChannelName, out var opts) || opts?.IsSuspend != true)
         {
-            var result = Result.InvalidOperation<TValue>($"无法读取, 通道 [{tag.ChannelName}] 已禁用");
+            var result = Result.Error<TValue>($"无法读取, 通道 [{tag.ChannelName}] 已禁用");
             return new ValueTask<Result<TValue>>(result);
         }
 
@@ -76,7 +76,7 @@ public sealed class Gateway : IGateway
         // 是否启用
         if (_channelOptions.TryGetValue(tag.ChannelName, out var opts) || opts?.IsSuspend != true)
         {
-            var result = Result.InvalidOperation($"无法写入, 通道 [{tag.ChannelName}] 已禁用");
+            var result = Result.Error($"无法写入, 通道 [{tag.ChannelName}] 已禁用");
             return new ValueTask<Result>(result);
         }
 
@@ -109,7 +109,7 @@ public sealed class Gateway : IGateway
                 }
                 catch (Exception ex)
                 {
-                    observer.OnNext(Result.InvalidData<TValue>(ex.Message));
+                    observer.OnNext(Result.Error<TValue>(ex.Message));
                 }
 
                 await Task.Delay(interval, ct);
@@ -137,13 +137,13 @@ public sealed class Gateway : IGateway
         // 查询通道
         if (!_channels.TryGetValue(tag.ChannelName, out var channel))
         {
-            var result = Result.InvalidOperation<TValue>($"无法读取, 未知的通道 [{tag.ChannelName}]");
+            var result = Result.Error<TValue>($"无法读取, 未知的通道 [{tag.ChannelName}]");
             return new ValueTask<Result<TValue>>(result);
         }
         // 不支持读取
         if (channel is not IReadableChannel readable)
         {
-            var result = Result.InvalidOperation<TValue>($"无法读取, 通道 [{tag.ChannelName}] 不支持操作");
+            var result = Result.Error<TValue>($"无法读取, 通道 [{tag.ChannelName}] 不支持操作");
             return new ValueTask<Result<TValue>>(result);
         }
 
@@ -157,13 +157,13 @@ public sealed class Gateway : IGateway
         // 查询通道
         if (!_channels.TryGetValue(tag.ChannelName, out var channel))
         {
-            var result = Result.InvalidOperation($"无法写入, 未知的通道名称 [{tag.ChannelName}]");
+            var result = Result.Error($"无法写入, 未知的通道名称 [{tag.ChannelName}]");
             return new ValueTask<Result>(result);
         }
         // 不支持写入
         if (channel is not IWritableChannel writable)
         {
-            var result = Result.InvalidOperation($"无法写入, 通道 [{tag.ChannelName}] 不支持操作");
+            var result = Result.Error($"无法写入, 通道 [{tag.ChannelName}] 不支持操作");
             return new ValueTask<Result>(result);
         }
 
@@ -176,9 +176,9 @@ public sealed class Gateway : IGateway
     {
         if (!_channelOptions.TryGetValue(name, out var options))
         {
-            return Result.InvalidOperation<ChannelRuntimeOptions>($"未查询到通道配置 [{name}]");
+            return Result.Error<ChannelRuntimeOptions>($"未查询到通道配置 [{name}]");
         }
 
-        return Result.Ok(options);
+        return Result.Success(options);
     }
 }

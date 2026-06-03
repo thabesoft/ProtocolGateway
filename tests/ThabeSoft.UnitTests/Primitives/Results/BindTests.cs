@@ -12,12 +12,12 @@ public class BindTests
         var task_value = Task.Run(() => "Task_Value");
         var value_task_value = new ValueTask<double>(3.14);
 
-        var result = Result.Ok(10);
-        var task_result = Task.Run(() => Result.Ok(3.14));
-        var value_task_result = new ValueTask<Result<string>>(Result.Ok("Abc"));
+        var result = Result.Success(10);
+        var task_result = Task.Run(() => Result.Success(3.14));
+        var value_task_result = new ValueTask<Result<string>>(Result.Success("Abc"));
 
 
-        Result<int> test_result = Result.Ok(10);
+        Result<int> test_result = Result.Success(10);
 
         test_result.Bind(x => value).AssertIsTrue();
         await test_result.BindAsync(x => task_value).AssertIsTrue();
@@ -40,11 +40,11 @@ public class BindTests
         var task_value = Task.Run(() => "Task_Value");
         var value_task_value = new ValueTask<double>(3.14);
 
-        var result = Result.Ok(10);
-        var task_result = Task.Run(() => Result.Ok(3.14));
-        var value_task_result = new ValueTask<Result<string>>(Result.Ok("Abc"));
+        var result = Result.Success(10);
+        var task_result = Task.Run(() => Result.Success(3.14));
+        var value_task_result = new ValueTask<Result<string>>(Result.Success("Abc"));
 
-        Task<Result<int>> test_result = Task.Run(() => Result.Ok(10));
+        Task<Result<int>> test_result = Task.Run(() => Result.Success(10));
 
         await test_result.BindAsync(x => value).AssertIsTrue();
         await test_result.BindAsync(x => task_value).AssertIsTrue();
@@ -67,11 +67,11 @@ public class BindTests
         var task_value = Task.Run(() => "Task_Value");
         var value_task_value = new ValueTask<double>(3.14);
 
-        var result = Result.Ok(10);
-        var task_result = Task.Run(() => Result.Ok(3.14));
-        var value_task_result = new ValueTask<Result<string>>(Result.Ok("Abc"));
+        var result = Result.Success(10);
+        var task_result = Task.Run(() => Result.Success(3.14));
+        var value_task_result = new ValueTask<Result<string>>(Result.Success("Abc"));
 
-        ValueTask<Result<int>> test_result = new ValueTask<Result<int>>(Result.Ok(10));
+        ValueTask<Result<int>> test_result = new ValueTask<Result<int>>(Result.Success(10));
 
         await test_result.BindAsync(x => value).AssertIsTrue();
         await test_result.BindAsync(x => task_value).AssertIsTrue();

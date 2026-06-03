@@ -108,7 +108,7 @@ public static class ModbusTag
     public static Result<ITag> CreateRoutableTag(ChannelName name, byte slaveId, FunctionCode functionCode, ushort address, TagValueType valueType)
     {
         var data_length_result = valueType.GetByteLength();
-        if (!data_length_result.IsSuccess) return data_length_result.PropagateError<ITag>();
+        if (!data_length_result.IsSuccess) return data_length_result.Cast<ITag>();
 
         var modbus_address = ModbusAddress.Create(slaveId, functionCode, address);
 
@@ -117,70 +117,70 @@ public static class ModbusTag
         {
             if(!functionCode.IsCoil)
             {
-                return Result.InvalidParameter<ITag>($"非线圈功能码 [{functionCode}], 无法使用该数据类型 [{valueType}]");
+                return Result.Error<ITag>($"非线圈功能码 [{functionCode}], 无法使用该数据类型 [{valueType}]");
             }
 
-            return Result.Ok<ITag>(Create<bool>(BoolConverter.Instance));
+            return Result.Success<ITag>(Create<bool>(BoolConverter.Instance));
         }
 
         // 功能码不匹配
         if (!functionCode.IsRegister)
         {
-            return Result.InvalidParameter<ITag>($"非寄存器功能码 [{functionCode}], 无法使用该数据类型 [{valueType}]");
+            return Result.Error<ITag>($"非寄存器功能码 [{functionCode}], 无法使用该数据类型 [{valueType}]");
         }
 
         if (valueType == TagValueType.Byte)
         {
-            return Result.Ok<ITag>(Create<byte>(ByteConverter.LSB0));
+            return Result.Success<ITag>(Create<byte>(ByteConverter.LSB0));
         }
         if (valueType == TagValueType.SByte)
         {
-            return Result.Ok<ITag>(Create<sbyte>(ByteConverter.LSB0));
+            return Result.Success<ITag>(Create<sbyte>(ByteConverter.LSB0));
         }
 
         // 16
         if (valueType == TagValueType.Int16)
         {
-            return Result.Ok<ITag>(Create<short>(WordConverter.BigEndian));
+            return Result.Success<ITag>(Create<short>(WordConverter.BigEndian));
         }
         if (valueType == TagValueType.UInt16)
         {
-            return Result.Ok<ITag>(Create<ushort>(WordConverter.BigEndian));
+            return Result.Success<ITag>(Create<ushort>(WordConverter.BigEndian));
         }
         if (valueType == TagValueType.Char)
         {
-            return Result.Ok<ITag>(Create<char>(WordConverter.BigEndian));
+            return Result.Success<ITag>(Create<char>(WordConverter.BigEndian));
         }
 
         // 32
         if (valueType == TagValueType.Int32)
         {
-            return Result.Ok<ITag>(Create<int>(DWordConverter.BigEndian));
+            return Result.Success<ITag>(Create<int>(DWordConverter.BigEndian));
         }
         if (valueType == TagValueType.UInt32)
         {
-            return Result.Ok<ITag>(Create<uint>(DWordConverter.BigEndian));
+            return Result.Success<ITag>(Create<uint>(DWordConverter.BigEndian));
         }
         if (valueType == TagValueType.Float)
         {
-            return Result.Ok<ITag>(Create<float>(DWordConverter.BigEndian));
+            return Result.Success<ITag>(Create<float>(DWordConverter.BigEndian));
         }
 
         // 64
         if (valueType == TagValueType.Int64)
         {
-            return Result.Ok<ITag>(Create<long>(QWordConverter.BigEndian));
+            return Result.Success<ITag>(Create<long>(QWordConverter.BigEndian));
         }
         if (valueType == TagValueType.UInt64)
         {
-            return Result.Ok<ITag>(Create<ulong>(QWordConverter.BigEndian));
+            return Result.Success<ITag>(Create<ulong>(QWordConverter.BigEndian));
         }
         if (valueType == TagValueType.Double)
         {
-            return Result.Ok<ITag>(Create<double>(QWordConverter.BigEndian));
+            return Result.Success<ITag>(Create<double>(QWordConverter.BigEndian));
         }
 
-        return Result.NotSupported<ITag>($"Modbus标签创建失败, 不支持的数据类型:{valueType}");
+        return Result.Error<ITag>($"Modbus标签创建失败, 不支持的数据类型:{valueType}");
 
 
         IRoutableTag<T> Create<T>(IValueConverter<T> converter) where T : unmanaged

@@ -8,7 +8,7 @@ namespace ThabeSoft.Modbus;
 /// </summary>
 public readonly record struct ErrorFunctionCode : IEquatable<ErrorFunctionCode>
 {
-    public static FunctionCode Empty = default;
+    public static readonly FunctionCode Empty = default;
 
 
     public FunctionCode FunctionCode { get; }
@@ -23,14 +23,12 @@ public readonly record struct ErrorFunctionCode : IEquatable<ErrorFunctionCode>
     {
         if ((code & 0x80) == 0)
         {
-            return Result.Error<ErrorFunctionCode>(ErrorType.InvalidOperation, $"不是有效的异常功能码: 0x{code:X2}（缺少 0x80 标志位）");
+            return Result.Error<ErrorFunctionCode>($"不是有效的异常功能码: 0x{code:X2}（缺少 0x80 标志位）");
         }
 
         return FunctionCode.FromCode((byte)(code & 0x7F))
             .Map(x => new ErrorFunctionCode(x));
     }
-
-    [Obsolete]
     public static bool TryFromCode(byte code, out ErrorFunctionCode errorFunctionCode)
     {
         errorFunctionCode = default;

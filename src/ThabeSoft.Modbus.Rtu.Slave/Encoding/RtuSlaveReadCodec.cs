@@ -47,24 +47,24 @@ public sealed class RtuSlaveReadCodec : ISlaveReadCodec
     {
         // 验证
         var crc_result = source[layout.CrcRange].ToWord(Endianness.LittleEndian);
-        if (!crc_result.IsSuccess) return crc_result.PropagateError<RtuReadRequesteHeader>();
+        if (!crc_result.IsSuccess) return crc_result.Cast<RtuReadRequesteHeader>();
         if (!Crc16.Validate(source[layout.PayloadRange], crc_result.Value).IsSuccess)
-            return Result.InvalidData<RtuReadRequesteHeader>("Crc校验失败");
+            return Result.Error<RtuReadRequesteHeader>("Crc校验失败");
 
         // 从站
         var slave_id = source[layout.SlaveIdIndex];
 
         // 功能码
         var funtion_code_result = FunctionCode.FromCode(source[layout.FunctionCodeIndex]);
-        if (!funtion_code_result.IsSuccess) return funtion_code_result.PropagateError<RtuReadRequesteHeader>();
+        if (!funtion_code_result.IsSuccess) return funtion_code_result.Cast<RtuReadRequesteHeader>();
 
         // 起始地址
         var address_result = source[layout.AddressRange].ToWord(Endianness.BigEndian);
-        if (!address_result.IsSuccess) return address_result.PropagateError<RtuReadRequesteHeader>();
+        if (!address_result.IsSuccess) return address_result.Cast<RtuReadRequesteHeader>();
 
         // 数量
         var quantity_result = source[layout.QuantityRange].ToWord(Endianness.BigEndian);
-        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<RtuReadRequesteHeader>();
+        if (!quantity_result.IsSuccess) return quantity_result.Cast<RtuReadRequesteHeader>();
 
 
         return RtuReadRequesteHeader.Create(
@@ -80,7 +80,7 @@ public sealed class RtuSlaveReadCodec : ISlaveReadCodec
     {
         // 根据数量创建布局
         var quantity_result = ReadCoilsQuantity.Create(values.Length);
-        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<int>();
+        if (!quantity_result.IsSuccess) return quantity_result.Cast<int>();
 
         var layout  = RtuReadResponseLayout.FromQuantity(quantity_result.Value);
         return EncodeCoilsResponse(destination, header, values, layout).Then(layout.TotalLength);
@@ -89,7 +89,7 @@ public sealed class RtuSlaveReadCodec : ISlaveReadCodec
     {
         // 缺少请求头
         if (layout == RtuReadResponseLayout.Empty)
-            return Result.InvalidParameter("请求头不可为空");
+            return Result.Error("请求头不可为空");
 
         // 缓冲区不足
         if (destination.Length < layout.TotalLength)
@@ -121,7 +121,7 @@ public sealed class RtuSlaveReadCodec : ISlaveReadCodec
 
         // 构建
         buffer.CopyTo(destination);
-        return Result.Ok();
+        return Result.Success();
     }
 
 
@@ -129,7 +129,7 @@ public sealed class RtuSlaveReadCodec : ISlaveReadCodec
     {
         // 根据数量创建布局
         var quantity_result = ReadCoilsQuantity.Create(values.Length);
-        if (!quantity_result.IsSuccess) return quantity_result.PropagateError<int>();
+        if (!quantity_result.IsSuccess) return quantity_result.Cast<int>();
 
         var layout = RtuReadResponseLayout.FromQuantity(quantity_result.Value);
         return EncodeRegistersResponse(destination, header, values, layout).Then(layout.TotalLength);
@@ -138,7 +138,7 @@ public sealed class RtuSlaveReadCodec : ISlaveReadCodec
     {
         // 缺少请求头
         if (layout == RtuReadResponseLayout.Empty)
-            return Result.InvalidParameter("请求头不可为空");
+            return Result.Error("请求头不可为空");
 
         // 缓冲区不足
         if (destination.Length < layout.TotalLength)
@@ -170,14 +170,14 @@ public sealed class RtuSlaveReadCodec : ISlaveReadCodec
 
         // 构建
         buffer.CopyTo(destination);
-        return Result.Ok();
+        return Result.Success();
     }
 
 
 
 
-    private static Result BufferTooSmall(int required, int actual) => Result.InvalidParameter(
+    private static Result BufferTooSmall(int required, int actual) => Result.Error(
         $"读响应编码所需建缓冲区不足，需要 {required} 字节，实际 {actual} 字节");
-    private static Result<T> BufferTooSmall<T>(int required, int actual) => Result.InvalidParameter<T>(
+    private static Result<T> BufferTooSmall<T>(int required, int actual) => Result.Error<T>(
         $"读响应编码所需建缓冲区不足，需要 {required} 字节，实际 {actual} 字节");
 }

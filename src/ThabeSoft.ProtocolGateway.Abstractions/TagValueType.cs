@@ -40,10 +40,10 @@ public static class TagValueTypeExtensions
         {
             if (_dataByteLength.TryGetValue(dataType, out var result))
             {
-                return Result.Ok(result);
+                return Result.Success(result);
             }
 
-            return Result.NotSupported<int>($"不支持的数据类型: {dataType}");
+            return Result.Error<int>($"不支持的数据类型: {dataType}");
         }
     }
 }

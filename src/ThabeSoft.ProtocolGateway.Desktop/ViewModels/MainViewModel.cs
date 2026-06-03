@@ -145,7 +145,7 @@ public sealed partial class MainViewModel : ViewModelBase, INavigationService, I
         var vm_type = target.GetType();
         var menu_item = _menuItems.FirstOrDefault(x => x.Target == vm_type);
         // 已经选中
-        if (menu_item == SelectedMenuItem) return Result.InvalidOperation("导航失败, 目标页面与当前页面一致");
+        if (menu_item == SelectedMenuItem) return Result.Warning("导航失败, 目标页面与当前页面一致");
 
         // 全部取消选择
         foreach (var i in _menuItems) i.Unselect();
@@ -153,7 +153,7 @@ public sealed partial class MainViewModel : ViewModelBase, INavigationService, I
         menu_item?.Select();
         SelectedMenuItem = menu_item;
 
-        return Result.Ok();
+        return Result.Success();
     }
 
     /// <summary>
@@ -163,13 +163,13 @@ public sealed partial class MainViewModel : ViewModelBase, INavigationService, I
     {
         if (ViewModelProvider is null)
         {
-            return Result.InvalidOperation($"导航失败, 视图模型提供者未初始化");
+            return Result.Error($"导航失败, 视图模型提供者未初始化");
         }
 
         var target_vm = ViewModelProvider.Get(target);
         if (target_vm is null)
         {
-            return Result.InvalidOperation($"导航失败, 目标页面无法创建实例: {target}");
+            return Result.Error($"导航失败, 目标页面无法创建实例: {target}");
         }
 
         return NavigateTo(target_vm);

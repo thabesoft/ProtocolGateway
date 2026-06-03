@@ -39,9 +39,9 @@ public readonly struct WordLayout
         const ByteSwap ValidSwapMask = ByteSwap.None | ByteSwap.SwapByte;
 
         if ((swap & ~ValidSwapMask) != 0)
-            return Result.InvalidParameter<WordLayout>($"不支持的字节组合模式: [{endianness}] {swap}");
+            return Result.Error<WordLayout>($"不支持的字节组合模式: [{endianness}] {swap}");
 
-        return Result.Ok(new WordLayout(endianness, swap));
+        return Result.Success(new WordLayout(endianness, swap));
     }
     public static Result<WordLayout> FromLittleEndian(ByteSwap swap)
     {

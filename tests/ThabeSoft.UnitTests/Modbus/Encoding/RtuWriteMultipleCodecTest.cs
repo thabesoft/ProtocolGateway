@@ -1,5 +1,6 @@
 ﻿using ThabeSoft.Modbus.Headers;
 using ThabeSoft.Modbus.Layouts;
+using ThabeSoft.Primitives;
 
 namespace ThabeSoft.Modbus.Encoding;
 
