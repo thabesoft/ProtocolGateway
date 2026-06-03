@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using ThabeSoft.Mvvm;
 using ThabeSoft.ProtocolGateway.Services.Menu;
 using ThabeSoft.ProtocolGateway.Services.Navigation;
 using ThabeSoft.ProtocolGateway.Services.ViewModel;

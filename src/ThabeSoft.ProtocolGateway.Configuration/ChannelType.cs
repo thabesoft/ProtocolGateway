@@ -5,5 +5,7 @@
 /// </summary>
 public enum ChannelType
 {
+    None,
+
     Modbus
 }

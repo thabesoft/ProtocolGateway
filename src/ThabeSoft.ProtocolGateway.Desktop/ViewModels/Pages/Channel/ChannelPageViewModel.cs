@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using ThabeSoft.Mvvm;
 using ThabeSoft.ProtocolGateway.Messages;
 using ThabeSoft.ProtocolGateway.Services;
 using ThabeSoft.ProtocolGateway.Services.Channel;
@@ -19,12 +20,12 @@ public sealed partial class ChannelPageViewModel : ObservableRecipient, IViewMod
     private readonly INavigationService _navigationService;
     private readonly IChannelRuntimeService _runtimeService;
     private readonly INotificationService _notificationService;
-    private AvaloniaList<ChannelViewModel> _channels = [];
+    private AvaloniaList<ChannelConfigViewModel> _channels = [];
 
     /// <summary>
     /// 所有通道元素
     /// </summary>
-    public IReadOnlyCollection<ChannelViewModel> Channels
+    public IReadOnlyCollection<ChannelConfigViewModel> Channels
     {
         get => _channels;
         private set
@@ -46,8 +47,8 @@ public sealed partial class ChannelPageViewModel : ObservableRecipient, IViewMod
         _notificationService = notificationService;
         _navigationService = navigationService;
 
-        // 通道详情页关闭时返回当前页面
-        Messenger.Register<ChannelDetailsClosed>(this, (_, _) => navigationService.NavigateTo(this));
+
+        WeakReferenceMessenger.Default.Register<ChannelPageViewModel, ChannelDetailsClosed>(this, (_, _) => navigationService.NavigateTo(this));
 
         _runtimeService.ChannelActivated += OnChannelActivated;
         _runtimeService.ChannelDeactivated += OnChannelDeactivated;
@@ -55,7 +56,7 @@ public sealed partial class ChannelPageViewModel : ObservableRecipient, IViewMod
 
 
     [RelayCommand]
-    private void OpenDetailsPage(ChannelViewModel item)
+    private void OpenDetailsPage(ChannelConfigViewModel item)
     {
         var context = _runtimeService.ActiveChannels.FirstOrDefault(ctx => ctx.Config.Name == item.Name);
 
@@ -84,7 +85,12 @@ public sealed partial class ChannelPageViewModel : ObservableRecipient, IViewMod
 
             // 转换为 ViewModel
             var vms = _runtimeService.ActiveChannels
-                .Select(ctx => new ChannelViewModel(ctx))
+                .Select(ctx =>
+                {
+                    var vm = new ChannelConfigViewModel();
+                    vm.LoadContext(ctx);
+                    return vm;
+                })
                 .ToList();
 
             Channels = [.. vms];
@@ -106,7 +112,9 @@ public sealed partial class ChannelPageViewModel : ObservableRecipient, IViewMod
 
         Avalonia.Threading.Dispatcher.UIThread.Post(() =>
         {
-            var vm = new ChannelViewModel(context);
+            var vm = new ChannelConfigViewModel();
+            vm.LoadContext(context);
+
             _channels.Add(vm);
         });
     }

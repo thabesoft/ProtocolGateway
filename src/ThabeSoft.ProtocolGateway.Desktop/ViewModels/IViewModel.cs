@@ -1,8 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System.Collections;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.CompilerServices;
+﻿using Avalonia.Threading;
+using ThabeSoft.Mvvm;
 
 namespace ThabeSoft.ProtocolGateway.ViewModels;
 
@@ -10,60 +7,20 @@ namespace ThabeSoft.ProtocolGateway.ViewModels;
 /// <summary>
 /// 视图模型
 /// </summary>
-public interface IViewModel : INotifyPropertyChanged;
-
-
-
-public abstract class ValidatableObservableObject : ObservableObject, INotifyDataErrorInfo, IViewModel
+public abstract class ViewModelBase : ViewModel
 {
-    private readonly Dictionary<string, List<ValidationResult>> results = [with(StringComparer.OrdinalIgnoreCase)];
+    protected virtual DispatcherPriority DispatcherPriority { get; } = DispatcherPriority.Normal;
 
-    public bool HasErrors => results.Count != 0;
-    public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
 
-    public IEnumerable GetErrors(string? propertyName)
+    protected override void Update<T>(string propertyName, T oldValue, T newValue, Action<T> update)
     {
-        if (string.IsNullOrEmpty(propertyName))
+        if (Dispatcher.UIThread.CheckAccess())
         {
-            return Array.Empty<ValidationResult>();
+            base.Update(propertyName, oldValue, newValue, update);
         }
-        if (!results.TryGetValue(propertyName, out var errors))
+        else
         {
-            return Array.Empty<ValidationResult>();
+            Dispatcher.UIThread.Post(() => base.Update(propertyName, oldValue, newValue, update), DispatcherPriority);
         }
-
-        return errors;
-    }
-
-    protected void ClearError([CallerMemberName] string? propertyName = null)
-    {
-        if (string.IsNullOrEmpty(propertyName)) return;
-
-        results.Remove(propertyName);
-        OnErrorsChanged(propertyName);
-    }
-
-    protected void AddError(string errorMessage, [CallerMemberName] string? propertyName = null)
-    {
-        if (string.IsNullOrEmpty(propertyName))
-        {
-            return;
-        }
-
-        if (!results.TryGetValue(propertyName, out var errors))
-        {
-            errors = [];
-            results[propertyName] = errors;
-        }
-
-        errors.Add(new ValidationResult(errorMessage, [propertyName]));
-        OnErrorsChanged(propertyName);
-    }
-
-
-    protected void OnErrorsChanged([CallerMemberName] string? propertyName = null)
-    {
-        if (string.IsNullOrEmpty(propertyName)) return;
-        ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
     }
 }

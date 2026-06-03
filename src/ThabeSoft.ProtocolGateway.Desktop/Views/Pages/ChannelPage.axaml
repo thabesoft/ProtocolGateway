@@ -53,7 +53,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTextColumn Header="协议" Binding="{Binding ProtocolType}" Width="*" />
+                <DataGridTextColumn Header="协议" Binding="{Binding Protocol}" Width="*" />
 
                 <DataGridTemplateColumn Header="操作" Width="Auto">
 

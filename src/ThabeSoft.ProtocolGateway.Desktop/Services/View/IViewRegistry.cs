@@ -1,5 +1,5 @@
 ﻿using Avalonia.Controls;
-using ThabeSoft.ProtocolGateway.ViewModels;
+using ThabeSoft.Mvvm;
 
 namespace ThabeSoft.ProtocolGateway.Services.View;
 

@@ -13,6 +13,7 @@
     <Project Path="src/ThabeSoft.ProtocolGateway.Converters/ThabeSoft.ProtocolGateway.Converters.csproj" />
   </Folder>
   <Folder Name="/Modules/">
+    <Project Path="src/ThabeSoft.Mvvm/ThabeSoft.Mvvm.csproj" />
     <Project Path="src/ThabeSoft.Primitives.ByteKit/ThabeSoft.Primitives.ByteKit.csproj" />
     <Project Path="src/ThabeSoft.Primitives.Result/ThabeSoft.Primitives.Result.csproj" />
   </Folder>

@@ -121,7 +121,7 @@
 
                     <ContentControl.DataTemplates>
 
-                        <DataTemplate DataType="vm:SerialPortConfigViewModel">
+                        <DataTemplate DataType="vm:PortConfigViewModel">
 
                             <StackPanel Orientation="Vertical">
 
@@ -130,7 +130,7 @@
                                 </HeaderedContentControl>
 
                                 <HeaderedContentControl Header="数据位">
-                                    <NumericUpDown Value="{Binding DataBits}" />
+                                    <NumericUpDown Value="{Binding DataBits}" Minimum="5" Maximum="8" Increment="1" />
                                 </HeaderedContentControl>
 
                                 <HeaderedContentControl Header="双工模式">

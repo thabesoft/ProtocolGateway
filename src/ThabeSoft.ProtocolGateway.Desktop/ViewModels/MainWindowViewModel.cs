@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using ThabeSoft.Mvvm;
 
 namespace ThabeSoft.ProtocolGateway.ViewModels;
 
@@ -6,21 +7,26 @@ namespace ThabeSoft.ProtocolGateway.ViewModels;
 /// <summary>
 /// 主窗口视图模型
 /// </summary>
-public sealed partial class MainWindowViewModel(MainViewModel view) : ObservableObject, IViewModel
+public sealed partial class MainWindowViewModel(MainViewModel view) : ViewModelBase
 {
     /// <summary>
     /// 标题
     /// </summary>
-    [ObservableProperty]
-    public partial string Title { get; set; } = "ProtocolGateway.Desktop";
+    public string Title 
+    {
+        get; set => Change(field, value, x => field = x)
+            .NotNullOrWhiteSpace()
+            .Apply();
+
+    } = "ProtocolGateway.Desktop";
 
     /// <summary>
     /// 内容
     /// </summary>
-    [ObservableProperty]
-    public partial MainViewModel Content { get; private set; } = view;
-
-
+    public MainViewModel Content
+    {
+        get; private set => Apply(field, value, x => field = x);
+    } = view;
 
 
     public override string ToString()

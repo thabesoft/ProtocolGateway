@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using ThabeSoft.Mvvm;
 using ThabeSoft.Primitives;
 
 namespace ThabeSoft.ProtocolGateway.ViewModels;

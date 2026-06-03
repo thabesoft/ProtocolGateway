@@ -1,7 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using Microsoft.Extensions.DependencyInjection;
-using ThabeSoft.ProtocolGateway.ViewModels;
+using ThabeSoft.Mvvm;
 
 namespace ThabeSoft.ProtocolGateway.Services.View;
 
