@@ -96,16 +96,15 @@ public readonly struct Result : IResult
 /// </summary>
 public readonly struct Result<TValue> : IResult<TValue>
 {
-    private readonly bool _hasValue;
-
-
     /// <summary> 等级 </summary>
     public ResultLevel Level { get; }
     /// <summary> 消息 </summary>
     public string? Message { get; }
+    /// <summary> 是否有值 </summary>
+    public bool HasValue { get; }
     /// <summary> 值, 当结果为错误的时候访问会抛出异常 </summary>
     /// <exception cref="InvalidOperationException">当结果是错误的时候访问抛出</exception>
-    public TValue Value => _hasValue ? field : throw new InvalidOperationException("Cannot access Value of a failed Result.");
+    public TValue Value => HasValue ? field : throw new InvalidOperationException("Cannot access Value of a failed Result.");
 
 
     internal Result(ResultLevel level, string? message)
@@ -113,7 +112,7 @@ public readonly struct Result<TValue> : IResult<TValue>
         Level = level;
         Message = message;
         Value = default!;
-        _hasValue = false;
+        HasValue = false;
 
 #if DEBUG
         if (Level == ResultLevel.Error) ResultException.ThrowIfDebugger(message);
@@ -124,7 +123,7 @@ public readonly struct Result<TValue> : IResult<TValue>
         Level = level;
         Message = message;
         Value = value;
-        _hasValue = true;
+        HasValue = true;
 
 #if DEBUG
         if (Level == ResultLevel.Error) ResultException.ThrowIfDebugger( message);
@@ -162,7 +161,7 @@ public readonly struct Result<TValue> : IResult<TValue>
     }
     public static Result<TValue> Warning(string message, TValue value)
     {
-        return new(ResultLevel.Info, message, value);
+        return new(ResultLevel.Warning, message, value);
     }
 
     public static Result<TValue> Error(string message)
@@ -183,7 +182,7 @@ public readonly struct Result<TValue> : IResult<TValue>
     /// <exception cref="ResultException"></exception>
     public Result<U> Cast<U>()
     {
-        if (_hasValue)
+        if (HasValue)
         {
             throw new ResultException("Cannot propagate error from successful result");
         }

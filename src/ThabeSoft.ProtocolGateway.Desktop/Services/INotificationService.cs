@@ -1,6 +1,5 @@
 ﻿using Avalonia.Controls.Notifications;
 using ThabeSoft.Primitives;
-using Tmds.DBus.Protocol;
 
 namespace ThabeSoft.ProtocolGateway.Services;
 
@@ -14,11 +13,23 @@ public static class NotificationServiceExtensions
 {
     extension(INotificationService services)
     {
-        public INotificationOptions Show(Result result)
+        public INotificationOptions Result(Result result)
         {
-            if(result.IsSuccess)
+            if (result.Level == ResultLevel.Success)
             {
-                return services.Information("OK");
+                return services.Success(result.Message!);
+            }
+            if (result.Level == ResultLevel.Info)
+            {
+                return services.Information(result.Message!);
+            }
+            if (result.Level == ResultLevel.Warning)
+            {
+                return services.Warning(result.Message!);
+            }
+            if (result.Level == ResultLevel.Error)
+            {
+                return services.Error(result.Message!);
             }
 
             return services.Error(result.Message!);

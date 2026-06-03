@@ -157,7 +157,11 @@ public sealed partial class ChannelPageViewModel : ViewModelBase, IDisposable
             var vms = ChannelRuntimeService.ActiveChannels
                 .Select(ctx =>
                 {
-                    var vm = new ChannelConfigViewModel();
+                    var vm = new ChannelConfigViewModel
+                    {
+                        NotificationService = NotificationService
+                    };
+
                     vm.LoadContext(ctx);
                     return vm;
                 })

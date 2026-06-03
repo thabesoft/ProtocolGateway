@@ -91,7 +91,7 @@ public sealed partial class ChannelConfigViewModel : ViewModelBase, IViewModel
         if (ChannelHandle is null) return;
 
         var result = await ChannelHandle.StartAsync();
-        NotificationService?.Show(result);
+        NotificationService?.Result(result).Show();
     }
 
     [RelayCommand(CanExecute = nameof(HasChannelHandle))]
@@ -100,7 +100,7 @@ public sealed partial class ChannelConfigViewModel : ViewModelBase, IViewModel
         if (ChannelHandle is null) return;
 
         var result = await ChannelHandle.StopAsync();
-        NotificationService?.Show(result);
+        NotificationService?.Result(result).Show();
     }
 
 

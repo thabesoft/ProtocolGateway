@@ -46,7 +46,7 @@ public sealed class SerialPortTransport : ITransport
             State != StartableState.Stoped &&
             State != StartableState.Error)
         {
-            return Result.Error("当前状态无法链接");
+            return Result.Error($"串口连接失败, 当前状态无法链接: {State}");
         }
 
         State = StartableState.Starting;

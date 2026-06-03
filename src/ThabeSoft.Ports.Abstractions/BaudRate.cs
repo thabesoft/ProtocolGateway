@@ -43,6 +43,7 @@ public readonly record struct BaudRate : IEquatable<BaudRate>
         if (!CommonBaudRate.Contains(baudRate))
         {
             Debug.WriteLine($"警告: 波特率 {baudRate} 不是标准值，请确认硬件支持");
+            return Result.Warning("非标准波特率", new BaudRate(baudRate));
         }
 
         return Result.Success(new BaudRate(baudRate));
