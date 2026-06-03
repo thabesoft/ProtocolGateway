@@ -1,4 +1,5 @@
 ﻿using ThabeSoft.Mvvm;
+using ThabeSoft.Primitives;
 
 namespace ThabeSoft.ProtocolGateway.Services.Navigation;
 
@@ -7,6 +8,6 @@ namespace ThabeSoft.ProtocolGateway.Services.Navigation;
 /// </summary>
 public interface INavigationService
 {
-    void NavigateTo(IViewModel target);
-    void NavigateTo(Type target);
+    Result NavigateTo(IViewModel target);
+    Result NavigateTo(Type target);
 }

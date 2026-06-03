@@ -14,9 +14,11 @@ namespace ThabeSoft.Modbus;
 /// <summary>
 /// Modbus Rtu 主站
 /// </summary>
-public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
+public sealed class ModbusRtuMaster(ITransport transport) : IModbusMaster
 {
     private readonly SemaphoreSlim _lock = new(1, 1);
+
+
 
     public async ValueTask<Result> ReadCoilsAsync(Memory<bool> destination, byte slaveId, ushort address, CancellationToken cancellationToken = default)
     {
@@ -105,7 +107,7 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
 
             // 发送请求
             var send_mem = buffer.AsMemory(0, layout.TotalLength);
-            var request_result = await port.WriteAsync(send_mem, cancellationToken);
+            var request_result = await transport.WriteAsync(send_mem, cancellationToken);
             if (!request_result.IsSuccess) return request_result.PropagateError<WriteSingleCoilHeader>();
 
 
@@ -141,7 +143,7 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
 
             // 发送请求
             var send_mem = buffer.AsMemory(0, layout.TotalLength);
-            var request_result = await port.WriteAsync(send_mem, cancellationToken);
+            var request_result = await transport.WriteAsync(send_mem, cancellationToken);
             if (!request_result.IsSuccess) return request_result;
 
 
@@ -183,7 +185,7 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
 
             // 发送请求
             var send_mem = buffer.AsMemory(0, send_layout.TotalLength);
-            var request_result = await port.WriteAsync(send_mem, cancellationToken);
+            var request_result = await transport.WriteAsync(send_mem, cancellationToken);
             if (!request_result.IsSuccess) return request_result;
 
 
@@ -225,7 +227,7 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
 
             // 发送请求
             var send_mem = buffer.AsMemory(0, send_layout.TotalLength);
-            var request_result = await port.WriteAsync(send_mem, cancellationToken);
+            var request_result = await transport.WriteAsync(send_mem, cancellationToken);
             if (!request_result.IsSuccess) return request_result;
 
 
@@ -276,7 +278,7 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
 
             // 发送请求
             var send_mem = buffer.AsMemory(0, request_layout.TotalLength);
-            var request_result = await port.WriteAsync(send_mem, cancellationToken);
+            var request_result = await transport.WriteAsync(send_mem, cancellationToken);
             if (!request_result.IsSuccess) return request_result;
 
 
@@ -327,7 +329,7 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
 
             // 发送请求
             var send_mem = buffer.AsMemory(0, request_layout.TotalLength);
-            var request_result = await port.WriteAsync(send_mem, cancellationToken);
+            var request_result = await transport.WriteAsync(send_mem, cancellationToken);
             if (!request_result.IsSuccess) return request_result.PropagateError<ReadResponseHeader>();
 
 
@@ -378,7 +380,7 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
         // 有两种情况, Rtu异常共5字节, 其他数据都大于5字节, 所以先读取5个
         var resp_header = destination[..RtuErrorResponseLayout.TotalLength];
         // 读取
-        var read_result = await port.ReadExactAsync(resp_header, cancellationToken);
+        var read_result = await transport.ReadExactAsync(resp_header, cancellationToken);
         if (!read_result.IsSuccess) return read_result;
         current_length += RtuErrorResponseLayout.TotalLength;
 
@@ -413,21 +415,22 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
             var tail_length = (current_length + data_length) - RtuErrorResponseLayout.TotalLength;
 
             var tail_span = destination.Slice(current_length, tail_length);
-            return await port.ReadExactAsync(tail_span, cancellationToken);
+            return await transport.ReadExactAsync(tail_span, cancellationToken);
         }
         else
         {
             // 写单个和写多个都是固定长度8
             var tail_span = destination.Slice(current_length, 3);
-            return await port.ReadExactAsync(tail_span, cancellationToken);
+            return await transport.ReadExactAsync(tail_span, cancellationToken);
         }
     }
 
 
 
-    State IStartable.State => port.State;
-    ValueTask<Result> IStartable.StartAsync(CancellationToken cancellationToken) => port.StartAsync(cancellationToken);
-    ValueTask<Result> IStartable.StopAsync(CancellationToken cancellationToken) => port.StopAsync(cancellationToken);
+    event Action<StartableState> INotifyStartable.StateChanged { add => transport.StateChanged += value; remove => transport.StateChanged -= value; }
+    StartableState IStartable.State => transport.State;
+    ValueTask<Result> IStartable.StartAsync(CancellationToken cancellationToken) => transport.StartAsync(cancellationToken);
+    ValueTask<Result> IStartable.StopAsync(CancellationToken cancellationToken) => transport.StopAsync(cancellationToken);
 }
 
 

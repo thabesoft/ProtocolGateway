@@ -5,7 +5,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\ThabeSoft.Modbus\ThabeSoft.Startable.Abstractions.csproj" />
+		<ProjectReference Include="..\ThabeSoft.Startable.Abstractions\ThabeSoft.Startable.Abstractions.csproj" />
 		<ProjectReference Include="..\ThabeSoft.Primitives.Result\ThabeSoft.Primitives.Result.csproj" />
 	</ItemGroup>
 

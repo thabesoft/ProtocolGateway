@@ -4,7 +4,7 @@
 /// <summary>
 /// 状态
 /// </summary>
-public enum State
+public enum StartableState
 {
     /// <summary>
     /// 错误

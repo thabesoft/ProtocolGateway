@@ -36,7 +36,7 @@ public class GatewayTests
         Assert.AreEqual(value, read_result.Value);
 
         // 读线圈端口模拟
-        static Mock<IPort> MockPort(byte slaveId, params bool[] values)
+        static Mock<ITransport> MockPort(byte slaveId, params bool[] values)
         {
             // 值数量
             var quantity_result = ReadCoilsQuantity.Create(values.Length);
@@ -53,7 +53,7 @@ public class GatewayTests
             Assert.IsTrue(encode_result.IsSuccess, encode_result.Message);
 
             // 响应模拟
-            var mock_port = new Mock<IPort>();
+            var mock_port = new Mock<ITransport>();
             mock_port
                 .Setup(x => x.ReadExactAsync(It.IsAny<Memory<byte>>(), It.IsAny<CancellationToken>()))
                 .Returns<Memory<byte>, CancellationToken>((buffer, _) =>
@@ -96,7 +96,7 @@ public class GatewayTests
 
 
         // 读线圈端口模拟
-        static Mock<IPort> MockPort(byte slaveId, params ushort[] values)
+        static Mock<ITransport> MockPort(byte slaveId, params ushort[] values)
         {
             // 值数量
             var quantity_result = ReadCoilsQuantity.Create(values.Length);
@@ -113,7 +113,7 @@ public class GatewayTests
             Assert.IsTrue(encode_result.IsSuccess, encode_result.Message);
 
             // 响应模拟
-            var mock_port = new Mock<IPort>();
+            var mock_port = new Mock<ITransport>();
             mock_port
                 .Setup(x => x.ReadExactAsync(It.IsAny<Memory<byte>>(), It.IsAny<CancellationToken>()))
                 .Returns<Memory<byte>, CancellationToken>((buffer, _) =>

@@ -59,7 +59,7 @@ public sealed partial class ChannelConfigViewModel : ViewModelBase, IViewModel
             .Apply();
 
     } = ProtocolType.ModbusRtu;
-    public bool IsShowConnectButton => ChannelHandle?.State == Startable.State.Starting;
+    public bool IsShowConnectButton => ChannelHandle?.State == Startable.StartableState.Starting;
 
 
     public ChannelConfigViewModel()

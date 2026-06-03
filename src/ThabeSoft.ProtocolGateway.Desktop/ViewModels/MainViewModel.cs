@@ -1,7 +1,9 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Avalonia.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using ThabeSoft.Mvvm;
+using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Services.Menu;
 using ThabeSoft.ProtocolGateway.Services.Navigation;
 using ThabeSoft.ProtocolGateway.Services.ViewModel;
@@ -12,9 +14,27 @@ namespace ThabeSoft.ProtocolGateway.ViewModels;
 /// <summary>
 /// 主视图
 /// </summary>
-public sealed partial class MainViewModel(IViewModelProvider viewModelProvider) : ViewModelBase, INavigationService, IMenuService
+public sealed partial class MainViewModel : ViewModelBase, INavigationService, IMenuService
 {
     private ObservableCollection<NavigationMenuItemViewModel> _menuItems = [];
+
+
+    public MainViewModel()
+    {
+        if(Design.IsDesignMode)
+        {
+
+        }
+    }
+    public MainViewModel(IViewModelProvider viewModelProvider)
+    {
+        ViewModelProvider = viewModelProvider;
+    }
+
+    public IViewModelProvider? ViewModelProvider
+    {
+        get; private set => Apply(field, value, x => field = x);
+    }
 
     /// <summary>
     /// 选中的导航元素
@@ -116,7 +136,7 @@ public sealed partial class MainViewModel(IViewModelProvider viewModelProvider) 
     /// <summary>
     /// 导航到目标
     /// </summary>
-    public void NavigateTo(IViewModel target)
+    public Result NavigateTo(IViewModel target)
     {
         Content = target;
         OnPropertyChanged(nameof(Content));
@@ -125,23 +145,33 @@ public sealed partial class MainViewModel(IViewModelProvider viewModelProvider) 
         var vm_type = target.GetType();
         var menu_item = _menuItems.FirstOrDefault(x => x.Target == vm_type);
         // 已经选中
-        if(menu_item == SelectedMenuItem) return;
+        if (menu_item == SelectedMenuItem) return Result.InvalidOperation("导航失败, 目标页面与当前页面一致");
 
         // 全部取消选择
         foreach (var i in _menuItems) i.Unselect();
         // 选择当前
         menu_item?.Select();
         SelectedMenuItem = menu_item;
+
+        return Result.Ok();
     }
 
     /// <summary>
     /// 导航到目标
     /// </summary>
-    public void NavigateTo(Type target)
+    public Result NavigateTo(Type target)
     {
-        var target_vm = viewModelProvider.Get(target);
-        if (target_vm is null) return;
+        if (ViewModelProvider is null)
+        {
+            return Result.InvalidOperation($"导航失败, 视图模型提供者未初始化");
+        }
 
-        NavigateTo(target_vm);
+        var target_vm = ViewModelProvider.Get(target);
+        if (target_vm is null)
+        {
+            return Result.InvalidOperation($"导航失败, 目标页面无法创建实例: {target}");
+        }
+
+        return NavigateTo(target_vm);
     }
 }

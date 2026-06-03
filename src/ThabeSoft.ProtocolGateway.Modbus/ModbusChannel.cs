@@ -12,7 +12,8 @@ namespace ThabeSoft.ProtocolGateway;
 /// <param name="master">Modbus主站</param>
 public sealed class ModbusChannel(IModbusMaster master) : IReadWriteChannel
 {
-    State IStartable.State => master.State;
+    StartableState IStartable.State => master.State;
+    event Action<StartableState> INotifyStartable.StateChanged { add => master.StateChanged += value; remove => master.StateChanged -= value; }
     ValueTask<Result> IStartable.StartAsync(CancellationToken cancellationToken) => master.StartAsync(cancellationToken);
     ValueTask<Result> IStartable.StopAsync(CancellationToken cancellationToken) => master.StopAsync(cancellationToken);
 

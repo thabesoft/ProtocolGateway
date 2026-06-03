@@ -11,7 +11,7 @@ public interface IStartable
     /// <summary>
     /// 状态
     /// </summary>
-    State State { get; }
+    StartableState State { get; }
 
     /// <summary>
     /// 启动

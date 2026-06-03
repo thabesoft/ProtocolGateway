@@ -17,7 +17,17 @@ public sealed class SerialPortTransport : ITransport
     private readonly SerialPortLock _lock = new();
 
 
-    public State State { get; private set; }
+    public event Action<StartableState>? StateChanged;
+    public StartableState State
+    {
+        get; private set
+        {
+            if (field == value) return;
+
+            field = value;
+            StateChanged?.Invoke(value);
+        }
+    }
 
 
     ValueTask<Result> ITransport.ConnectAsync(ITransportOptions options, CancellationToken cancellation)
@@ -32,14 +42,14 @@ public sealed class SerialPortTransport : ITransport
 
     public async ValueTask<Result> ConnectAsync(ISerialPortOptions options, CancellationToken cancellation = default)
     {
-        if (State != State.Ready &&
-            State != State.Stoped &&
-            State != State.Error)
+        if (State != StartableState.Ready &&
+            State != StartableState.Stoped &&
+            State != StartableState.Error)
         {
             return Result.Error(ErrorType.InvalidOperation, "当前状态无法链接");
         }
 
-        State = State.Starting;
+        State = StartableState.Starting;
 
         using var _ = await _lock.GetConfigLockAsync();
 
@@ -52,57 +62,57 @@ public sealed class SerialPortTransport : ITransport
                 port = x;
                 port.Open();
 
-                State = Startable.State.Started;
+                State = Startable.StartableState.Started;
             }));
         }
         catch (UnauthorizedAccessException)
         {
-            State = State.Error;
+            State = StartableState.Error;
             return Result.InvalidOperation("访问被拒绝, 无法打开串口");
         }
         catch (ArgumentOutOfRangeException)
         {
-            State = State.Error;
+            State = StartableState.Error;
             return Result.InvalidOperation("参数超出范围, 无法打开串口");
         }
         catch (IOException)
         {
-            State = State.Error;
-            return Result.InvalidOperation( "IO异常, 无法打开串口");
+            State = StartableState.Error;
+            return Result.InvalidOperation("IO异常, 无法打开串口");
         }
         catch (InvalidOperationException ex)
         {
-            State = State.Error;
-            return Result.InvalidOperation( $"串口连接失败: {ex.Message}");
+            State = StartableState.Error;
+            return Result.InvalidOperation($"串口连接失败: {ex.Message}");
         }
     }
     public async ValueTask<Result> DisconnectAsync(CancellationToken cancellation = default)
     {
-        if (State != State.Started && State != State.Starting)
+        if (State != StartableState.Started && State != StartableState.Starting)
         {
             return Result.Error(ErrorType.InvalidOperation, "传输未连接, 无法断开");
         }
 
-        State = State.Stoping;
+        State = StartableState.Stoping;
         using var _ = await _lock.GetConfigLockAsync();
 
         try
         {
             port?.Close();
-            State = State.Stoped;
+            State = StartableState.Stoped;
             return Result.Ok();
         }
-        catch(IOException ex)
+        catch (IOException ex)
         {
-            State = State.Error;
-            return Result.InvalidOperation( $"断开连接时发生错误: {ex.Message}");
+            State = StartableState.Error;
+            return Result.InvalidOperation($"断开连接时发生错误: {ex.Message}");
         }
     }
 
 
     public async ValueTask<Result> ReadExactAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
     {
-        if (port?.IsOpen != true || State != State.Started)
+        if (port?.IsOpen != true || State != StartableState.Started)
             return Result.Error<int>(ErrorType.InvalidOperation, "未连接无法读取数据");
 
         if (_options is null)
@@ -127,7 +137,7 @@ public sealed class SerialPortTransport : ITransport
     }
     public async ValueTask<Result> WriteAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
     {
-        if (port?.IsOpen != true || State != State.Started)
+        if (port?.IsOpen != true || State != StartableState.Started)
             return Result.Error(ErrorType.InvalidOperation, "未连接无法写入数据");
 
         if (_options is null)
@@ -141,7 +151,7 @@ public sealed class SerialPortTransport : ITransport
             await port.BaseStream.WriteAsync(data, cancellationToken);
             return Result.Ok();
         }
-        catch(InvalidOperationException)
+        catch (InvalidOperationException)
         {
             return Result.Error(ErrorType.InvalidOperation, "串口已关闭");
         }
@@ -150,7 +160,7 @@ public sealed class SerialPortTransport : ITransport
 
     public async ValueTask DisposeAsync()
     {
-        if (State == State.Disposed) return;
+        if (State == StartableState.Disposed) return;
 
         using var _ = await _lock.GetConfigLockAsync();
 
@@ -158,10 +168,10 @@ public sealed class SerialPortTransport : ITransport
         {
             if ((port?.IsOpen) != true) return;
 
-            State = State.Stoping;
+            State = StartableState.Stoping;
             port.Close();
         }
-        catch(IOException ex)
+        catch (IOException ex)
         {
             Debug.Fail($"释放串口时发生IO异常: {ex.Message}");
         }
@@ -170,7 +180,7 @@ public sealed class SerialPortTransport : ITransport
             port?.Dispose();
             port = null;
 
-            State = State.Disposed;
+            State = StartableState.Disposed;
         }
     }
 

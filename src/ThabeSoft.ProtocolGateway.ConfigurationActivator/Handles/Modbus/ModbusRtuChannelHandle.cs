@@ -10,7 +10,7 @@ public sealed class ModbusRtuChannelHandle(ChannelName name, IChannel channel, S
     public ChannelName Name => name;
     public ChannelType Type => ChannelType.Modbus;
     public ProtocolType Protocol => ProtocolType.ModbusRtu;
-    public State State => transport.State;
+    public StartableState State => transport.State;
 
 
     public ValueTask<Result> StartAsync(CancellationToken cancellationToken = default)
