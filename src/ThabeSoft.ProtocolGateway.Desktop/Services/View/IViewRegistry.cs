@@ -14,6 +14,6 @@ public interface IViewRegistry
     /// <typeparam name="TView">视图</typeparam>
     /// <typeparam name="TViewModel">视图模型</typeparam>
     void Register<TView, TViewModel>()
-        where TView : Control, new()
+        where TView : Control
         where TViewModel : IViewModel;
 }

@@ -105,70 +105,82 @@ public static class ModbusTag
 
     #region --路由标签--
 
-    public static Result<ITag> CreateRoutableTag(ChannelName name, byte slaveId, FunctionCode functionCode, ushort address, TagValueType dataType)
+    public static Result<ITag> CreateRoutableTag(ChannelName name, byte slaveId, FunctionCode functionCode, ushort address, TagValueType valueType)
     {
-        var data_length_result = dataType.GetByteLength();
+        var data_length_result = valueType.GetByteLength();
         if (!data_length_result.IsSuccess) return data_length_result.PropagateError<ITag>();
 
         var modbus_address = ModbusAddress.Create(slaveId, functionCode, address);
 
         // 8
-        if (dataType == TagValueType.Bool)
+        if (valueType == TagValueType.Bool)
         {
+            if(!functionCode.IsCoil)
+            {
+                return Result.InvalidParameter<ITag>($"非线圈功能码 [{functionCode}], 无法使用该数据类型 [{valueType}]");
+            }
+
             return Result.Ok<ITag>(Create<bool>(BoolConverter.Instance));
         }
-        if (dataType == TagValueType.Byte)
+
+        // 功能码不匹配
+        if (!functionCode.IsRegister)
+        {
+            return Result.InvalidParameter<ITag>($"非寄存器功能码 [{functionCode}], 无法使用该数据类型 [{valueType}]");
+        }
+
+        if (valueType == TagValueType.Byte)
         {
             return Result.Ok<ITag>(Create<byte>(ByteConverter.LSB0));
         }
-        if (dataType == TagValueType.SByte)
+        if (valueType == TagValueType.SByte)
         {
             return Result.Ok<ITag>(Create<sbyte>(ByteConverter.LSB0));
         }
 
         // 16
-        if (dataType == TagValueType.Int16)
+        if (valueType == TagValueType.Int16)
         {
             return Result.Ok<ITag>(Create<short>(WordConverter.BigEndian));
         }
-        if (dataType == TagValueType.UInt16)
+        if (valueType == TagValueType.UInt16)
         {
             return Result.Ok<ITag>(Create<ushort>(WordConverter.BigEndian));
         }
-        if (dataType == TagValueType.Char)
+        if (valueType == TagValueType.Char)
         {
             return Result.Ok<ITag>(Create<char>(WordConverter.BigEndian));
         }
 
         // 32
-        if (dataType == TagValueType.Int32)
+        if (valueType == TagValueType.Int32)
         {
             return Result.Ok<ITag>(Create<int>(DWordConverter.BigEndian));
         }
-        if (dataType == TagValueType.UInt32)
+        if (valueType == TagValueType.UInt32)
         {
             return Result.Ok<ITag>(Create<uint>(DWordConverter.BigEndian));
         }
-        if (dataType == TagValueType.Float)
+        if (valueType == TagValueType.Float)
         {
             return Result.Ok<ITag>(Create<float>(DWordConverter.BigEndian));
         }
 
         // 64
-        if (dataType == TagValueType.Int64)
+        if (valueType == TagValueType.Int64)
         {
             return Result.Ok<ITag>(Create<long>(QWordConverter.BigEndian));
         }
-        if (dataType == TagValueType.UInt64)
+        if (valueType == TagValueType.UInt64)
         {
             return Result.Ok<ITag>(Create<ulong>(QWordConverter.BigEndian));
         }
-        if (dataType == TagValueType.Double)
+        if (valueType == TagValueType.Double)
         {
             return Result.Ok<ITag>(Create<double>(QWordConverter.BigEndian));
         }
 
-        return Result.NotSupported<ITag>($"Modbus标签创建失败, 不支持的数据类型:{dataType}");
+        return Result.NotSupported<ITag>($"Modbus标签创建失败, 不支持的数据类型:{valueType}");
 
 
         IRoutableTag<T> Create<T>(IValueConverter<T> converter) where T : unmanaged
@@ -176,7 +188,7 @@ public static class ModbusTag
             return new ModbusRoutableTag<T>(
                channelName: name,
                address: modbus_address,
-               dataType: dataType,
+               dataType: valueType,
                length: data_length_result.Value,
                converter: converter);
         }
@@ -287,7 +299,6 @@ public static class ModbusTag
     #endregion
 }
 
-
 /// <summary>
 /// 常规标签
 /// </summary>
@@ -303,7 +314,6 @@ internal sealed class ModbusTag<T>(
     public TagValueType ValueType => dataType;
     public int Length => length;
     public IValueConverter<T> Converter => converter;
-
 }
 
 /// <summary>

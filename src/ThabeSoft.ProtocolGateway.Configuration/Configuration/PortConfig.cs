@@ -1,6 +1,5 @@
 ﻿using System.Text.Json.Serialization;
 using ThabeSoft.Ports;
-using ThabeSoft.Ports.Options;
 
 namespace ThabeSoft.ProtocolGateway.Configuration;
 

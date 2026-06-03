@@ -1,15 +1,16 @@
 ﻿using Avalonia;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using ThabeSoft.ProtocolGateway;
+using ThabeSoft.ProtocolGateway.Services;
 using ThabeSoft.ProtocolGateway.Services.Application;
 using ThabeSoft.ProtocolGateway.Services.Channel;
 using ThabeSoft.ProtocolGateway.Services.Icon;
-using ThabeSoft.ProtocolGateway.Services.Locators;
 using ThabeSoft.ProtocolGateway.Services.Menu;
 using ThabeSoft.ProtocolGateway.Services.Navigation;
 using ThabeSoft.ProtocolGateway.Services.View;
 using ThabeSoft.ProtocolGateway.Services.ViewModel;
 using ThabeSoft.ProtocolGateway.ViewModels;
+using ThabeSoft.ProtocolGateway.Views;
 
 
 #pragma warning disable IDE0130 // 命名空间与文件夹结构不匹配
@@ -29,29 +30,15 @@ public static class DependencyInjectionExtensions
         /// </summary>
         public void AddProtocolGatewayDesktop(App application)
         {
-            // 通道运行时业务
-            services.AddSingleton<IChannelRuntimeService, ChannelRuntimeService>();
-
-
-
-
             // 模板注册器
             services.AddSingleton<IDataTemplateRegistry>(application);
             // UI 程序生命周期
             services.AddSingleton<IApplicationLifetimeAccessor>(application);
 
-
             // 视图模型提供者
             services.TryAddSingleton<IViewModelProvider, ViewModelProvider>();
-            // 视图模型
-            services.TryAddSingleton<MainWindowViewModel>(); // 主窗口
-            services.TryAddSingleton<MainViewModel>();       // 主视图
-            services.TryAddSingleton<INavigationService>(x => x.GetRequiredService<MainViewModel>()); // 导航业务
-            services.TryAddSingleton<IMenuService>(x => x.GetRequiredService<MainViewModel>());       // 菜单业务
-            // 页面
-            services.TryAddSingleton<ChannelPageViewModel>();        // 通道
-            services.TryAddTransient<ChannelDetailsPageViewModel>(); // 通道详
-
+            // 通道运行时业务
+            services.AddSingleton<IChannelRuntimeService, ChannelRuntimeService>();
 
             // 图标
             services.TryAddSingleton<ProtocolTypeIconLocator>(); // 协议类型图标
@@ -63,8 +50,28 @@ public static class DependencyInjectionExtensions
             services.TryAddSingleton<IViewRegistry>(x => x.GetRequiredService<ViewLocator>());
             services.TryAddSingleton<IViewProvider>(x => x.GetRequiredService<ViewLocator>());
 
-            // 后台业务
-            services.AddHostedService<Initialization>(); // 资源初始化
+
+            // 主窗口
+            services.TryAddSingleton<MainWindow>();
+            services.TryAddSingleton<MainWindowViewModel>();
+
+            // 主视图
+            services.TryAddSingleton<MainView>();
+            services.TryAddSingleton<INotificationService>(x => x.GetRequiredService<MainView>());
+            services.TryAddSingleton<MainViewModel>();       // 视图模型
+            services.TryAddSingleton<INavigationService>(x => x.GetRequiredService<MainViewModel>()); // 导航业务
+            services.TryAddSingleton<IMenuService>(x => x.GetRequiredService<MainViewModel>());       // 菜单业务
+
+            // 通道页面
+            services.TryAddTransient<ChannelPage>();
+            services.TryAddSingleton<ChannelPageViewModel>();
+            // 通道详情页面
+            services.TryAddTransient<ChannelDetailsPage>();
+            services.TryAddTransient<ChannelDetailsPageViewModel>();
+
+
+            // 初始化
+            services.AddHostedService<Initialization>();
         }
     }
 }

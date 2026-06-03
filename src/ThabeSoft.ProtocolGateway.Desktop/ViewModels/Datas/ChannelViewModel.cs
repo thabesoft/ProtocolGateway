@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using ThabeSoft.ProtocolGateway.Handles;
 using ThabeSoft.ProtocolGateway.Services.Channel;
 
 namespace ThabeSoft.ProtocolGateway.ViewModels;

@@ -1,4 +1,4 @@
-﻿using ThabeSoft.Ports.Options;
+﻿using System.IO.Ports;
 
 namespace ThabeSoft.Ports;
 
@@ -108,15 +108,22 @@ public sealed class SerialPortOptions : TransportOptions, ISerialPortOptions
     }
     public SerialPortOptions SetStopBits(StopBits stopBits)
     {
-        if (stopBits == StopBits.None) throw new ArgumentException(nameof(stopBits), "停止位不可为空");
-
+#if NET8_0_OR_GREATER
+        if (!Enum.IsDefined(stopBits)) throw new ArgumentException("无效的停止位", nameof(stopBits));
+#else
+        if (!Enum.IsDefined(typeof(StopBits), stopBits)) throw new ArgumentException("无效的停止位", nameof(stopBits));
+#endif
         StopBits = stopBits;
         return this;
     }
 
     public SerialPortOptions SetDuplexMode(DuplexMode duplexMode)
     {
-        if (duplexMode == DuplexMode.None) throw new ArgumentException(nameof(duplexMode), "双工模式不可为空");
+#if NET8_0_OR_GREATER
+        if (!Enum.IsDefined(duplexMode)) throw new ArgumentException("无效的双工模式", nameof(duplexMode));
+#else
+        if (!Enum.IsDefined(typeof(DuplexMode), duplexMode)) throw new ArgumentException("无效的双工模式", nameof(duplexMode));
+#endif
 
         DuplexMode = duplexMode;
         return this;

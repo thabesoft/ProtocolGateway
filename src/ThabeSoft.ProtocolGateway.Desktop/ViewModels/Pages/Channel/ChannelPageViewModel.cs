@@ -1,8 +1,9 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Avalonia.Collections;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using System.Collections.ObjectModel;
 using ThabeSoft.ProtocolGateway.Messages;
+using ThabeSoft.ProtocolGateway.Services;
 using ThabeSoft.ProtocolGateway.Services.Channel;
 using ThabeSoft.ProtocolGateway.Services.Navigation;
 
@@ -17,13 +18,21 @@ public sealed partial class ChannelPageViewModel : ObservableRecipient, IViewMod
     // 导航
     private readonly INavigationService _navigationService;
     private readonly IChannelRuntimeService _runtimeService;
-
+    private readonly INotificationService _notificationService;
+    private AvaloniaList<ChannelViewModel> _channels = [];
 
     /// <summary>
     /// 所有通道元素
     /// </summary>
-    [ObservableProperty]
-    public partial IReadOnlyCollection<ChannelViewModel> Channels { get; private set; } = new ObservableCollection<ChannelViewModel>();
+    public IReadOnlyCollection<ChannelViewModel> Channels
+    {
+        get => _channels;
+        private set
+        {
+            _channels = [.. value];
+            OnPropertyChanged(nameof(Channels));
+        }
+    }
 
     // 是否在加载
     [ObservableProperty]
@@ -31,9 +40,10 @@ public sealed partial class ChannelPageViewModel : ObservableRecipient, IViewMod
 
 
 
-    public ChannelPageViewModel(INavigationService navigationService, IChannelRuntimeService runtimeService)
+    public ChannelPageViewModel(INavigationService navigationService, IChannelRuntimeService runtimeService, INotificationService notificationService)
     {
         _runtimeService = runtimeService;
+        _notificationService = notificationService;
         _navigationService = navigationService;
 
         // 通道详情页关闭时返回当前页面
@@ -51,7 +61,9 @@ public sealed partial class ChannelPageViewModel : ObservableRecipient, IViewMod
 
         if (context is not null)
         {
-            var detailsPage = new ChannelDetailsPageViewModel(context);
+            var detailsPage = new ChannelDetailsPageViewModel();
+            detailsPage.LoadContext(context);
+
             _navigationService.NavigateTo(detailsPage);
         }
     }
@@ -75,7 +87,11 @@ public sealed partial class ChannelPageViewModel : ObservableRecipient, IViewMod
                 .Select(ctx => new ChannelViewModel(ctx))
                 .ToList();
 
-            Channels = new ObservableCollection<ChannelViewModel>(vms);
+            Channels = [.. vms];
+        }
+        catch(Exception ex)
+        {
+            _notificationService.Error(ex.Message).Title("重新加载失败").Show();
         }
         finally
         {
@@ -86,36 +102,32 @@ public sealed partial class ChannelPageViewModel : ObservableRecipient, IViewMod
 
     private void OnChannelActivated(object? sender, ChannelRuntimeContext context)
     {
+        if (IsLoading) return;
+
         Avalonia.Threading.Dispatcher.UIThread.Post(() =>
         {
             var vm = new ChannelViewModel(context);
-            var list = Channels.ToList();
-            list.Add(vm);
-            Channels = new ObservableCollection<ChannelViewModel>(list);
+            _channels.Add(vm);
         });
     }
     private void OnChannelDeactivated(object? sender, ChannelName channelName)
     {
+        if (IsLoading) return;
+
         Avalonia.Threading.Dispatcher.UIThread.Post(() =>
         {
             // 找到要移除的 ViewModel
             var toRemove = Channels.FirstOrDefault(vm => vm.Name == channelName);
             if (toRemove == null) return;
 
-            // 移除
-            var currentList = Channels.ToList();
-            currentList.Remove(toRemove);
-            Channels = new ObservableCollection<ChannelViewModel>(currentList);
-
-            // 可选：显示通知
-            // Toast.Show($"{channelName} 已停用");
+            _channels.Remove(toRemove);
         });
     }
 
 
     public void Dispose()
     {
-        ((ObservableCollection<ChannelViewModel>)Channels).Clear();
+        _channels.Clear();
 
         _runtimeService.ChannelActivated -= OnChannelActivated;
         _runtimeService.ChannelDeactivated -= OnChannelDeactivated;

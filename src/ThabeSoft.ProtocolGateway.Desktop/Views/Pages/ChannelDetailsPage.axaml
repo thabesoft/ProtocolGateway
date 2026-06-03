@@ -1,0 +1,165 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+
+             xmlns:vm="using:ThabeSoft.ProtocolGateway.ViewModels"
+
+             x:Class="ThabeSoft.ProtocolGateway.Views.ChannelDetailsPage"
+
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="vm:ChannelDetailsPageViewModel">
+
+    <UserControl.DataContext>
+        <vm:ChannelDetailsPageViewModel />
+    </UserControl.DataContext>
+
+
+    <Grid RowDefinitions="Auto,1,Auto,*">
+
+        <!--工具栏-->
+        <DockPanel Height="40" Grid.Row="0">
+
+            <!--左侧-->
+            <Button DockPanel.Dock="Left"
+                    Command="{Binding BackCommand}"
+                    Content="返回"/>
+
+            <!--右侧功能-->
+            <StackPanel DockPanel.Dock="Right"
+                        Orientation="Horizontal">
+
+                <Button Content="运行" />
+                <Button Content="停止" />
+
+            </StackPanel>
+
+            <TextBlock Margin="10 0 0 0"
+                       VerticalAlignment="Center"
+                       DockPanel.Dock="Left"
+                       Text="{Binding Name}" />
+
+        </DockPanel>
+
+        <!--分界线-->
+        <Separator Margin="0" Height="1" Grid.Row="1" />
+
+        <!--状态-->
+        <UniformGrid IsVisible="False" Height="80" Grid.Row="2" Columns="4">
+
+            <Button Content="1"></Button>
+            <Button Content="2"></Button>
+            <Button Content="3"></Button>
+            <Button Content="4"></Button>
+
+        </UniformGrid>
+
+        <!--内容-->
+        <TabControl Grid.Row="3">
+
+            <TabItem Header="标签">
+                <DataGrid ItemsSource="{Binding Tags}"
+                          AutoGenerateColumns="False"
+                          CanUserSortColumns="True"
+                          CanUserReorderColumns="True">
+
+                    <DataGrid.Columns>
+
+                        <DataGridTextColumn SortMemberPath="Name" Header="名称" Binding="{Binding Name}" Width="Auto" />
+                        <DataGridTextColumn SortMemberPath="Value" Header="最新值" Binding="{Binding Value}" Width="Auto"/>
+                        <DataGridTextColumn SortMemberPath="ValueType" Header="值类型" Binding="{Binding ValueType}" Width="Auto"/>
+                        <DataGridTextColumn SortMemberPath="ValueQuality" Header="质量" Binding="{Binding ValueQuality}" Width="80" />
+                        <DataGridTextColumn SortMemberPath="Timestamp" Header="时间戳" Binding="{Binding Timestamp, StringFormat=HH:mm:ss.fff}" Width="Auto"/>
+
+                        <DataGridTextColumn SortMemberPath="SlaveId" IsVisible="{Binding IsModbusProtocol}" Header="从站 Id" Binding="{Binding SlaveId}" Width="Auto"/>
+                        <DataGridTextColumn SortMemberPath="Address" IsVisible="{Binding IsModbusProtocol}" Header="起始地址" Binding="{Binding Address}" Width="Auto"/>
+                        <DataGridTextColumn SortMemberPath="FunctionCode" IsVisible="{Binding IsModbusProtocol}" Header="功能码" Binding="{Binding FunctionCode}" Width="Auto"/>
+
+                    </DataGrid.Columns>
+
+                </DataGrid>
+            </TabItem>
+
+            <TabItem Header="日志">
+                <Button Content="日志" />
+            </TabItem>
+
+            <TabItem Header="配置" IsSelected="True">
+
+                <ContentControl Content="{Binding Port}">
+
+                    <ContentControl.Styles>
+
+                        <Style Selector="HeaderedContentControl">
+                            <Setter Property="Template">
+                                <ControlTemplate TargetType="HeaderedContentControl">
+                                    <Border Background="{TemplateBinding Background}"
+                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                            CornerRadius="{TemplateBinding CornerRadius}"
+                                            Padding="{TemplateBinding Padding}">
+
+                                        <DockPanel>
+
+                                            <!-- 标题 -->
+                                            <ContentPresenter Margin="0 10 0 5" DockPanel.Dock="Top"
+                                                              Content="{TemplateBinding Header}"
+                                                              HorizontalAlignment="Left"
+                                                              ContentTemplate="{TemplateBinding HeaderTemplate}"/>
+                                            <!-- 内容 -->
+                                            <ContentPresenter Content="{TemplateBinding Content}"
+                                                              HorizontalAlignment="Left"
+                                                              ContentTemplate="{TemplateBinding ContentTemplate}"/>
+
+                                        </DockPanel>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter>
+                        </Style>
+
+                    </ContentControl.Styles>
+
+                    <ContentControl.DataTemplates>
+
+                        <DataTemplate DataType="vm:SerialPortConfigViewModel">
+
+                            <StackPanel Orientation="Vertical">
+
+                                <HeaderedContentControl Header="波特率">
+                                    <TextBox Text="{Binding BaudRate}" />
+                                </HeaderedContentControl>
+
+                                <HeaderedContentControl Header="数据位">
+                                    <NumericUpDown Value="{Binding DataBits}" />
+                                </HeaderedContentControl>
+
+                                <HeaderedContentControl Header="双工模式">
+                                    <ComboBox ItemsSource="{Binding DuplexModes}" SelectedItem="{Binding DuplexMode}" />
+                                </HeaderedContentControl>
+
+                                <HeaderedContentControl Header="校验">
+                                    <ComboBox ItemsSource="{Binding Paritys}" SelectedItem="{Binding Parity}" />
+                                </HeaderedContentControl>
+
+                                <HeaderedContentControl Header="停止位">
+                                    <StackPanel Orientation="Horizontal">
+
+                                        <RadioButton GroupName="StopBits" Content="1" />
+                                        <RadioButton GroupName="StopBits" Margin="10 0 0 0" Content="1.5" />
+                                        <RadioButton GroupName="StopBits" Margin="10 0 0 0" Content="2" />
+
+                                    </StackPanel>
+                                </HeaderedContentControl>
+
+                            </StackPanel>
+
+                        </DataTemplate>
+                    </ContentControl.DataTemplates>
+                </ContentControl>
+            </TabItem>
+
+        </TabControl>
+
+    </Grid>
+
+</UserControl>

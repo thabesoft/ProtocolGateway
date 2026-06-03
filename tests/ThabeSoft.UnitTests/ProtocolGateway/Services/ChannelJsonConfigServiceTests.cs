@@ -1,6 +1,4 @@
-﻿using ThabeSoft.ProtocolGateway.Configuration;
-
-namespace ThabeSoft.ProtocolGateway.Services;
+﻿namespace ThabeSoft.ProtocolGateway.Services;
 
 
 [TestClass]

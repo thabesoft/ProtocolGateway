@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using ThabeSoft.Primitives;
 
-namespace ThabeSoft.Ports.Options;
+namespace ThabeSoft.Ports;
 
 
 /// <summary>

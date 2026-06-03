@@ -1,23 +1,24 @@
 <Project>
-	
+
 	<!-- See https://aka.ms/dotnet/msbuild/customize for more details on customizing your build -->
 	<PropertyGroup>
 
 		<!--版本-->
-		<TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;net8.0;net10.0</TargetFrameworks>
 		<LangVersion>preview</LangVersion>
-		
+
 		<!--特性-->
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		
+
 	</PropertyGroup>
 
-	
+
 	<!--.net8 Aot-->
-	<!--<PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">-->
-	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
-		
+	<!--<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">-->
+	<!--<PropertyGroup Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(TargetFrameworkVersion)', 'net8.0'))">-->
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0' OR '$(TargetFramework)' == 'net10.0'">
+
 		<!-- 开启 AOT 发布 -->
 		<PublishAot>true</PublishAot>
 		<!-- 声明与 AOT 兼容 -->
@@ -36,20 +37,20 @@
 		<IlcFoldIdenticalMethodBodies>true</IlcFoldIdenticalMethodBodies>
 		<!-- JIT 编译器优化偏好：此处为 Speed -->
 		<OptimizationPreference>Speed</OptimizationPreference>
-		
+
 	</PropertyGroup>
-	
+
 
 	<!--低版本兼容包-->
 	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-		
+
 		<!--ValueTask-->
 		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.8" />
 		<!--Span, Memory-->
 		<PackageReference Include="System.Memory" Version="4.6.3" />
 		<!--Range,Index-->
 		<PackageReference Include="IndexRange" Version="1.1.1" />
-		
+
 	</ItemGroup>
-	
+
 </Project>

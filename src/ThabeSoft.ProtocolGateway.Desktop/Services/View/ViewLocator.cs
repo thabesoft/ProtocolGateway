@@ -1,46 +1,53 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using ThabeSoft.ProtocolGateway.Services.View;
+using Microsoft.Extensions.DependencyInjection;
 using ThabeSoft.ProtocolGateway.ViewModels;
 
-namespace ThabeSoft.ProtocolGateway.Services.Locators;
+namespace ThabeSoft.ProtocolGateway.Services.View;
 
 
 /// <summary>
 /// 视图定位器
 /// </summary>
-internal sealed class ViewLocator : IViewProvider, IViewRegistry, IDataTemplate
+internal sealed class ViewLocator(IServiceProvider services) : IViewProvider, IViewRegistry, IDataTemplate
 {
-    private readonly Dictionary<Type, Func<object, Control>> _viewFactory = [];
+    // viewModel - view
+    private readonly Dictionary<Type, Type> _binds = [];
 
 
     /// <summary>
-    /// 绑定视图和视图模型
+    /// 从容器注册
     /// </summary>
     /// <typeparam name="TView">视图</typeparam>
     /// <typeparam name="TViewModel">视图模型</typeparam>
     public void Register<TView, TViewModel>()
-        where TView : Control, new()
+        where TView : Control
         where TViewModel : IViewModel
     {
-        var vm_type = typeof(TViewModel);
-        _viewFactory[vm_type] = data_context => new TView() { DataContext = data_context };
+        _binds[typeof(TViewModel)] = typeof(TView);
     }
+
     // 根据Vm获取视图
     public Control? GetView(IViewModel viewModel)
     {
-        if (_viewFactory.TryGetValue(viewModel.GetType(), out var viewFactory))
+        if (!_binds.TryGetValue(viewModel.GetType(), out var view_type))
         {
-            return viewFactory(viewModel);
+            return default;
         }
 
-        return default;
+        if(services.GetService(view_type) is not Control view)
+        {
+            return default;
+        }
+
+        view.DataContext = viewModel;
+        return view;
     }
 
 
     bool IDataTemplate.Match(object? data)
     {
-        return data is IViewModel vm && _viewFactory.ContainsKey(vm.GetType());
+        return data is IViewModel vm && _binds.ContainsKey(vm.GetType());
     }
     Control? ITemplate<object?, Control?>.Build(object? param)
     {

@@ -3,7 +3,6 @@ using Avalonia.Media;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ThabeSoft.ProtocolGateway.Services.Icon;
-using ThabeSoft.ProtocolGateway.Services.Locators;
 using ThabeSoft.ProtocolGateway.Services.View;
 using ThabeSoft.ProtocolGateway.ViewModels;
 using ThabeSoft.ProtocolGateway.Views;

@@ -21,7 +21,7 @@ public readonly record struct FunctionCode : IEquatable<FunctionCode>
     /// <summary>
     /// 是否是读操作码
     /// </summary>
-    public bool IsRead => _value is ReadCoilsValue or ReadDiscreteInputsValue or ReadHoldingRegistersValue or ReadInputRegistersValue;
+    public bool IsRead => IsReadCoils && IsReadRegisters;
     /// <summary>
     /// 是否是读线圈
     /// </summary>
@@ -34,11 +34,29 @@ public readonly record struct FunctionCode : IEquatable<FunctionCode>
     /// <summary>
     /// 是否是写操作码
     /// </summary>
-    public bool IsWrite => _value is WriteSingleCoilValue or WriteSingleRegisterValue or WriteMultipleCoilsValue or WriteMultipleRegistersValue;
+    public bool IsWrite => IsWriteCoils && IsWriteRegisters;
+    /// <summary>
+    /// 是否是写线圈
+    /// </summary>
+    public bool IsWriteCoils => _value is WriteSingleCoilValue or WriteMultipleCoilsValue;
+    /// <summary>
+    /// 是否是写寄存器
+    /// </summary>
+    public bool IsWriteRegisters => _value is WriteSingleRegisterValue or WriteMultipleRegistersValue;
     /// <summary>
     /// 是否是写入单值
     /// </summary>
     public bool IsWriteSingle => _value is WriteSingleCoilValue or WriteSingleRegisterValue;
+
+
+    /// <summary>
+    /// 是否是线圈
+    /// </summary>
+    public bool IsCoil => IsReadCoils && IsWriteCoils;
+    /// <summary>
+    /// 是否是寄存器
+    /// </summary>
+    public bool IsRegister => IsReadRegisters && IsWriteRegisters;
 
 
 
