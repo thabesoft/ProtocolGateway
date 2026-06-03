@@ -421,6 +421,16 @@ public sealed class ModbusRtuMaster(IPort port) : IModbusMaster
             return await port.ReadExactAsync(tail_span, cancellationToken);
         }
     }
+
+
+    public ValueTask<Result> StartAsync(CancellationToken cancellationToken = default)
+    {
+        return port.StartAsync(cancellationToken);
+    }
+    public ValueTask<Result> StopAsync(CancellationToken cancellationToken = default)
+    {
+        return port.StopAsync(cancellationToken);
+    }
 }
 
 

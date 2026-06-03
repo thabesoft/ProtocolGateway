@@ -171,7 +171,9 @@ public abstract class ViewModel : INotifyDataErrorInfo, IErrorContainer, IProper
 
         if (!EqualityComparer<T>.Default.Equals(oldValue, newValue))
         {
+            OnPropertyChanging(propertyName!);
             Update(propertyName!, oldValue, newValue, update);
+            OnPropertyChanged(propertyName!);
         }
     }
 

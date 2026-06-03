@@ -44,6 +44,7 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
 
         return ConnectAsync(serialOptions);
     }
+
     public async ValueTask<Result> ConnectAsync(ISerialPortOptions options, CancellationToken cancellation = default)
     {
         if (State != TransporterState.Pending &&
@@ -90,7 +91,6 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
             return Result.InvalidOperation( $"串口连接失败: {ex.Message}");
         }
     }
-
     public async ValueTask<Result> DisconnectAsync(CancellationToken cancellation = default)
     {
         if (State != TransporterState.Connected && State != TransporterState.Connecting)
@@ -120,7 +120,7 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
         if (port?.IsOpen != true || State != TransporterState.Connected)
             return Result.Error<int>(ErrorType.InvalidOperation, "未连接无法读取数据");
 
-        if (_options is null) 
+        if (_options is null)
             return Result.InvalidOperation("串口未配置, 无法读取数据");
 
 
@@ -206,6 +206,19 @@ public sealed class SerialPortTransport : ITransport, INotifyPropertyChanged
         {
             return Result.Error<SerialPort>(ErrorType.InvalidOperation, $"无法创建串口: {ex.Message}");
         }
+    }
+
+
+    public ValueTask<Result> StartAsync(CancellationToken cancellationToken = default)
+    {
+        if (_options is null)
+            return new ValueTask<Result>(Result.InvalidOperation("串口未配置, 无法读取数据"));
+
+        return ConnectAsync(_options, cancellationToken);
+    }
+    public ValueTask<Result> StopAsync(CancellationToken cancellationToken = default)
+    {
+        return DisconnectAsync(cancellationToken);
     }
 }
 

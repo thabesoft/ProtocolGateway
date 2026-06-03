@@ -1,6 +1,5 @@
 ﻿using Avalonia.Collections;
 using Avalonia.Controls;
-using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using ThabeSoft.Mvvm;

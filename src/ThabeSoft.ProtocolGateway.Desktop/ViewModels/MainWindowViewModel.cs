@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using ThabeSoft.Mvvm;
+﻿using ThabeSoft.Mvvm;
 
 namespace ThabeSoft.ProtocolGateway.ViewModels;
 
@@ -7,12 +6,12 @@ namespace ThabeSoft.ProtocolGateway.ViewModels;
 /// <summary>
 /// 主窗口视图模型
 /// </summary>
-public sealed partial class MainWindowViewModel(MainViewModel view) : ViewModelBase
+public sealed class MainWindowViewModel(MainViewModel view) : ViewModelBase
 {
     /// <summary>
     /// 标题
     /// </summary>
-    public string Title 
+    public string Title
     {
         get; set => Change(field, value, x => field = x)
             .NotNullOrWhiteSpace()

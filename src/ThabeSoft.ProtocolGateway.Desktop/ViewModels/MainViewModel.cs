@@ -12,26 +12,31 @@ namespace ThabeSoft.ProtocolGateway.ViewModels;
 /// <summary>
 /// 主视图
 /// </summary>
-public sealed partial class MainViewModel(IViewModelProvider viewModelProvider) : ObservableObject, IViewModel, INavigationService, IMenuService
+public sealed partial class MainViewModel(IViewModelProvider viewModelProvider) : ViewModelBase, INavigationService, IMenuService
 {
-    private readonly ObservableCollection<NavigationMenuItemViewModel> _menuItems = [];
+    private ObservableCollection<NavigationMenuItemViewModel> _menuItems = [];
 
     /// <summary>
     /// 选中的导航元素
     /// </summary>
-    [ObservableProperty]
-    public partial NavigationMenuItemViewModel? SelectedMenuItem { get; private set; }
+    public NavigationMenuItemViewModel? SelectedMenuItem
+    {
+        get; private set => Apply(field, value, x => field = x);
+    }
 
     /// <summary>
     /// 所有导航元素
     /// </summary>
-    public IReadOnlyCollection<NavigationMenuItemViewModel> MenuItemsSource => _menuItems;
+    public IReadOnlyCollection<NavigationMenuItemViewModel> MenuItemsSource
+    {
+        get => _menuItems;
+        private set => Apply(_menuItems, value, x => _menuItems = [.. x]);
+    }
 
     /// <summary>
     /// 内容
     /// </summary>
-    [ObservableProperty]
-    public partial IViewModel? Content { get; private set; }
+    public IViewModel? Content { get; private set => Apply(field, value, x => field = x); }
 
 
     /// <summary>

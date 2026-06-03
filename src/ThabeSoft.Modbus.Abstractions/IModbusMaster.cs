@@ -66,4 +66,10 @@ public interface IModbusMaster
     /// <param name="address">起始地址</param>
     /// <param name="values">写入全部元素</param>
     ValueTask<Result> WriteMultipleRegistersAsync(byte slaveId, ushort address, ReadOnlyMemory<ushort> values, CancellationToken cancellationToken = default);
+
+
+
+
+    ValueTask<Result> StartAsync(CancellationToken cancellationToken = default);
+    ValueTask<Result> StopAsync(CancellationToken cancellationToken = default);
 }

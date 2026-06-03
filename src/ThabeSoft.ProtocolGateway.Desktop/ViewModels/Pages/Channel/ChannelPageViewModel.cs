@@ -1,5 +1,4 @@
 ﻿using Avalonia.Collections;
-using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using ThabeSoft.Mvvm;
@@ -14,13 +13,52 @@ namespace ThabeSoft.ProtocolGateway.ViewModels;
 /// <summary>
 /// 通道页面
 /// </summary>
-public sealed partial class ChannelPageViewModel : ObservableRecipient, IViewModel, IDisposable
+public sealed partial class ChannelPageViewModel : ViewModelBase, IDisposable
 {
-    // 导航
-    private readonly INavigationService _navigationService;
-    private readonly IChannelRuntimeService _runtimeService;
-    private readonly INotificationService _notificationService;
+    // 所有通道
     private AvaloniaList<ChannelConfigViewModel> _channels = [];
+
+
+    public INotificationService? NotificationService
+    {
+        get; set => Apply(field, value, x => field = x);
+    }
+    public INavigationService? NavigationService
+    {
+        get; set => Change(field, value, x =>
+            {
+                field = x;
+                if (field is null) return;
+
+                WeakReferenceMessenger.Default.Register<ChannelPageViewModel, ChannelDetailsClosed>(this, (_, _) => field.NavigateTo(this));
+            })
+            .Tap(_ => OpenDetailsPageCommand.NotifyCanExecuteChanged())
+            .Apply();
+    }
+    public IChannelRuntimeService? ChannelRuntimeService
+    {
+        get; set => Change(field, value, x =>
+            {
+                if (field is not null)
+                {
+                    field.ChannelActivated -= OnChannelActivated;
+                    field.ChannelDeactivated -= OnChannelDeactivated;
+                }
+
+                field = value;
+                if (field is null) return;
+
+                field.ChannelActivated += OnChannelActivated;
+                field.ChannelDeactivated += OnChannelDeactivated;
+            })
+            .Tap(_ =>
+            {
+                ReloadCommand.NotifyCanExecuteChanged();
+                OpenDetailsPageCommand.NotifyCanExecuteChanged();
+            })
+            .Apply();
+    }
+
 
     /// <summary>
     /// 所有通道元素
@@ -28,55 +66,79 @@ public sealed partial class ChannelPageViewModel : ObservableRecipient, IViewMod
     public IReadOnlyCollection<ChannelConfigViewModel> Channels
     {
         get => _channels;
-        private set
-        {
-            _channels = [.. value];
-            OnPropertyChanged(nameof(Channels));
-        }
+        private set => Apply(_channels, value, x => _channels = [.. x]);
     }
 
     // 是否在加载
-    [ObservableProperty]
-    public partial bool IsLoading { get; private set; }
-
-
-
-    public ChannelPageViewModel(INavigationService navigationService, IChannelRuntimeService runtimeService, INotificationService notificationService)
+    public bool IsLoading
     {
-        _runtimeService = runtimeService;
-        _notificationService = notificationService;
-        _navigationService = navigationService;
-
-
-        WeakReferenceMessenger.Default.Register<ChannelPageViewModel, ChannelDetailsClosed>(this, (_, _) => navigationService.NavigateTo(this));
-
-        _runtimeService.ChannelActivated += OnChannelActivated;
-        _runtimeService.ChannelDeactivated += OnChannelDeactivated;
+        get; private set => Apply(field, value, x => field = x);
     }
 
 
-    [RelayCommand]
+    public ChannelPageViewModel()
+    {
+    }
+    public ChannelPageViewModel(INavigationService navigationService, IChannelRuntimeService runtimeService, INotificationService notificationService)
+    {
+        NavigationService = navigationService;
+        ChannelRuntimeService = runtimeService;
+        NotificationService = notificationService;
+    }
+    public void Dispose()
+    {
+        _channels.Clear();
+
+        if (ChannelRuntimeService is not null)
+        {
+            ChannelRuntimeService.ChannelActivated -= OnChannelActivated;
+            ChannelRuntimeService.ChannelDeactivated -= OnChannelDeactivated;
+        }
+    }
+
+
+
+
+    [RelayCommand(CanExecute = nameof(OpenDetailsPageCommandCanExecute))]
     private void OpenDetailsPage(ChannelConfigViewModel item)
     {
-        var context = _runtimeService.ActiveChannels.FirstOrDefault(ctx => ctx.Config.Name == item.Name);
+        if (ChannelRuntimeService is null)
+        {
+            TryNotification(x => x.Error("通道运行时业务未初始化").Title("详情页打开失败").Show());
+            return;
+        }
+        if (NavigationService is null)
+        {
+            TryNotification(x => x.Error("导航业务未初始化").Title("详情页打开失败").Show());
+            return;
+        }
+
+
+        var context = ChannelRuntimeService.ActiveChannels.FirstOrDefault(ctx => ctx.Config.Name == item.Name);
 
         if (context is not null)
         {
             var detailsPage = new ChannelDetailsPageViewModel();
             detailsPage.LoadContext(context);
 
-            _navigationService.NavigateTo(detailsPage);
+            NavigationService.NavigateTo(detailsPage);
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(ReloadCommandCanExecute))]
     private async Task ReloadAsync()
     {
+        if (ChannelRuntimeService is null)
+        {
+            TryNotification(x => x.Error("通道运行时业务未初始化").Title("重新加载失败").Show());
+            return;
+        }
+
         IsLoading = true;
 
         try
         {
-            var result = await _runtimeService.LoadAndActivateAllAsync();
+            var result = await ChannelRuntimeService.LoadAndActivateAllAsync();
             if (!result.IsSuccess)
             {
                 //await ShowErrorAsync(result.Error!);
@@ -84,7 +146,7 @@ public sealed partial class ChannelPageViewModel : ObservableRecipient, IViewMod
             }
 
             // 转换为 ViewModel
-            var vms = _runtimeService.ActiveChannels
+            var vms = ChannelRuntimeService.ActiveChannels
                 .Select(ctx =>
                 {
                     var vm = new ChannelConfigViewModel();
@@ -97,7 +159,7 @@ public sealed partial class ChannelPageViewModel : ObservableRecipient, IViewMod
         }
         catch(Exception ex)
         {
-            _notificationService.Error(ex.Message).Title("重新加载失败").Show();
+            TryNotification(x => x.Error(ex.Message).Title("重新加载失败").Show());
         }
         finally
         {
@@ -105,6 +167,12 @@ public sealed partial class ChannelPageViewModel : ObservableRecipient, IViewMod
         }
     }
 
+
+    private void TryNotification(Action<INotificationService> action)
+    {
+        if(NotificationService is null) return;
+        action(NotificationService);
+    }
 
     private void OnChannelActivated(object? sender, ChannelRuntimeContext context)
     {
@@ -132,12 +200,6 @@ public sealed partial class ChannelPageViewModel : ObservableRecipient, IViewMod
         });
     }
 
-
-    public void Dispose()
-    {
-        _channels.Clear();
-
-        _runtimeService.ChannelActivated -= OnChannelActivated;
-        _runtimeService.ChannelDeactivated -= OnChannelDeactivated;
-    }
+    private bool ReloadCommandCanExecute() => ChannelRuntimeService is not null;
+    private bool OpenDetailsPageCommandCanExecute() => ChannelRuntimeService is not null && NavigationService is not null;
 }

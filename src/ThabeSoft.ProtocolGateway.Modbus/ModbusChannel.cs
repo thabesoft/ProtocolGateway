@@ -11,6 +11,16 @@ namespace ThabeSoft.ProtocolGateway;
 /// <param name="master">Modbus主站</param>
 public sealed class ModbusChannel(IModbusMaster master) : IReadWriteChannel
 {
+    public ValueTask<Result> StartAsync(CancellationToken cancellationToken = default)
+    {
+        return master.StartAsync(cancellationToken);
+    }
+    public ValueTask<Result> StopAsync(CancellationToken cancellationToken = default)
+    {
+        return master.StartAsync(cancellationToken);
+    }
+
+
     /// <summary>
     /// 读取
     /// </summary>
@@ -160,6 +170,7 @@ public sealed class ModbusChannel(IModbusMaster master) : IReadWriteChannel
             ArrayPool<ushort>.Shared.Return(word_buffer);
         }
     }
+
 
 
     /// <summary>
