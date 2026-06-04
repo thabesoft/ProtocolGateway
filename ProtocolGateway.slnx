@@ -16,7 +16,10 @@
     <Project Path="src/ThabeSoft.Mvvm/ThabeSoft.Mvvm.csproj" />
     <Project Path="src/ThabeSoft.Primitives.Binary/ThabeSoft.Primitives.Binary.csproj" />
     <Project Path="src/ThabeSoft.Primitives.Result/ThabeSoft.Primitives.Result.csproj" />
-    <Project Path="src/ThabeSoft.Startable.Abstractions/ThabeSoft.Startable.Abstractions.csproj" />
+  </Folder>
+  <Folder Name="/Modules/Lifecycle/">
+    <Project Path="src/ThabeSoft.Lifecycle.Abstractions/ThabeSoft.Lifecycle.Abstractions.csproj" />
+    <Project Path="src/ThabeSoft.Lifecycle/ThabeSoft.Lifecycle.csproj" />
   </Folder>
   <Folder Name="/Modules/Modbus/">
     <Project Path="src/ThabeSoft.Modbus.Abstractions/ThabeSoft.Modbus.Abstractions.csproj" />

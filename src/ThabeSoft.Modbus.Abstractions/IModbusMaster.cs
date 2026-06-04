@@ -7,7 +7,7 @@ namespace ThabeSoft.Modbus;
 /// <summary>
 /// Modbus 主站
 /// </summary>
-public interface IModbusMaster : INotifyStartable
+public interface IModbusMaster : ILifecycle
 {
     /// <summary>
     /// 读取n个线圈值

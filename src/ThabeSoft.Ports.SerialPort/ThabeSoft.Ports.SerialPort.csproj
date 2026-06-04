@@ -9,6 +9,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\ThabeSoft.Lifecycle\ThabeSoft.Lifecycle.csproj" />
 		<ProjectReference Include="..\ThabeSoft.Ports.Abstractions\ThabeSoft.Ports.Abstractions.csproj" />
 	</ItemGroup>
 

@@ -15,7 +15,7 @@ internal sealed class RuntimeChannel(
     ProcessHandler start,
     ProcessHandler stop,
     DisposeHandler dispose
-    ) : StartableObject, IRuntimeChannel
+    ) : LifecycleObject, IRuntimeChannel
 {
     public IChannelConfig Config => config;
     public bool IsEnable { get; private set; } = true;

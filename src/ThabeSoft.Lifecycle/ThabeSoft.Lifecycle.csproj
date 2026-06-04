@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<RootNamespace>ThabeSoft.Lifecycle</RootNamespace>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\ThabeSoft.LanguageExtensions\ThabeSoft.LanguageExtensions.csproj" />
+	  <ProjectReference Include="..\ThabeSoft.Lifecycle.Abstractions\ThabeSoft.Lifecycle.Abstractions.csproj" />
+	</ItemGroup>
+
+</Project>

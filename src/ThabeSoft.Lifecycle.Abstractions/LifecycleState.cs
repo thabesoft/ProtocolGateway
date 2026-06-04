@@ -2,9 +2,9 @@
 
 
 /// <summary>
-/// 状态
+/// 生命周期状态
 /// </summary>
-public enum StartableState
+public enum LifecycleState
 {
     /// <summary>
     /// 已准备好

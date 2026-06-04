@@ -1,6 +1,4 @@
-﻿using ThabeSoft.Startable;
-
-namespace ThabeSoft.Ports;
+﻿namespace ThabeSoft.Ports;
 
 /// <summary>
 /// 可读写的端口

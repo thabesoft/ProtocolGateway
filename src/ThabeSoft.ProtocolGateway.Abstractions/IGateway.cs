@@ -8,7 +8,7 @@ namespace ThabeSoft.ProtocolGateway;
 /// <summary>
 /// 网关
 /// </summary>
-public interface IGateway : INotifyStartable
+public interface IGateway : ILifecycle
 {
     /// <summary>
     /// 读取数据

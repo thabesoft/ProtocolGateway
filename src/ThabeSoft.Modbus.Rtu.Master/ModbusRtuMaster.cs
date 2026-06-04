@@ -1,4 +1,5 @@
 ﻿using System.Buffers;
+using System.ComponentModel;
 using ThabeSoft.Modbus.Encoding;
 using ThabeSoft.Modbus.Headers;
 using ThabeSoft.Modbus.Layouts;
@@ -20,10 +21,10 @@ public sealed class ModbusRtuMaster(ITransport transport) : IModbusMaster
 
 
 
-    public event Action<StartableState> StateChanged { add => transport.StateChanged += value; remove => transport.StateChanged -= value; }
-    public StartableState State => transport.State;
-    public ValueTask<Result> StartAsync(CancellationToken cancellationToken) => transport.StartAsync(cancellationToken);
-    public ValueTask<Result> StopAsync(CancellationToken cancellationToken) => transport.StopAsync(cancellationToken);
+    public event PropertyChangedEventHandler? PropertyChanged { add => transport.PropertyChanged += value; remove => transport.PropertyChanged -= value; }
+    public LifecycleState State => transport.State;
+    public ValueTask<Result> StartAsync(CancellationToken cancellationToken = default) => transport.StartAsync(cancellationToken);
+    public ValueTask<Result> StopAsync(CancellationToken cancellationToken = default) => transport.StopAsync(cancellationToken);
     public ValueTask DisposeAsync() => transport.DisposeAsync();
 
 
@@ -427,32 +428,5 @@ public sealed class ModbusRtuMaster(ITransport transport) : IModbusMaster
             var tail_span = destination.Slice(current_length, 3);
             return await transport.ReadExactAsync(tail_span, cancellationToken);
         }
-    }
-}
-
-
-/// <summary>
-/// 信号量扩展
-/// </summary>
-internal static class SemaphoreSlimExtensions
-{
-    extension(SemaphoreSlim slim)
-    {
-        public Releaser Lock()
-        {
-            slim.Wait();
-            return new Releaser(slim);
-        }
-
-        public async Task<Releaser> LockAsync()
-        {
-            await slim.WaitAsync();
-            return new Releaser(slim);
-        }
-    }
-
-    public readonly struct Releaser(SemaphoreSlim slim) : IDisposable
-    {
-        public void Dispose() => slim.Release();
     }
 }

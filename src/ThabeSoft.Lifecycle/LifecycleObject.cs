@@ -1,42 +1,12 @@
-﻿using ThabeSoft.Primitives;
+﻿using System.ComponentModel;
+using ThabeSoft.Primitives;
 
 namespace ThabeSoft.Startable;
 
 /// <summary>
-/// 带事件的可启动对象
-/// </summary>
-public interface INotifyStartable : IObservableState, IStartable;
-
-
-/// <summary>
-/// 可观察的启动状态对象
-/// </summary>
-public abstract class ObservableStateObject : IObservableState
-{
-    public event Action<StartableState>? StateChanged;
-
-    public StartableState State
-    {
-        get;
-        private set
-        {
-            if (value == field) return;
-            field = value;
-            OnStateChanged();
-        }
-    }
-
-    protected void OnStateChanged()
-    {
-        StateChanged?.Invoke(State);
-    }
-}
-
-
-/// <summary>
 /// 一个可通知状态的启动对象
 /// </summary>
-public abstract class StartableObject : INotifyStartable
+public abstract class LifecycleObject : ILifecycle
 {
     // 线程锁
     private readonly SemaphoreSlim _lock = new(1, 1);
@@ -44,12 +14,12 @@ public abstract class StartableObject : INotifyStartable
     /// <summary>
     /// 状态改变
     /// </summary>
-    public event Action<StartableState>? StateChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     /// <summary>
     /// 当前状态
     /// </summary>
-    public StartableState State
+    public LifecycleState State
     {
         get;
         private set
@@ -61,9 +31,9 @@ public abstract class StartableObject : INotifyStartable
     }
 
     // 启动
-    async ValueTask<Result> IStartable.StartAsync(CancellationToken cancellationToken)
+    async ValueTask<Result> ILifecycle.StartAsync(CancellationToken cancellationToken)
     {
-        await _lock.WaitAsync(cancellationToken);
+        using var _ = await _lock.LockAsync(cancellationToken);
 
         try
         {
@@ -71,34 +41,30 @@ public abstract class StartableObject : INotifyStartable
             var can_start_result = CanStart();
             if (can_start_result.IsFailure)
             {
-                State = StartableState.Faulted;
+                State = LifecycleState.Faulted;
                 return can_start_result;
             }
 
             // 启动中
-            State = StartableState.Starting;
+            State = LifecycleState.Starting;
 
             // 启动结果
             var start_result = await StartAsync(cancellationToken);
-            State = can_start_result.IsSuccess ? StartableState.Running : StartableState.Faulted;
+            State = can_start_result.IsSuccess ? LifecycleState.Running : LifecycleState.Faulted;
 
             // 返回结果
             return can_start_result;
         }
         catch (Exception ex)
         {
-            State = StartableState.Faulted;
+            State = LifecycleState.Faulted;
             return Result.Error($"启动失败, {ex.Message}");
-        }
-        finally
-        {
-            _lock.Release();
         }
     }
     // 停止
-    async ValueTask<Result> IStartable.StopAsync(CancellationToken cancellationToken)
+    async ValueTask<Result> ILifecycle.StopAsync(CancellationToken cancellationToken)
     {
-        await _lock.WaitAsync(cancellationToken);
+        using var _ = await _lock.LockAsync(cancellationToken);
 
         try
         {
@@ -106,39 +72,35 @@ public abstract class StartableObject : INotifyStartable
             var can_stop_result = CanStop();
             if (can_stop_result.IsFailure)
             {
-                State = StartableState.Faulted;
+                State = LifecycleState.Faulted;
                 return can_stop_result;
             }
 
             // 停止中
-            State = StartableState.Stopping;
+            State = LifecycleState.Stopping;
 
             // 停止结果
             var start_result = await StopAsync(cancellationToken);
-            State = can_stop_result.IsSuccess ? StartableState.Stopped : StartableState.Faulted;
+            State = can_stop_result.IsSuccess ? LifecycleState.Stopped : LifecycleState.Faulted;
 
             // 返回结果
             return can_stop_result;
         }
         catch (Exception ex)
         {
-            State = StartableState.Faulted;
+            State = LifecycleState.Faulted;
             return Result.Error($"停止失败, {ex.Message}");
-        }
-        finally
-        {
-            _lock.Release();
         }
     }
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
-        if (State == StartableState.Disposed) return;
+        if (State == LifecycleState.Disposed) return;
 
-        await _lock.WaitAsync();
+        using var _ = await _lock.LockAsync();
         try
         {
             await DisposeAsync();
-            State = StartableState.Disposed;
+            State = LifecycleState.Disposed;
         }
         finally
         {
@@ -155,7 +117,7 @@ public abstract class StartableObject : INotifyStartable
     /// </summary>
     protected virtual Result CanStart()
     {
-        if (State is StartableState.Starting or StartableState.Running or StartableState.Disposed)
+        if (State is LifecycleState.Starting or LifecycleState.Running or LifecycleState.Disposed)
         {
             return Result.Error($"当前状态不能启动: {State}");
         }
@@ -168,7 +130,7 @@ public abstract class StartableObject : INotifyStartable
     /// </summary>
     protected virtual Result CanStop()
     {
-        if (State is StartableState.Stopping or StartableState.Stopped or StartableState.Disposed)
+        if (State is LifecycleState.Stopping or LifecycleState.Stopped or LifecycleState.Disposed)
         {
             return Result.Error($"当前状态不能启动: {State}");
         }
@@ -181,7 +143,15 @@ public abstract class StartableObject : INotifyStartable
     /// </summary>
     protected void OnStateChanged()
     {
-        StateChanged?.Invoke(State);
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(State)));
+    }
+
+    /// <summary>
+    /// 获取生命周期锁，确保状态转换的原子性
+    /// </summary>
+    protected async Task<IDisposable> LockAsync(CancellationToken cancellationToken = default)
+    {
+        return await _lock.LockAsync(cancellationToken);
     }
 
 

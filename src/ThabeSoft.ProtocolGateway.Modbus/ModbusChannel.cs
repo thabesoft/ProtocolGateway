@@ -1,4 +1,5 @@
 ﻿using System.Buffers;
+using System.ComponentModel;
 using ThabeSoft.Modbus;
 using ThabeSoft.Primitives;
 using ThabeSoft.Primitives.Binary;
@@ -13,10 +14,11 @@ namespace ThabeSoft.ProtocolGateway;
 /// <param name="master">Modbus主站</param>
 public sealed class ModbusChannel(IModbusMaster master) : IReadWriteChannel
 {
-    public StartableState State => master.State;
-    public event Action<StartableState> StateChanged { add => master.StateChanged += value; remove => master.StateChanged -= value; }
-    public ValueTask<Result> StartAsync(CancellationToken cancellationToken) => master.StartAsync(cancellationToken);
-    public ValueTask<Result> StopAsync(CancellationToken cancellationToken) => master.StopAsync(cancellationToken);
+
+    public event PropertyChangedEventHandler? PropertyChanged { add => master.PropertyChanged += value; remove => master.PropertyChanged -= value; }
+    public LifecycleState State => master.State;
+    public ValueTask<Result> StartAsync(CancellationToken cancellationToken = default) => master.StartAsync(cancellationToken);
+    public ValueTask<Result> StopAsync(CancellationToken cancellationToken = default) => master.StopAsync(cancellationToken);
     public ValueTask DisposeAsync() => master.DisposeAsync();
 
 

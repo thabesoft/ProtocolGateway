@@ -4,8 +4,8 @@
 		<RootNamespace>ThabeSoft.Modbus</RootNamespace>
 	</PropertyGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\ThabeSoft.Startable.Abstractions\ThabeSoft.Startable.Abstractions.csproj" />
+	<ItemGroup>		<ProjectReference Include="..\ThabeSoft.Lifecycle.Abstractions\ThabeSoft.Lifecycle.Abstractions.csproj" />
+
 		<ProjectReference Include="..\ThabeSoft.Primitives.Result\ThabeSoft.Primitives.Result.csproj" />
 	</ItemGroup>
 

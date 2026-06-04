@@ -1,13 +1,19 @@
-﻿using ThabeSoft.Primitives;
+﻿using System.ComponentModel;
+using ThabeSoft.Primitives;
 
 namespace ThabeSoft.Startable;
 
 
 /// <summary>
-/// 可以启动的
+/// 生命周期
 /// </summary>
-public interface IStartable : IStateable, IAsyncDisposable
+public interface ILifecycle : IAsyncDisposable, INotifyPropertyChanged
 {
+    /// <summary>
+    /// 生命周期状态
+    /// </summary>
+    LifecycleState State { get; }
+
     /// <summary>
     /// 启动
     /// </summary>

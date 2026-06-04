@@ -14,7 +14,7 @@ namespace ThabeSoft.ProtocolGateway.ViewModels;
 /// <summary>
 /// 通道配置
 /// </summary>
-public sealed partial class ChannelConfigViewModel : ViewModelBase, IDisposable
+public sealed partial class ChannelConfigViewModel : ViewModelBase
 {
     private readonly Lock _lock = new();
 
@@ -73,11 +73,11 @@ public sealed partial class ChannelConfigViewModel : ViewModelBase, IDisposable
     /// <summary>
     /// 是否可以连接
     /// </summary>
-    public bool CanConnect => _handle?.State is not (StartableState.Starting or StartableState.Running or StartableState.Disposed);
+    public bool CanConnect => _handle?.State is not (LifecycleState.Starting or LifecycleState.Running or LifecycleState.Disposed);
     /// <summary>
     /// 是否可以取消连接
     /// </summary>
-    public bool CanDisconnect => _handle?.State is not (StartableState.Stopping or StartableState.Stopped or StartableState.Disposed);
+    public bool CanDisconnect => _handle?.State is not (LifecycleState.Stopping or LifecycleState.Stopped or LifecycleState.Disposed);
     /// <summary>
     /// 是否是Modbus协议
     /// </summary>
@@ -96,29 +96,17 @@ public sealed partial class ChannelConfigViewModel : ViewModelBase, IDisposable
     {
         _notificationService = notificationService;
     }
-    public void Dispose()
-    {
-        _handle?.StateChanged -= OnStateChanged;
-    }
 
     public void LoadHandle(IRuntimeChannel channel)
     {
         // 更新状态
-        _handle?.StateChanged -= OnStateChanged;
         _handle = channel;
-        channel.StateChanged += OnStateChanged;
 
         // 更新命令状态
         ConnectCommand.NotifyCanExecuteChanged();
         DisconnectCommand.NotifyCanExecuteChanged();
         PauseCommand.NotifyCanExecuteChanged();
         ResumeCommand.NotifyCanExecuteChanged();
-    }
-
-    private void OnStateChanged(StartableState obj)
-    {
-        OnPropertyChanged(nameof(CanConnect));
-        OnPropertyChanged(nameof(CanDisconnect));
     }
 
     public void LoadTagConfigs(IEnumerable<ITagConfig> configs)
