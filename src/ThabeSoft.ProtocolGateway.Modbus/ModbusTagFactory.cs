@@ -1,5 +1,6 @@
 ﻿using ThabeSoft.Modbus;
 using ThabeSoft.Primitives;
+using ThabeSoft.Primitives.Binary;
 
 namespace ThabeSoft.ProtocolGateway;
 
@@ -16,14 +17,14 @@ public static class ModbusTagFactory
             address: ModbusAddress.ReadCoils(slaveId, address),
             TagValueType.Bool,
             length: 1,
-            converter: BoolConverter.Instance);
+            converter: BoolSerializer.Instance);
 
     public static ITag<bool> ReadDiscreteInputs(byte slaveId, ushort address)
         => new ModbusTag<bool>(
             address: ModbusAddress.ReadDiscreteInputs(slaveId, address),
             TagValueType.Bool,
             length: 1,
-            converter: BoolConverter.Instance);
+            converter: BoolSerializer.Instance);
 
 
 
@@ -32,21 +33,21 @@ public static class ModbusTagFactory
             address: ModbusAddress.ReadHoldingRegisters(slaveId, address),
             TagValueType.UInt16,
             length: 2,
-            converter: WordConverter.BigEndian);
+            converter: WordSerializer.BigEndian);
 
     public static ITag<uint> ReadHoldingRegisterDWord(byte slaveId, ushort address)
         => new ModbusTag<uint>(
             address: ModbusAddress.ReadHoldingRegisters(slaveId, address),
             TagValueType.UInt32,
             length: 4,
-            converter: DWordConverter.BigEndian);
+            converter: DWordSerializer.BigEndian);
 
     public static ITag<ulong> ReadHoldingRegisterQWord(byte slaveId, ushort address)
         => new ModbusTag<ulong>(
             address: ModbusAddress.ReadHoldingRegisters(slaveId, address),
             TagValueType.UInt64,
             length: 8,
-            converter: QWordConverter.BigEndian);
+            converter: QWordSerializer.BigEndian);
 
 
 
@@ -55,21 +56,21 @@ public static class ModbusTagFactory
             address: ModbusAddress.ReadInputRegisters(slaveId, address),
             TagValueType.UInt16,
             length: 2,
-            converter: WordConverter.BigEndian);
+            converter: WordSerializer.BigEndian);
 
     public static ITag<uint> ReadInputRegistersDWord(byte slaveId, ushort address)
         => new ModbusTag<uint>(
             address: ModbusAddress.ReadInputRegisters(slaveId, address),
             TagValueType.UInt32,
             length: 4,
-            converter: DWordConverter.BigEndian);
+            converter: DWordSerializer.BigEndian);
 
     public static ITag<ulong> ReadInputRegistersQWord(byte slaveId, ushort address)
         => new ModbusTag<ulong>(
             address: ModbusAddress.ReadInputRegisters(slaveId, address),
             TagValueType.UInt64,
             length: 8,
-            converter: QWordConverter.BigEndian);
+            converter: QWordSerializer.BigEndian);
 
 
 
@@ -78,28 +79,28 @@ public static class ModbusTagFactory
           address: ModbusAddress.WriteSingleCoil(slaveId, address),
           TagValueType.Bool,
           length: 1,
-          converter: BoolConverter.Instance);
+          converter: BoolSerializer.Instance);
 
     public static ITag<ushort> WriteRegisterWord(byte slaveId, ushort address)
        => new ModbusTag<ushort>(
            address: ModbusAddress.WriteMultipleRegisters(slaveId, address),
            TagValueType.UInt16,
            length: 2,
-           converter: WordConverter.BigEndian);
+           converter: WordSerializer.BigEndian);
 
     public static ITag<uint> WriteRegisterDWord(byte slaveId, ushort address)
       => new ModbusTag<uint>(
           address: ModbusAddress.WriteMultipleRegisters(slaveId, address),
           TagValueType.UInt32,
           length: 4,
-          converter: DWordConverter.BigEndian);
+          converter: DWordSerializer.BigEndian);
 
     public static ITag<ulong> WriteRegisterQWord(byte slaveId, ushort address)
       => new ModbusTag<ulong>(
           address: ModbusAddress.WriteMultipleRegisters(slaveId, address),
           TagValueType.UInt64,
           length: 8,
-          converter: QWordConverter.BigEndian);
+          converter: QWordSerializer.BigEndian);
 
     #endregion
 
@@ -120,7 +121,7 @@ public static class ModbusTagFactory
                 return Result.Error<ITag>($"非线圈功能码 [{functionCode}], 无法使用该数据类型 [{valueType}]");
             }
 
-            return Result.Success<ITag>(Create<bool>(BoolConverter.Instance));
+            return Result.Success<ITag>(Create<bool>(BoolSerializer.Instance));
         }
 
         // 功能码不匹配
@@ -131,53 +132,53 @@ public static class ModbusTagFactory
 
         if (valueType == TagValueType.Byte)
         {
-            return Result.Success<ITag>(Create<byte>(ByteConverter.LSB0));
+            return Result.Success<ITag>(Create<byte>(ByteSerializer.LSB0));
         }
         if (valueType == TagValueType.SByte)
         {
-            return Result.Success<ITag>(Create<sbyte>(ByteConverter.LSB0));
+            return Result.Success<ITag>(Create<sbyte>(ByteSerializer.LSB0));
         }
 
         // 16
         if (valueType == TagValueType.Int16)
         {
-            return Result.Success<ITag>(Create<short>(WordConverter.BigEndian));
+            return Result.Success<ITag>(Create<short>(WordSerializer.BigEndian));
         }
         if (valueType == TagValueType.UInt16)
         {
-            return Result.Success<ITag>(Create<ushort>(WordConverter.BigEndian));
+            return Result.Success<ITag>(Create<ushort>(WordSerializer.BigEndian));
         }
         if (valueType == TagValueType.Char)
         {
-            return Result.Success<ITag>(Create<char>(WordConverter.BigEndian));
+            return Result.Success<ITag>(Create<char>(WordSerializer.BigEndian));
         }
 
         // 32
         if (valueType == TagValueType.Int32)
         {
-            return Result.Success<ITag>(Create<int>(DWordConverter.BigEndian));
+            return Result.Success<ITag>(Create<int>(DWordSerializer.BigEndian));
         }
         if (valueType == TagValueType.UInt32)
         {
-            return Result.Success<ITag>(Create<uint>(DWordConverter.BigEndian));
+            return Result.Success<ITag>(Create<uint>(DWordSerializer.BigEndian));
         }
         if (valueType == TagValueType.Float)
         {
-            return Result.Success<ITag>(Create<float>(DWordConverter.BigEndian));
+            return Result.Success<ITag>(Create<float>(DWordSerializer.BigEndian));
         }
 
         // 64
         if (valueType == TagValueType.Int64)
         {
-            return Result.Success<ITag>(Create<long>(QWordConverter.BigEndian));
+            return Result.Success<ITag>(Create<long>(QWordSerializer.BigEndian));
         }
         if (valueType == TagValueType.UInt64)
         {
-            return Result.Success<ITag>(Create<ulong>(QWordConverter.BigEndian));
+            return Result.Success<ITag>(Create<ulong>(QWordSerializer.BigEndian));
         }
         if (valueType == TagValueType.Double)
         {
-            return Result.Success<ITag>(Create<double>(QWordConverter.BigEndian));
+            return Result.Success<ITag>(Create<double>(QWordSerializer.BigEndian));
         }
 
         return Result.Error<ITag>($"Modbus标签创建失败, 不支持的数据类型:{valueType}");
@@ -200,7 +201,7 @@ public static class ModbusTagFactory
             address: ModbusAddress.ReadCoils(slaveId, address),
             TagValueType.Bool,
             length: 1,
-            converter: BoolConverter.Instance);
+            converter: BoolSerializer.Instance);
 
     public static IRoutableTag<bool> ReadDiscreteInputs(ChannelName name, byte slaveId, ushort address)
         => new ModbusRoutableTag<bool>(
@@ -208,7 +209,7 @@ public static class ModbusTagFactory
             address: ModbusAddress.ReadDiscreteInputs(slaveId, address),
             TagValueType.Bool,
             length: 1,
-            converter: BoolConverter.Instance);
+            converter: BoolSerializer.Instance);
 
 
 
@@ -218,7 +219,7 @@ public static class ModbusTagFactory
             address: ModbusAddress.ReadHoldingRegisters(slaveId, address),
             TagValueType.UInt16,
             length: 2,
-            converter: WordConverter.BigEndian);
+            converter: WordSerializer.BigEndian);
 
     public static IRoutableTag<uint> ReadHoldingRegisterDWord(ChannelName name, byte slaveId, ushort address)
         => new ModbusRoutableTag<uint>(
@@ -226,7 +227,7 @@ public static class ModbusTagFactory
             address: ModbusAddress.ReadHoldingRegisters(slaveId, address),
             TagValueType.UInt32,
             length: 4,
-            converter: DWordConverter.BigEndian);
+            converter: DWordSerializer.BigEndian);
 
     public static IRoutableTag<ulong> ReadHoldingRegisterQWord(ChannelName name, byte slaveId, ushort address)
         => new ModbusRoutableTag<ulong>(
@@ -234,7 +235,7 @@ public static class ModbusTagFactory
             address: ModbusAddress.ReadHoldingRegisters(slaveId, address),
             TagValueType.UInt64,
             length: 8,
-            converter: QWordConverter.BigEndian);
+            converter: QWordSerializer.BigEndian);
 
 
 
@@ -244,7 +245,7 @@ public static class ModbusTagFactory
             address: ModbusAddress.ReadInputRegisters(slaveId, address),
             TagValueType.UInt16,
             length: 2,
-            converter: WordConverter.BigEndian);
+            converter: WordSerializer.BigEndian);
 
     public static IRoutableTag<uint> ReadInputRegistersDWord(ChannelName name, byte slaveId, ushort address)
         => new ModbusRoutableTag<uint>(
@@ -252,7 +253,7 @@ public static class ModbusTagFactory
             address: ModbusAddress.ReadInputRegisters(slaveId, address),
             TagValueType.UInt32,
             length: 4,
-            converter: DWordConverter.BigEndian);
+            converter: DWordSerializer.BigEndian);
 
     public static IRoutableTag<ulong> ReadInputRegistersQWord(ChannelName name, byte slaveId, ushort address)
         => new ModbusRoutableTag<ulong>(
@@ -260,7 +261,7 @@ public static class ModbusTagFactory
             address: ModbusAddress.ReadInputRegisters(slaveId, address),
             TagValueType.UInt64,
             length: 8,
-            converter: QWordConverter.BigEndian);
+            converter: QWordSerializer.BigEndian);
 
 
 
@@ -270,7 +271,7 @@ public static class ModbusTagFactory
           address: ModbusAddress.WriteSingleCoil(slaveId, address),
           TagValueType.Bool,
           length: 1,
-          converter: BoolConverter.Instance);
+          converter: BoolSerializer.Instance);
 
     public static IRoutableTag<ushort> WriteRegisterWord(ChannelName name, byte slaveId, ushort address)
        => new ModbusRoutableTag<ushort>(
@@ -278,7 +279,7 @@ public static class ModbusTagFactory
            address: ModbusAddress.WriteSingleRegister(slaveId, address),
            TagValueType.UInt16,
            length: 2,
-           converter: WordConverter.BigEndian);
+           converter: WordSerializer.BigEndian);
 
     public static IRoutableTag<uint> WriteRegisterDWord(ChannelName name, byte slaveId, ushort address)
       => new ModbusRoutableTag<uint>(
@@ -286,7 +287,7 @@ public static class ModbusTagFactory
           address: ModbusAddress.WriteMultipleRegisters(slaveId, address),
           TagValueType.UInt32,
           length: 4,
-          converter: DWordConverter.BigEndian);
+          converter: DWordSerializer.BigEndian);
 
     public static IRoutableTag<ulong> WriteRegisterQWord(ChannelName name, byte slaveId, ushort address)
       => new ModbusRoutableTag<ulong>(
@@ -294,7 +295,7 @@ public static class ModbusTagFactory
           address: ModbusAddress.WriteMultipleRegisters(slaveId, address),
           TagValueType.UInt64,
           length: 8,
-          converter: QWordConverter.BigEndian);
+          converter: QWordSerializer.BigEndian);
 
     #endregion
 }

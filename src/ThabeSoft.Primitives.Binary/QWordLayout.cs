@@ -1,4 +1,4 @@
-﻿namespace ThabeSoft.Primitives;
+﻿namespace ThabeSoft.Primitives.Binary;
 
 /// <summary>
 /// 四字布局
@@ -8,7 +8,7 @@ public readonly struct QWordLayout
     /// <summary>
     /// 默认大端序 ABCD
     /// </summary>
-    public static QWordLayout Default = default;
+    public static readonly QWordLayout Default = default;
 
 
     /// <summary>

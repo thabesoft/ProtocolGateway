@@ -3,7 +3,7 @@ using ThabeSoft.Modbus.Helpers;
 using ThabeSoft.Modbus.Layouts;
 using ThabeSoft.Modbus.Responses;
 using ThabeSoft.Primitives;
-using ThabeSoft.Primitives.Crc;
+using ThabeSoft.Primitives.Binary;
 
 namespace ThabeSoft.Modbus.Encoding;
 

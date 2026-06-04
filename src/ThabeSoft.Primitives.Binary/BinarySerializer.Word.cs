@@ -1,24 +1,22 @@
-﻿using ThabeSoft.Primitives;
-
-namespace ThabeSoft.ProtocolGateway;
+﻿namespace ThabeSoft.Primitives.Binary;
 
 
 /// <summary>
 /// 16 位数据转换
 /// </summary>
-public sealed class WordConverter :
+public sealed class WordSerializer :
     IBinarySerializer<ushort>,
     IBinarySerializer<short>,
     IBinarySerializer<char>
 {
     private readonly Endianness _endianness;
-    private WordConverter(Endianness endianness) => _endianness = endianness;
+    private WordSerializer(Endianness endianness) => _endianness = endianness;
 
 
-    public static WordConverter BigEndian { get;} = new(Endianness.BigEndian);
-    public static WordConverter LittleEndian { get; } = new(Endianness.LittleEndian);
+    public static WordSerializer BigEndian { get;} = new(Endianness.BigEndian);
+    public static WordSerializer LittleEndian { get; } = new(Endianness.LittleEndian);
 
-    public static WordConverter From(Endianness endianness)
+    public static WordSerializer From(Endianness endianness)
     {
         return (endianness == Endianness.BigEndian) ? BigEndian : LittleEndian;
     }

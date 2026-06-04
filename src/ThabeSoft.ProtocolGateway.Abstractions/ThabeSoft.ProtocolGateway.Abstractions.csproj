@@ -5,7 +5,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\ThabeSoft.Primitives.ByteKit\ThabeSoft.Primitives.ByteKit.csproj" />
+		<ProjectReference Include="..\ThabeSoft.Primitives.Binary\ThabeSoft.Primitives.Binary.csproj" />
+		<ProjectReference Include="..\ThabeSoft.Primitives.ByteKit\ThabeSoft.Primitives.Binary.csproj" />
 		<ProjectReference Include="..\ThabeSoft.Startable.Abstractions\ThabeSoft.Startable.Abstractions.csproj" />
 		<ProjectReference Include="..\ThabeSoft.Primitives.Result\ThabeSoft.Primitives.Result.csproj" />
 	</ItemGroup>

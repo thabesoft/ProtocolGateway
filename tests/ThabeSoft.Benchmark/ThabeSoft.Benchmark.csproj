@@ -18,8 +18,8 @@
 	  <ProjectReference Include="..\..\src\ThabeSoft.Modbus.Rtu\ThabeSoft.Modbus.Rtu.csproj" />
 	  <ProjectReference Include="..\..\src\ThabeSoft.Ports.SerialPort\ThabeSoft.Ports.SerialPort.csproj" />
 	  <ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.Abstractions\ThabeSoft.ProtocolGateway.Abstractions.csproj" />
+	  <ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.ConfigurationActivator\ThabeSoft.ProtocolGateway.Runtime.csproj" />
 	  <ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.Modbus\ThabeSoft.ProtocolGateway.Modbus.csproj" />
-	  <ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway\ThabeSoft.ProtocolGateway.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-﻿using ThabeSoft.Mvvm.Internal;
+﻿using ThabeSoft.Mvvm;
 using ThabeSoft.Primitives;
 
 namespace ThabeSoft.Mvvm;

@@ -1,16 +1,14 @@
-﻿using ThabeSoft.Primitives;
-
-namespace ThabeSoft.ProtocolGateway;
+﻿namespace ThabeSoft.Primitives.Binary;
 
 
 /// <summary>
 /// 布尔转换器
 /// </summary>
-public sealed class BoolConverter :
+public sealed class BoolSerializer :
     IBinarySerializer<bool>
 {
-    private BoolConverter() { }
-    public static BoolConverter Instance => new();
+    private BoolSerializer() { }
+    public static BoolSerializer Instance => new();
 
 
 

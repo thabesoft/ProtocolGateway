@@ -11,9 +11,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\ThabeSoft.Primitives.ByteKit\ThabeSoft.Primitives.ByteKit.csproj" />
+		<ProjectReference Include="..\ThabeSoft.Primitives.Binary\ThabeSoft.Primitives.Binary.csproj" />
 		<ProjectReference Include="..\ThabeSoft.ProtocolGateway.Abstractions\ThabeSoft.ProtocolGateway.Abstractions.csproj" />
-		<ProjectReference Include="..\ThabeSoft.ProtocolGateway.Converters\ThabeSoft.ProtocolGateway.Converters.csproj" />
 	</ItemGroup>
 
 </Project>

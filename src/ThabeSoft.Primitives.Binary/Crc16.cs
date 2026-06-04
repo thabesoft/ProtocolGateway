@@ -1,4 +1,4 @@
-﻿namespace ThabeSoft.Primitives.Crc;
+﻿namespace ThabeSoft.Primitives.Binary;
 
 
 /// <summary>

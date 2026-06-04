@@ -1,6 +1,7 @@
 ﻿using System.Buffers;
 using ThabeSoft.Modbus;
 using ThabeSoft.Primitives;
+using ThabeSoft.Primitives.Binary;
 using ThabeSoft.Startable;
 
 namespace ThabeSoft.ProtocolGateway;

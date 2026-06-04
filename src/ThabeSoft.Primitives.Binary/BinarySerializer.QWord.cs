@@ -1,18 +1,16 @@
-﻿using ThabeSoft.Primitives;
-
-namespace ThabeSoft.ProtocolGateway;
+﻿namespace ThabeSoft.Primitives.Binary;
 
 
 /// <summary>
 /// 64 位数据转换
 /// </summary>
-public sealed class QWordConverter(QWordLayout layout) :
+public sealed class QWordSerializer(QWordLayout layout) :
     IBinarySerializer<ulong>,
     IBinarySerializer<long>,
     IBinarySerializer<double>
 {
-    public static QWordConverter BigEndian { get; } = new(QWordLayout.BigEndian);
-    public static QWordConverter LittleEndian { get; } = new(QWordLayout.LittleEndian);
+    public static QWordSerializer BigEndian { get; } = new(QWordLayout.BigEndian);
+    public static QWordSerializer LittleEndian { get; } = new(QWordLayout.LittleEndian);
 
 
     private Result<ulong> From(ReadOnlySpan<byte> source)

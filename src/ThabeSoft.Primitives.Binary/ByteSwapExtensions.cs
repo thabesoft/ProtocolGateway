@@ -1,4 +1,4 @@
-﻿namespace ThabeSoft.Primitives;
+﻿namespace ThabeSoft.Primitives.Binary;
 
 /// <summary>
 /// 字节调换扩展

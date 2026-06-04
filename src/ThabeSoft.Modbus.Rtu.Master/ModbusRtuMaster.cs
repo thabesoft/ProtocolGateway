@@ -5,7 +5,7 @@ using ThabeSoft.Modbus.Layouts;
 using ThabeSoft.Modbus.Primitives;
 using ThabeSoft.Ports;
 using ThabeSoft.Primitives;
-using ThabeSoft.Primitives.Crc;
+using ThabeSoft.Primitives.Binary;
 using ThabeSoft.Startable;
 
 namespace ThabeSoft.Modbus;

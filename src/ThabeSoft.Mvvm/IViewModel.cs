@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using ThabeSoft.Mvvm.Internal;
 
 namespace ThabeSoft.Mvvm;
 

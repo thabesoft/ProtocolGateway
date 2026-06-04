@@ -2,6 +2,7 @@
 using ThabeSoft.Ports;
 using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway;
+using ThabeSoft.ProtocolGateway.Runtime;
 
 namespace ThabeSoft.Benchmark;
 
@@ -11,10 +12,11 @@ internal static class ModbusTest
     {
         // 端口
         SerialPortTransport transport = new();
-        await transport.ConnectAsync(SerialPortOptions.Create("Com2"), cancellationToken);
+        transport.ChangeOptions(SerialPortOptions.Create("Com2"));
+        await transport.StartAsync(cancellationToken);
 
         // 网关
-         Gateway gateway = new();
+        IRuntimeGateway gateway = default!;
         var channel_name = ChannelName.Create("Pcl1").Value;
 
         // 通道

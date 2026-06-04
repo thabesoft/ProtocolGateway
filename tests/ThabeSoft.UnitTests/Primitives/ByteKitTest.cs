@@ -1,4 +1,6 @@
-﻿namespace ThabeSoft.Primitives;
+﻿using ThabeSoft.Primitives.Binary;
+
+namespace ThabeSoft.Primitives;
 
 
 [TestClass]

@@ -1,9 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<RootNamespace>ThabeSoft.Primitives</RootNamespace>
-	</PropertyGroup>
-
 	<ItemGroup>
 		<ProjectReference Include="..\ThabeSoft.Primitives.Result\ThabeSoft.Primitives.Result.csproj" />
 	</ItemGroup>

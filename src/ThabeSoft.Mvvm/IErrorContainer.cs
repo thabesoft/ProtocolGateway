@@ -1,4 +1,4 @@
-﻿namespace ThabeSoft.Mvvm.Internal;
+﻿namespace ThabeSoft.Mvvm;
 
 /// <summary>
 /// 错误容器

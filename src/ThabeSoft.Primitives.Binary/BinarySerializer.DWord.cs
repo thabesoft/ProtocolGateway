@@ -1,18 +1,16 @@
-﻿using ThabeSoft.Primitives;
-
-namespace ThabeSoft.ProtocolGateway;
+﻿namespace ThabeSoft.Primitives.Binary;
 
 
 /// <summary>
 /// 32 位数据转换
 /// </summary>
-public sealed class DWordConverter(DWordLayout layout) :
+public sealed class DWordSerializer(DWordLayout layout) :
     IBinarySerializer<uint>,
     IBinarySerializer<int>,
     IBinarySerializer<float>
 {
-    public static DWordConverter BigEndian { get; } = new(DWordLayout.BigEndian);
-    public static DWordConverter LittleEndian { get; } = new(DWordLayout.LittleEndian);
+    public static DWordSerializer BigEndian { get; } = new(DWordLayout.BigEndian);
+    public static DWordSerializer LittleEndian { get; } = new(DWordLayout.LittleEndian);
 
 
     private Result<uint> From(ReadOnlySpan<byte> source)

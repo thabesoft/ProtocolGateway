@@ -1,24 +1,22 @@
-﻿using ThabeSoft.Primitives;
-
-namespace ThabeSoft.ProtocolGateway;
+﻿namespace ThabeSoft.Primitives.Binary;
 
 
 /// <summary>
 /// 字节转换器
 /// </summary>
-public readonly struct ByteConverter :
+public readonly struct ByteSerializer :
     IBinarySerializer<byte>,
     IBinarySerializer<sbyte>
 {
 
     private readonly BitOrder _bitOrder;
-    private ByteConverter(BitOrder bitOrder) => _bitOrder = bitOrder;
+    private ByteSerializer(BitOrder bitOrder) => _bitOrder = bitOrder;
 
 
-    public static ByteConverter LSB0 { get; } = new(BitOrder.LSB0);
-    public static ByteConverter MSB0 { get; } = new(BitOrder.MSB0);
+    public static ByteSerializer LSB0 { get; } = new(BitOrder.LSB0);
+    public static ByteSerializer MSB0 { get; } = new(BitOrder.MSB0);
 
-    public static ByteConverter From(BitOrder bitOrder)
+    public static ByteSerializer From(BitOrder bitOrder)
     {
         return (bitOrder == BitOrder.LSB0) ? LSB0 : MSB0;
     }
