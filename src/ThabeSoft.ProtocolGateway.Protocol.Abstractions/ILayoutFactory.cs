@@ -1,4 +1,4 @@
-﻿namespace ThabeSoft.ProtocolGateway.Protocols;
+﻿namespace ThabeSoft.ProtocolGateway.Protocol;
 
 /// <summary>
 /// 协议工厂

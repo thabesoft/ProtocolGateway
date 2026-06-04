@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<RootNamespace>ThabeSoft.ProtocolGateway.Protocol</RootNamespace>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\ThabeSoft.Primitives.Result\ThabeSoft.Primitives.Result.csproj" />
+	</ItemGroup>
+
+</Project>

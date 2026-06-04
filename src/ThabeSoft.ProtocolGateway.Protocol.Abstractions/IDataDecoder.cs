@@ -1,6 +1,6 @@
 ﻿using ThabeSoft.Primitives;
 
-namespace ThabeSoft.ProtocolGateway.Protocols;
+namespace ThabeSoft.ProtocolGateway.Protocol;
 
 /// <summary>
 /// 含可变长度数据的协议解码器
