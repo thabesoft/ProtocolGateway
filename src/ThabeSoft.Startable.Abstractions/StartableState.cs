@@ -7,14 +7,9 @@
 public enum StartableState
 {
     /// <summary>
-    /// 错误
-    /// </summary>
-    Error,
-
-    /// <summary>
     /// 已准备好
     /// </summary>
-    Ready,
+    Ready = 0,
 
     /// <summary>
     /// 正在启动
@@ -22,22 +17,27 @@ public enum StartableState
     Starting,
 
     /// <summary>
-    /// 已启动
+    /// 运行中
     /// </summary>
-    Started,
+    Running,
 
     /// <summary>
     /// 正在停止
     /// </summary>
-    Stoping,
+    Stopping,
 
     /// <summary>
     /// 已停止
     /// </summary>
-    Stoped,
+    Stopped,
 
     /// <summary>
     /// 已释放
     /// </summary>
-    Disposed
+    Disposed,
+
+    /// <summary>
+    /// 故障
+    /// </summary>
+    Faulted,
 }

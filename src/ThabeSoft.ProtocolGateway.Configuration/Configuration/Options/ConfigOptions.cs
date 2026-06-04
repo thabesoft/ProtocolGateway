@@ -12,7 +12,12 @@ public sealed class ConfigOptions
     public required string Directory { get; init; } = "Configs";
 
     /// <summary>
-    /// 通道配置文件路径（自动组合）
+    /// 获取网关配置文件路径
     /// </summary>
-    public string ChannelsFilePath => Path.Combine(Directory, "Channels.json");
+    /// <param name="gatewayName">网关名称</param>
+    public string GetGatewayConfigFilePath(string gatewayName = "Default.json")
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(gatewayName);
+        return Path.Combine(Directory, gatewayName);
+    }
 }

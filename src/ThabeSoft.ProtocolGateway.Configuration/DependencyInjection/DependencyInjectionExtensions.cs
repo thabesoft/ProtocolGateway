@@ -1,7 +1,8 @@
-﻿using ThabeSoft.ProtocolGateway.Configuration.Options;
-using ThabeSoft.ProtocolGateway.Configuration.Repositories;
+﻿using ThabeSoft.ProtocolGateway.Configuration;
+using ThabeSoft.ProtocolGateway.Configuration.Internal;
+using ThabeSoft.ProtocolGateway.Configuration.Internal.Json;
+using ThabeSoft.ProtocolGateway.Configuration.Options;
 using ThabeSoft.ProtocolGateway.Infrastructure.Json;
-using ThabeSoft.ProtocolGateway.Infrastructure.Repositories;
 
 
 #pragma warning disable IDE0130 // 命名空间与文件夹结构不匹配
@@ -19,7 +20,7 @@ public static class DependencyInjectionExtensions
         /// <summary>
         /// 添加协议网关配置相关服务
         /// </summary>
-        public void AddProtocolGatewayConfiguration(Action<ConfigOptions> optionsAction)
+        public void AddGatewayConfiguration(Action<ConfigOptions> optionsAction)
         {
             // 配置选项
             services.Configure(optionsAction);
@@ -29,7 +30,7 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<ConfigJsonSerializer>();
 
             // 配置仓储
-            services.AddSingleton<IChannelRepository, ChannelConfigRepository>();
+            services.AddSingleton<IGatewayConfigRepository, ChannelConfigRepository>();
         }
     }
 }

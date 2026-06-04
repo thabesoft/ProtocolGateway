@@ -81,7 +81,7 @@ public sealed class PortConfigViewModel : ViewModelBase
 
     #endregion
 
-    public static PortConfigViewModel CreateFromConfig(PortConfig config)
+    public static PortConfigViewModel CreateFromConfig(IPortConfig config)
     {
         var port = new PortConfigViewModel();
         port.LoadConfig(config);
@@ -93,9 +93,9 @@ public sealed class PortConfigViewModel : ViewModelBase
     /// <summary>
     /// 从配置加载
     /// </summary>
-    public void LoadConfig(PortConfig config)
+    public void LoadConfig(IPortConfig config)
     {
-        if(config is SerialPortConfig serialPortConfig)
+        if(config is ISerialPortConfig serialPortConfig)
         {
             LoadConfig(serialPortConfig);
         }
@@ -104,7 +104,7 @@ public sealed class PortConfigViewModel : ViewModelBase
     /// <summary>
     /// 从串口配置加载
     /// </summary>
-    public void LoadConfig(SerialPortConfig config)
+    public void LoadConfig(ISerialPortConfig config)
     {
         using var _ = _lock.EnterScope();
 

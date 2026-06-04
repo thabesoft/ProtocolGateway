@@ -7,9 +7,11 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.8" />
+		<PackageReference Include="System.Reactive" Version="6.1.0" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\ThabeSoft.LanguageExtensions\ThabeSoft.LanguageExtensions.csproj" />
 	  <ProjectReference Include="..\ThabeSoft.Ports.SerialPort\ThabeSoft.Ports.SerialPort.csproj" />
 	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.Configuration\ThabeSoft.ProtocolGateway.Configuration.csproj" />
 	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.Modbus\ThabeSoft.ProtocolGateway.Modbus.csproj" />

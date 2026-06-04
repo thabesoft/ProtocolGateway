@@ -11,14 +11,16 @@ public static class PortConfigExtensions
 {
     extension(IPortConfig config)
     {
+        /// <summary>
+        /// 从配置创建传输器
+        /// </summary>
         public Result<ITransport> CreateTransport()
         {
             // 串口
             if (config is ISerialPortConfig serialPort)
             {
-                return serialPort.ToSerialPortTransport().Map(x => (ITransport)x);
+                return serialPort.CreateSerialPortTransport().Map(x => (ITransport)x);
             }
-
 
             return Result.Error<ITransport>($"该配置无法创建传输器: {config.GetType().Name}");
         }
@@ -27,6 +29,9 @@ public static class PortConfigExtensions
 
     extension(ISerialPortConfig config)
     {
+        /// <summary>
+        /// 从串口配置转为串口选项
+        /// </summary>
         public Result<SerialPortOptions> ToOptions()
         {
             var result = config.Validate();
@@ -41,8 +46,10 @@ public static class PortConfigExtensions
             return Result.Success(value);
         }
 
-
-        public Result<SerialPortTransport> ToSerialPortTransport()
+        /// <summary>
+        /// 从串口配置创建串口传输器
+        /// </summary>
+        public Result<SerialPortTransport> CreateSerialPortTransport()
         {
             var result = config.Validate();
             if (!result.IsSuccess) return result.Cast<SerialPortTransport>();

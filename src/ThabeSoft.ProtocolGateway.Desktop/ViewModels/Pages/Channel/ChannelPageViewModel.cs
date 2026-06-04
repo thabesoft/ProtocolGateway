@@ -6,6 +6,7 @@ using System.Diagnostics;
 using ThabeSoft.Mvvm;
 using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Messages;
+using ThabeSoft.ProtocolGateway.Runtime;
 using ThabeSoft.ProtocolGateway.Services;
 using ThabeSoft.ProtocolGateway.Services.Channel;
 using ThabeSoft.ProtocolGateway.Services.Navigation;
@@ -38,21 +39,21 @@ public sealed partial class ChannelPageViewModel : ViewModelBase, IDisposable
             .Tap(_ => OpenDetailsPageCommand.NotifyCanExecuteChanged())
             .Apply();
     }
-    public IChannelRuntimeService? ChannelRuntimeService
+    public IRuntimeChannel? ChannelRuntimeService
     {
         get; set => Change(field, value, _ =>
             {
                 if (field is not null)
                 {
-                    field.ChannelActivated -= OnChannelActivated;
-                    field.ChannelDeactivated -= OnChannelDeactivated;
+                    //field.ChannelActivated -= OnChannelActivated;
+                    //field.ChannelDeactivated -= OnChannelDeactivated;
                 }
 
                 field = value;
                 if (field is null) return;
 
-                field.ChannelActivated += OnChannelActivated;
-                field.ChannelDeactivated += OnChannelDeactivated;
+                //field.ChannelActivated += OnChannelActivated;
+                //field.ChannelDeactivated += OnChannelDeactivated;
             })
             .Tap(_ =>
             {
@@ -86,7 +87,7 @@ public sealed partial class ChannelPageViewModel : ViewModelBase, IDisposable
             _channels = [.. Enumerable.Range(1, Random.Shared.Next(1, 10)).Select(x => new ChannelConfigViewModel() { Name = $"测试通道{x}" })];
         }
     }
-    public ChannelPageViewModel(INavigationService navigationService, IChannelRuntimeService runtimeService, INotificationService notificationService)
+    public ChannelPageViewModel(INavigationService navigationService, IRuntimeChannel runtimeService, INotificationService notificationService)
     {
         NavigationService = navigationService;
         ChannelRuntimeService = runtimeService;
@@ -98,8 +99,8 @@ public sealed partial class ChannelPageViewModel : ViewModelBase, IDisposable
 
         if (ChannelRuntimeService is not null)
         {
-            ChannelRuntimeService.ChannelActivated -= OnChannelActivated;
-            ChannelRuntimeService.ChannelDeactivated -= OnChannelDeactivated;
+            //ChannelRuntimeService.ChannelActivated -= OnChannelActivated;
+            //ChannelRuntimeService.ChannelDeactivated -= OnChannelDeactivated;
         }
     }
 
@@ -127,77 +128,77 @@ public sealed partial class ChannelPageViewModel : ViewModelBase, IDisposable
     [RelayCommand(CanExecute = nameof(ReloadCommandCanExecute))]
     private async Task ReloadAsync()
     {
-        if (ChannelRuntimeService is null)
-        {
-            TryNotification(x => x.Error("通道运行时业务未初始化").Title("重新加载失败").Show());
-            return;
-        }
+        //if (ChannelRuntimeService is null)
+        //{
+        //    TryNotification(x => x.Error("通道运行时业务未初始化").Title("重新加载失败").Show());
+        //    return;
+        //}
 
-        IsLoading = true;
+        //IsLoading = true;
 
-        try
-        {
-            var result = await ChannelRuntimeService.LoadAndActivateAllAsync();
-            if (!result.IsSuccess)
-            {
-                //await ShowErrorAsync(result.Error!);
-                return;
-            }
+        //try
+        //{
+        //    var result = await ChannelRuntimeService.LoadAndActivateAllAsync();
+        //    if (!result.IsSuccess)
+        //    {
+        //        //await ShowErrorAsync(result.Error!);
+        //        return;
+        //    }
 
-            // 转换为 ViewModel
-            var vms = ChannelRuntimeService.ActiveChannels
-                .Select(ctx =>
-                {
-                    var vm = new ChannelConfigViewModel
-                    {
-                        _notificationService = NotificationService
-                    };
+        //    // 转换为 ViewModel
+        //    var vms = ChannelRuntimeService.ActiveChannels
+        //        .Select(ctx =>
+        //        {
+        //            var vm = new ChannelConfigViewModel
+        //            {
+        //                _notificationService = NotificationService
+        //            };
 
-                    vm.LoadContext(ctx);
-                    return vm;
-                })
-                .ToList();
+        //            vm.LoadContext(ctx);
+        //            return vm;
+        //        })
+        //        .ToList();
 
-            Channels = [.. vms];
-        }
-        catch (Exception ex)
-        {
-            TryNotification(x => x.Error(ex.Message).Title("重新加载失败").Show());
-        }
-        finally
-        {
-            IsLoading = false;
-        }
+        //    Channels = [.. vms];
+        //}
+        //catch (Exception ex)
+        //{
+        //    TryNotification(x => x.Error(ex.Message).Title("重新加载失败").Show());
+        //}
+        //finally
+        //{
+        //    IsLoading = false;
+        //}
     }
 
 
-    // 通道已添加
-    private void OnChannelActivated(object? sender, ChannelRuntimeContext context)
-    {
-        if (IsLoading) return;
+    //// 通道已添加
+    //private void OnChannelActivated(object? sender, ChannelRuntimeContext context)
+    //{
+    //    if (IsLoading) return;
 
-        Avalonia.Threading.Dispatcher.UIThread.Post(() =>
-        {
-            var vm = new ChannelConfigViewModel();
-            vm.LoadContext(context);
+    //    Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+    //    {
+    //        var vm = new ChannelConfigViewModel();
+    //        vm.LoadContext(context);
 
-            _channels.Add(vm);
-        });
-    }
-    // 通道已取消
-    private void OnChannelDeactivated(object? sender, ChannelName channelName)
-    {
-        if (IsLoading) return;
+    //        _channels.Add(vm);
+    //    });
+    //}
+    //// 通道已取消
+    //private void OnChannelDeactivated(object? sender, ChannelName channelName)
+    //{
+    //    if (IsLoading) return;
 
-        Avalonia.Threading.Dispatcher.UIThread.Post(() =>
-        {
-            // 找到要移除的 ViewModel
-            var toRemove = Channels.FirstOrDefault(vm => vm.Name == channelName);
-            if (toRemove == null) return;
+    //    Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+    //    {
+    //        // 找到要移除的 ViewModel
+    //        var toRemove = Channels.FirstOrDefault(vm => vm.Name == channelName);
+    //        if (toRemove == null) return;
 
-            _channels.Remove(toRemove);
-        });
-    }
+    //        _channels.Remove(toRemove);
+    //    });
+    //}
 
 
     // 重载命令是否可以执行

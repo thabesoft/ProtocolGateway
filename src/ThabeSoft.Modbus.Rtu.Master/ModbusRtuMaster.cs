@@ -20,6 +20,15 @@ public sealed class ModbusRtuMaster(ITransport transport) : IModbusMaster
 
 
 
+    public event Action<StartableState> StateChanged { add => transport.StateChanged += value; remove => transport.StateChanged -= value; }
+    public StartableState State => transport.State;
+    public ValueTask<Result> StartAsync(CancellationToken cancellationToken) => transport.StartAsync(cancellationToken);
+    public ValueTask<Result> StopAsync(CancellationToken cancellationToken) => transport.StopAsync(cancellationToken);
+    public ValueTask DisposeAsync() => transport.DisposeAsync();
+
+
+
+
     public async ValueTask<Result> ReadCoilsAsync(Memory<bool> destination, byte slaveId, ushort address, CancellationToken cancellationToken = default)
     {
         using var _ = await _lock.LockAsync();
@@ -365,11 +374,6 @@ public sealed class ModbusRtuMaster(ITransport transport) : IModbusMaster
     private delegate Result<ReadResponseHeader> ReadCoilsResponseDecodeHandler(ReadOnlySpan<byte> source, Span<bool> values);
 
 
-
-
-
-
-
     /// <summary>
     /// 获取完整响应帧
     /// </summary>
@@ -424,13 +428,6 @@ public sealed class ModbusRtuMaster(ITransport transport) : IModbusMaster
             return await transport.ReadExactAsync(tail_span, cancellationToken);
         }
     }
-
-
-
-    public event Action<StartableState> StateChanged { add => transport.StateChanged += value; remove => transport.StateChanged -= value; }
-    public StartableState State => transport.State;
-    public ValueTask<Result> StartAsync(CancellationToken cancellationToken) => transport.StartAsync(cancellationToken);
-    public ValueTask<Result> StopAsync(CancellationToken cancellationToken) => transport.StopAsync(cancellationToken);
 }
 
 

@@ -183,7 +183,7 @@ public static class ModbusTagFactory
         return Result.Error<ITag>($"Modbus标签创建失败, 不支持的数据类型:{valueType}");
 
 
-        IRoutableTag<T> Create<T>(IValueConverter<T> converter) where T : unmanaged
+        IRoutableTag<T> Create<T>(IBinarySerializer<T> converter) where T : unmanaged
         {
             return new ModbusRoutableTag<T>(
                channelName: name,
@@ -306,14 +306,14 @@ internal sealed class ModbusTag<T>(
     ModbusAddress address,
     TagValueType dataType,
     int length,
-    IValueConverter<T> converter
+    IBinarySerializer<T> converter
     ) : ITag<T>
     where T : unmanaged
 {
     public IAddress Address => address;
     public TagValueType ValueType => dataType;
     public int Length => length;
-    public IValueConverter<T> Converter => converter;
+    public IBinarySerializer<T> Converter => converter;
 }
 
 /// <summary>
@@ -324,7 +324,7 @@ internal sealed class ModbusRoutableTag<T>(
     ModbusAddress address,
     TagValueType dataType,
     int length,
-    IValueConverter<T> converter
+    IBinarySerializer<T> converter
     ) : IRoutableTag<T>
     where T : unmanaged
 {
@@ -332,5 +332,5 @@ internal sealed class ModbusRoutableTag<T>(
     public IAddress Address => address;
     public TagValueType ValueType => dataType;
     public int Length => length;
-    public IValueConverter<T> Converter => converter;
+    public IBinarySerializer<T> Converter => converter;
 }

@@ -6,7 +6,7 @@ namespace ThabeSoft.Startable;
 /// <summary>
 /// 可以启动的
 /// </summary>
-public interface IStartable : IStateable
+public interface IStartable : IStateable, IAsyncDisposable
 {
     /// <summary>
     /// 启动

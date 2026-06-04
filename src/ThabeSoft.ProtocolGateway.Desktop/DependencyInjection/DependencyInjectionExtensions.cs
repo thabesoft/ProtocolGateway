@@ -38,7 +38,7 @@ public static class DependencyInjectionExtensions
             // 视图模型提供者
             services.TryAddSingleton<IViewModelProvider, ViewModelProvider>();
             // 通道运行时业务
-            services.AddSingleton<IChannelRuntimeService, ChannelRuntimeService>();
+            //services.AddSingleton<IChannelRuntimeService, ChannelRuntimeService>();
 
             // 图标
             services.TryAddSingleton<ProtocolTypeIconLocator>(); // 协议类型图标

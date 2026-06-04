@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using ThabeSoft.Primitives;
+using ThabeSoft.Startable;
 
 namespace ThabeSoft.ProtocolGateway;
 
@@ -7,7 +8,7 @@ namespace ThabeSoft.ProtocolGateway;
 /// <summary>
 /// 网关
 /// </summary>
-public interface IGateway : IChannelManager, IDisposable
+public interface IGateway : INotifyStartable
 {
     /// <summary>
     /// 读取数据

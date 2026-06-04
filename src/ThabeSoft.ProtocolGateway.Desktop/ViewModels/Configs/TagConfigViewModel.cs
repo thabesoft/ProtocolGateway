@@ -49,7 +49,7 @@ public sealed class TagConfigViewModel : ViewModelBase
         }
     }
 
-    public static TagConfigViewModel CreateFromConfig(TagConfig config)
+    public static TagConfigViewModel CreateFromConfig(ITagConfig config)
     {
         var tag = new TagConfigViewModel();
         tag.LoadConfig(config);
@@ -58,9 +58,9 @@ public sealed class TagConfigViewModel : ViewModelBase
     }
 
 
-    public void LoadConfig(TagConfig config)
+    public void LoadConfig(ITagConfig config)
     {
-        if(config is ModbusTagConfig modbus)
+        if(config is IModbusTagConfig modbus)
         {
             LoadConfig(modbus);
         }
@@ -69,7 +69,7 @@ public sealed class TagConfigViewModel : ViewModelBase
     /// <summary>
     /// 从配置加载
     /// </summary>
-    public void LoadConfig(ModbusTagConfig config)
+    public void LoadConfig(IModbusTagConfig config)
     {
         using var _ = _lock.EnterScope();
 

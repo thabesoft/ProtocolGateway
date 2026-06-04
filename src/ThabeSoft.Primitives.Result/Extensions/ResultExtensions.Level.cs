@@ -17,7 +17,7 @@ public static partial class ResultExtensions
         /// <summary>
         /// 是否存在问题
         /// </summary>
-        public bool IsProblem => result.Level >= ResultLevel.Warning;
+        public bool IsProblem => result.Level is ResultLevel.Warning or ResultLevel.Error;
 
         /// <summary>
         /// 是否失败

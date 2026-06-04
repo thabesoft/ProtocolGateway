@@ -7,6 +7,9 @@ public static class PortTypeExtensions
 {
     extension(PortType type)
     {
+        /// <summary>
+        /// 从端口类型创建传输器
+        /// </summary>
         public Result<ITransport> CreatePort()
         {
             if (type == PortType.SerialPort)

@@ -8,6 +8,9 @@ public static class ProtocolTypeExtensions
 {
     extension(ProtocolType type)
     {
+        /// <summary>
+        /// 从协议类型创建Modbus主站
+        /// </summary>
         public Result<IModbusMaster> CreateModbusMaster(ITransport transport)
         {
             if (type == ProtocolType.ModbusRtu)

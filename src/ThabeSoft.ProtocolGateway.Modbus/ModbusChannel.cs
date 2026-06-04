@@ -16,6 +16,8 @@ public sealed class ModbusChannel(IModbusMaster master) : IReadWriteChannel
     public event Action<StartableState> StateChanged { add => master.StateChanged += value; remove => master.StateChanged -= value; }
     public ValueTask<Result> StartAsync(CancellationToken cancellationToken) => master.StartAsync(cancellationToken);
     public ValueTask<Result> StopAsync(CancellationToken cancellationToken) => master.StopAsync(cancellationToken);
+    public ValueTask DisposeAsync() => master.DisposeAsync();
+
 
 
     /// <summary>
@@ -167,6 +169,8 @@ public sealed class ModbusChannel(IModbusMaster master) : IReadWriteChannel
             ArrayPool<ushort>.Shared.Return(word_buffer);
         }
     }
+
+    
 
 
 

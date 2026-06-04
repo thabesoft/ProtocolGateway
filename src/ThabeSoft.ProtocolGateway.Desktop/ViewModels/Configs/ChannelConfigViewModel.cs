@@ -3,10 +3,9 @@ using Avalonia.Controls;
 using CommunityToolkit.Mvvm.Input;
 using ThabeSoft.Mvvm;
 using ThabeSoft.Primitives;
-using ThabeSoft.ProtocolGateway.Handles;
-using ThabeSoft.ProtocolGateway.Infrastructure.Dtos;
+using ThabeSoft.ProtocolGateway.Configuration;
+using ThabeSoft.ProtocolGateway.Runtime;
 using ThabeSoft.ProtocolGateway.Services;
-using ThabeSoft.ProtocolGateway.Services.Channel;
 using ThabeSoft.Startable;
 
 namespace ThabeSoft.ProtocolGateway.ViewModels;
@@ -23,7 +22,7 @@ public sealed partial class ChannelConfigViewModel : ViewModelBase, IDisposable
     // 导航业务
     private INotificationService? _notificationService;
     // 句柄
-    private IChannelHandle? _handle;
+    private IRuntimeChannel? _handle;
     // 标签
     private AvaloniaList<TagConfigViewModel> _tags = [];
 
@@ -74,11 +73,11 @@ public sealed partial class ChannelConfigViewModel : ViewModelBase, IDisposable
     /// <summary>
     /// 是否可以连接
     /// </summary>
-    public bool CanConnect => _handle?.State is not (StartableState.Starting or StartableState.Started or StartableState.Disposed);
+    public bool CanConnect => _handle?.State is not (StartableState.Starting or StartableState.Running or StartableState.Disposed);
     /// <summary>
     /// 是否可以取消连接
     /// </summary>
-    public bool CanDisconnect => _handle?.State is not (StartableState.Stoping or StartableState.Stoped or StartableState.Disposed);
+    public bool CanDisconnect => _handle?.State is not (StartableState.Stopping or StartableState.Stopped or StartableState.Disposed);
     /// <summary>
     /// 是否是Modbus协议
     /// </summary>
@@ -102,22 +101,12 @@ public sealed partial class ChannelConfigViewModel : ViewModelBase, IDisposable
         _handle?.StateChanged -= OnStateChanged;
     }
 
-
-    public void LoadContext(ChannelRuntimeContext context)
-    {
-        Name = context.Config.Name;
-        Protocol = context.Config.Protocol;
-
-        LoadHandle(context.Handle);
-        LoadTagConfigs(context.Config.Tags);
-        LoadPortConfig(context.Config.Port);
-    }
-    public void LoadHandle(IChannelHandle handle)
+    public void LoadHandle(IRuntimeChannel channel)
     {
         // 更新状态
         _handle?.StateChanged -= OnStateChanged;
-        _handle = handle;
-        handle.StateChanged += OnStateChanged;
+        _handle = channel;
+        channel.StateChanged += OnStateChanged;
 
         // 更新命令状态
         ConnectCommand.NotifyCanExecuteChanged();
@@ -132,11 +121,11 @@ public sealed partial class ChannelConfigViewModel : ViewModelBase, IDisposable
         OnPropertyChanged(nameof(CanDisconnect));
     }
 
-    public void LoadTagConfigs(IEnumerable<TagDto> configs)
+    public void LoadTagConfigs(IEnumerable<ITagConfig> configs)
     {
         Tags = [.. configs.Select(TagConfigViewModel.CreateFromConfig)];
     }
-    public void LoadPortConfig(PortDto config)
+    public void LoadPortConfig(IPortConfig config)
     {
         Port = PortConfigViewModel.CreateFromConfig(config);
     }

@@ -1,2 +1,0 @@
-﻿namespace ThabeSoft.ProtocolGateway.Configuration;
-

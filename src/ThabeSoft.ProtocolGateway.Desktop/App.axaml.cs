@@ -22,11 +22,11 @@ public class App : Application, IDataTemplateRegistry, IApplicationLifetimeAcces
             .ConfigureServices((context, services) =>
             {
                 // 核心
-                services.AddProtocolGateway();
+                //services.AddProtocolGateway();
                 // 配置
-                services.AddProtocolGatewayConfiguration(x => context.Configuration.GetSection("Config").Bind(x));
+                services.AddGatewayConfiguration(x => context.Configuration.GetSection("Config").Bind(x));
                 // 配置实例创建
-                services.AddProtocolGatewayRuntime();
+                services.AddRuntimeGateway();
                 // 桌面
                 services.AddProtocolGatewayDesktop(this);
             })

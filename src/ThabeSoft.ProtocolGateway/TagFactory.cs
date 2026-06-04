@@ -86,9 +86,9 @@ internal sealed class Tag<TValue> : IRoutableTag<TValue>
     public IAddress Address { get; }
     public TagValueType ValueType { get; }
     public int Length { get; }
-    public IValueConverter<TValue> Converter { get; }
+    public IBinarySerializer<TValue> Converter { get; }
 
-    internal Tag(IAddress address, TagValueType type, int length, IValueConverter<TValue> converter)
+    internal Tag(IAddress address, TagValueType type, int length, IBinarySerializer<TValue> converter)
     {
         Address = address;
         ValueType = type;
@@ -106,10 +106,10 @@ internal sealed class RoutableTag<TValue> : IRoutableTag<TValue>
     public IAddress Address { get; }
     public TagValueType ValueType { get; }
     public int Length { get; }
-    public IValueConverter<TValue> Converter { get; }
+    public IBinarySerializer<TValue> Converter { get; }
 
 
-    internal RoutableTag(ChannelName name, IAddress address, TagValueType type, int length, IValueConverter<TValue> converter)
+    internal RoutableTag(ChannelName name, IAddress address, TagValueType type, int length, IBinarySerializer<TValue> converter)
     {
         ChannelName = name;
         Address = address;

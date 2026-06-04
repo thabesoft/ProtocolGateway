@@ -32,5 +32,5 @@ public interface ITag<TValue> : ITag
     /// <summary>
     /// 值转换器
     /// </summary>
-    IValueConverter<TValue> Converter { get; }
+    IBinarySerializer<TValue> Converter { get; }
 }
