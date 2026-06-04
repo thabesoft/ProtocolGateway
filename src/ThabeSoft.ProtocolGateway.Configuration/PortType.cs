@@ -6,6 +6,11 @@
 public enum PortType
 {
     /// <summary>
+    /// 未知
+    /// </summary>
+    None,
+
+    /// <summary>
     /// 串口
     /// </summary>
     SerialPort

@@ -3,8 +3,8 @@ using Avalonia.Controls;
 using CommunityToolkit.Mvvm.Input;
 using ThabeSoft.Mvvm;
 using ThabeSoft.Primitives;
-using ThabeSoft.ProtocolGateway.Configuration;
 using ThabeSoft.ProtocolGateway.Handles;
+using ThabeSoft.ProtocolGateway.Infrastructure.Dtos;
 using ThabeSoft.ProtocolGateway.Services;
 using ThabeSoft.ProtocolGateway.Services.Channel;
 using ThabeSoft.Startable;
@@ -132,11 +132,11 @@ public sealed partial class ChannelConfigViewModel : ViewModelBase, IDisposable
         OnPropertyChanged(nameof(CanDisconnect));
     }
 
-    public void LoadTagConfigs(IEnumerable<TagConfig> configs)
+    public void LoadTagConfigs(IEnumerable<TagDto> configs)
     {
         Tags = [.. configs.Select(TagConfigViewModel.CreateFromConfig)];
     }
-    public void LoadPortConfig(PortConfig config)
+    public void LoadPortConfig(PortDto config)
     {
         Port = PortConfigViewModel.CreateFromConfig(config);
     }

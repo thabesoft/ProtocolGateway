@@ -1,8 +1,7 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
-using ThabeSoft.ProtocolGateway;
-using ThabeSoft.ProtocolGateway.JsonConverters;
-using ThabeSoft.ProtocolGateway.Options;
+﻿using ThabeSoft.ProtocolGateway.Configuration.Options;
+using ThabeSoft.ProtocolGateway.Configuration.Repositories;
+using ThabeSoft.ProtocolGateway.Infrastructure.Json;
+using ThabeSoft.ProtocolGateway.Infrastructure.Repositories;
 
 
 #pragma warning disable IDE0130 // 命名空间与文件夹结构不匹配
@@ -25,19 +24,12 @@ public static class DependencyInjectionExtensions
             // 配置选项
             services.Configure(optionsAction);
 
-            // Json 序列化
-            services.Configure<JsonSerializerOptions>(x =>
-            {
-                x.Converters.Add(new BaudRateConverter());
-                x.Converters.Add(new FunctionCodeConverter());
-                x.Converters.Add(new ChannelNameConverter());
-                x.Converters.Add(new JsonStringEnumConverter<ChannelType>());
-                x.Converters.Add(new JsonStringEnumConverter<PortType>());
-                x.Converters.Add(new JsonStringEnumConverter<ProtocolType>());
-            });
+            // 配置Json序列化
+            services.AddSingleton<ConfigJsonSerializerContext>();
+            services.AddSingleton<ConfigJsonSerializer>();
 
-            // 通道句柄
-            services.AddSingleton<IChannelConfigRepository, ChannelConfigRepository>();
+            // 配置仓储
+            services.AddSingleton<IChannelRepository, ChannelConfigRepository>();
         }
     }
 }

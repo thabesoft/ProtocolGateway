@@ -427,10 +427,10 @@ public sealed class ModbusRtuMaster(ITransport transport) : IModbusMaster
 
 
 
-    event Action<StartableState> INotifyStartable.StateChanged { add => transport.StateChanged += value; remove => transport.StateChanged -= value; }
-    StartableState IStartable.State => transport.State;
-    ValueTask<Result> IStartable.StartAsync(CancellationToken cancellationToken) => transport.StartAsync(cancellationToken);
-    ValueTask<Result> IStartable.StopAsync(CancellationToken cancellationToken) => transport.StopAsync(cancellationToken);
+    public event Action<StartableState> StateChanged { add => transport.StateChanged += value; remove => transport.StateChanged -= value; }
+    public StartableState State => transport.State;
+    public ValueTask<Result> StartAsync(CancellationToken cancellationToken) => transport.StartAsync(cancellationToken);
+    public ValueTask<Result> StopAsync(CancellationToken cancellationToken) => transport.StopAsync(cancellationToken);
 }
 
 

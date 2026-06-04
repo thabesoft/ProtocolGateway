@@ -1,5 +1,4 @@
 ﻿using ThabeSoft.ProtocolGateway.Configuration;
-using ThabeSoft.ProtocolGateway.Handles;
 
 namespace ThabeSoft.ProtocolGateway.Services.Channel;
 

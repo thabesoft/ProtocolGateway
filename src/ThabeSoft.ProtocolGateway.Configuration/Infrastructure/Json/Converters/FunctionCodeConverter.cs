@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using ThabeSoft.Modbus;
 using ThabeSoft.Primitives;
 
-namespace ThabeSoft.ProtocolGateway.JsonConverters;
+namespace ThabeSoft.ProtocolGateway.Infrastructure.Json.Converters;
 
 /// <summary>
 /// 功能码转换

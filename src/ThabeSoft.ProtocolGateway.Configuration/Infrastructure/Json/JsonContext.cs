@@ -2,9 +2,9 @@
 using ThabeSoft.Modbus;
 using ThabeSoft.Ports;
 using ThabeSoft.ProtocolGateway.Configuration;
+using ThabeSoft.ProtocolGateway.Infrastructure.Json.Converters;
 
-namespace ThabeSoft.ProtocolGateway.JsonConverters;
-
+namespace ThabeSoft.ProtocolGateway.Infrastructure.Json;
 
 
 [JsonSourceGenerationOptions(
@@ -36,6 +36,7 @@ namespace ThabeSoft.ProtocolGateway.JsonConverters;
 [JsonSerializable(typeof(ChannelConfig[]))]
 
 // 标签
+[JsonSerializable(typeof(TagConfig[]))]
 [JsonSerializable(typeof(TagConfig))]
 [JsonSerializable(typeof(ModbusTagConfig))]
 
@@ -45,7 +46,4 @@ namespace ThabeSoft.ProtocolGateway.JsonConverters;
 
 // 值类型
 [JsonSerializable(typeof(FunctionCode))]
-public partial class JsonContext : JsonSerializerContext
-{
-
-}
+internal partial class ConfigJsonSerializerContext : JsonSerializerContext;

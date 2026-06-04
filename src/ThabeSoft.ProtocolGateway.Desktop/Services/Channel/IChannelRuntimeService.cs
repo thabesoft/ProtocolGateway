@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Configuration;
+using ThabeSoft.ProtocolGateway.Configuration.Repositories;
 
 namespace ThabeSoft.ProtocolGateway.Services.Channel;
 
@@ -34,8 +35,8 @@ public interface IChannelRuntimeService
 
 internal sealed class ChannelRuntimeService : IChannelRuntimeService
 {
-    private readonly IChannelConfigRepository _configRepository;
-    private readonly IChannelHandleFactory _handleFactory;
+    private readonly IChannelRepository _configRepository;
+    private readonly IRuntimeChannelFactory _handleFactory;
     private readonly ConcurrentDictionary<ChannelName, ChannelRuntimeContext> _contexts = new();
 
     public event EventHandler<ChannelRuntimeContext>? ChannelActivated;
@@ -44,8 +45,8 @@ internal sealed class ChannelRuntimeService : IChannelRuntimeService
     public IReadOnlyList<ChannelRuntimeContext> ActiveChannels => _contexts.Values.ToList();
 
     public ChannelRuntimeService(
-        IChannelConfigRepository configRepository,
-        IChannelHandleFactory handleFactory)
+        IChannelRepository configRepository,
+        IRuntimeChannelFactory handleFactory)
     {
         _configRepository = configRepository;
         _handleFactory = handleFactory;
@@ -78,7 +79,7 @@ internal sealed class ChannelRuntimeService : IChannelRuntimeService
         }
 
         // 创建 Handle
-        var handleResult = _handleFactory.GetHandle(config);
+        var handleResult = _handleFactory.Create(config);
         if (!handleResult.IsSuccess)
         {
             return handleResult.Cast<ChannelRuntimeContext>();

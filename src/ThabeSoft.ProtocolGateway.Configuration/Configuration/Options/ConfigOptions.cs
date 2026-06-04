@@ -1,4 +1,4 @@
-﻿namespace ThabeSoft.ProtocolGateway.Options;
+﻿namespace ThabeSoft.ProtocolGateway.Configuration.Options;
 
 
 /// <summary>

@@ -1,5 +1,4 @@
-﻿using Avalonia.Threading;
-using ThabeSoft.Mvvm;
+﻿using ThabeSoft.Mvvm;
 using ThabeSoft.Ports;
 using ThabeSoft.ProtocolGateway.Configuration;
 

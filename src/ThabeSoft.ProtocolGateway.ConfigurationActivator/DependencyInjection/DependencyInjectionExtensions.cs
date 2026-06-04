@@ -1,6 +1,5 @@
 ﻿using ThabeSoft.ProtocolGateway;
-using ThabeSoft.ProtocolGateway.Handles;
-using ThabeSoft.ProtocolGateway.Handles.Modbus;
+using ThabeSoft.ProtocolGateway.Infrastructure;
 
 
 #pragma warning disable IDE0130 // 命名空间与文件夹结构不匹配
@@ -18,10 +17,10 @@ public static class DependencyInjectionExtensions
         /// <summary>
         /// 添加基础层业务
         /// </summary>
-        public void AddProtocolGatewayConfigurationActivator()
+        public void AddProtocolGatewayRuntime()
         {
             // 通道处理器工厂
-            services.AddSingleton<IChannelHandleFactory, ChannelHandleFactory>();
+            services.AddSingleton<IRuntimeChannelFactory, ChannelHandleFactory>();
 
             // 通道句柄
             services.AddSingleton<IChannelHandleProvider, ModbusChannelHandleProvider>();

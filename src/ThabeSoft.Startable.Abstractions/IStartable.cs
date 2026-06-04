@@ -6,13 +6,8 @@ namespace ThabeSoft.Startable;
 /// <summary>
 /// 可以启动的
 /// </summary>
-public interface IStartable
+public interface IStartable : IStateable
 {
-    /// <summary>
-    /// 状态
-    /// </summary>
-    StartableState State { get; }
-
     /// <summary>
     /// 启动
     /// </summary>

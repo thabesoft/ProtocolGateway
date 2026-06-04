@@ -26,7 +26,7 @@ public class App : Application, IDataTemplateRegistry, IApplicationLifetimeAcces
                 // 配置
                 services.AddProtocolGatewayConfiguration(x => context.Configuration.GetSection("Config").Bind(x));
                 // 配置实例创建
-                services.AddProtocolGatewayConfigurationActivator();
+                services.AddProtocolGatewayRuntime();
                 // 桌面
                 services.AddProtocolGatewayDesktop(this);
             })

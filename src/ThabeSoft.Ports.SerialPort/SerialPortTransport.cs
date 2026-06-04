@@ -11,8 +11,8 @@ namespace ThabeSoft.Ports;
 /// </summary>
 public sealed class SerialPortTransport : ITransport
 {
-    private ISerialPortOptions? _options;
     private SerialPort? port;
+    private ISerialPortOptions? _options;
 
     private readonly SerialPortLock _lock = new();
 
@@ -30,18 +30,14 @@ public sealed class SerialPortTransport : ITransport
     }
 
 
-    ValueTask<Result> ITransport.ConnectAsync(ITransportOptions options, CancellationToken cancellation)
+    // 启动
+    public async ValueTask<Result> StartAsync(CancellationToken cancellationToken = default)
     {
-        if (options is not ISerialPortOptions serialOptions)
+        if (_options is not ISerialPortOptions serialOptions)
         {
-            return new ValueTask<Result>(Result.Error("当前配置不持支创建串口链接"));
+            return Result.Error("当前配置不持支创建串口链接");
         }
 
-        return ConnectAsync(serialOptions, cancellation);
-    }
-
-    public async ValueTask<Result> ConnectAsync(ISerialPortOptions options, CancellationToken _)
-    {
         if (State != StartableState.Ready &&
             State != StartableState.Stoped &&
             State != StartableState.Error)
@@ -55,9 +51,7 @@ public sealed class SerialPortTransport : ITransport
 
         try
         {
-            _options = options;
-
-            return CreateSerialPort(options).Tap(x =>
+            return CreateSerialPort(_options).Tap(x =>
             {
                 port = x;
                 port.Open();
@@ -85,7 +79,8 @@ public sealed class SerialPortTransport : ITransport
             return Result.Error($"串口连接失败: {ex.Message}");
         }
     }
-    public async ValueTask<Result> DisconnectAsync(CancellationToken cancellation = default)
+    // 结束
+    public async ValueTask<Result> StopAsync(CancellationToken cancellationToken = default)
     {
         if (State != StartableState.Started && State != StartableState.Starting)
         {
@@ -107,56 +102,7 @@ public sealed class SerialPortTransport : ITransport
             return Result.Error($"断开连接时发生错误: {ex.Message}");
         }
     }
-
-
-    public async ValueTask<Result> ReadExactAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
-    {
-        if (port?.IsOpen != true || State != StartableState.Started)
-            return Result.Error<int>("未连接无法读取数据");
-
-        if (_options is null)
-            return Result.Error("串口未配置, 无法读取数据");
-
-
-        //using var _ = await _lock.GetReadLockAsync(_options.DuplexMode);
-
-        try
-        {
-            await port.BaseStream.ReadExactAsync(buffer, cancellationToken);
-            return Result.Success();
-        }
-        catch (InvalidOperationException)
-        {
-            return Result.Error<int>("串口已关闭");
-        }
-        catch (EndOfStreamException)
-        {
-            return Result.Error<int>("连接意外中断");
-        }
-    }
-    public async ValueTask<Result> WriteAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
-    {
-        if (port?.IsOpen != true || State != StartableState.Started)
-            return Result.Error("未连接无法写入数据");
-
-        if (_options is null)
-            return Result.Error("串口未配置, 无法写入数据");
-
-
-        //using var _ = await _lock.GetWriteLockAsync(_options.DuplexMode);
-
-        try
-        {
-            await port.BaseStream.WriteAsync(data, cancellationToken);
-            return Result.Success();
-        }
-        catch (InvalidOperationException)
-        {
-            return Result.Error("串口已关闭");
-        }
-    }
-
-
+    // 释放
     public async ValueTask DisposeAsync()
     {
         if (State == StartableState.Disposed) return;
@@ -183,7 +129,72 @@ public sealed class SerialPortTransport : ITransport
         }
     }
 
+    // 改变配置
+    public Result ChangeOptions(ISerialPortOptions options)
+    {
+        using var _ = _lock.GetConfigLockAsync();
 
+        if (State == StartableState.Starting || State == StartableState.Started)
+        {
+            return Result.Error("无法在启动状态修改配置, 请结束后修改");
+        }
+
+        _options = options;
+        return Result.Success();
+    }
+
+
+    // 读取
+    public async ValueTask<Result> ReadExactAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+    {
+        if (port?.IsOpen != true || State != StartableState.Started)
+            return Result.Error<int>("未连接无法读取数据");
+
+        if (_options is null)
+            return Result.Error("串口未配置, 无法读取数据");
+
+
+        //using var _ = await _lock.GetReadLockAsync(_options.DuplexMode);
+
+        try
+        {
+            await port.BaseStream.ReadExactAsync(buffer, cancellationToken);
+            return Result.Success();
+        }
+        catch (InvalidOperationException)
+        {
+            return Result.Error<int>("串口已关闭");
+        }
+        catch (EndOfStreamException)
+        {
+            return Result.Error<int>("连接意外中断");
+        }
+    }
+    // 写入
+    public async ValueTask<Result> WriteAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+    {
+        if (port?.IsOpen != true || State != StartableState.Started)
+            return Result.Error("未连接无法写入数据");
+
+        if (_options is null)
+            return Result.Error("串口未配置, 无法写入数据");
+
+
+        //using var _ = await _lock.GetWriteLockAsync(_options.DuplexMode);
+
+        try
+        {
+            await port.BaseStream.WriteAsync(data, cancellationToken);
+            return Result.Success();
+        }
+        catch (InvalidOperationException)
+        {
+            return Result.Error("串口已关闭");
+        }
+    }
+
+
+    // 从配置创建串口
     private static Result<SerialPort> CreateSerialPort(ISerialPortOptions options)
     {
         try
@@ -200,20 +211,6 @@ public sealed class SerialPortTransport : ITransport
         {
             return Result.Error<SerialPort>($"无法创建串口: {ex.Message}");
         }
-    }
-
-
-
-    public ValueTask<Result> StartAsync(CancellationToken cancellationToken = default)
-    {
-        if (_options is null)
-            return new ValueTask<Result>(Result.Error("串口未配置, 无法读取数据"));
-
-        return ConnectAsync(_options, cancellationToken);
-    }
-    public ValueTask<Result> StopAsync(CancellationToken cancellationToken = default)
-    {
-        return DisconnectAsync(cancellationToken);
     }
 }
 

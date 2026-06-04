@@ -35,7 +35,7 @@
 	<!--依赖项目-->
 	<ItemGroup>
 	  <ProjectReference Include="..\ThabeSoft.Mvvm\ThabeSoft.Mvvm.csproj" />
-	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.ConfigurationActivator\ThabeSoft.ProtocolGateway.ConfigurationActivator.csproj" />
+	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.ConfigurationActivator\ThabeSoft.ProtocolGateway.Runtime.csproj" />
 	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.Configuration\ThabeSoft.ProtocolGateway.Configuration.csproj" />
 	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway\ThabeSoft.ProtocolGateway.csproj" />
 	</ItemGroup>
