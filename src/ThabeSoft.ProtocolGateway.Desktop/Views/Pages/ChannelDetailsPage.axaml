@@ -29,15 +29,15 @@
             <StackPanel DockPanel.Dock="Right"
                         Orientation="Horizontal">
 
-                <Button Content="运行" />
-                <Button Content="停止" />
+                <Button Content="运行" IsVisible="{Binding Channel.CanConnect}" Command="{Binding Channel.ConnectCommand}" />
+                <Button Content="停止"  IsVisible="{Binding Channel.CanDisconnect}" Command="{Binding Channel.DisconnectCommand}" />
 
             </StackPanel>
 
             <TextBlock Margin="10 0 0 0"
                        VerticalAlignment="Center"
                        DockPanel.Dock="Left"
-                       Text="{Binding Name}" />
+                       Text="{Binding Channel.Name}" />
 
         </DockPanel>
 
@@ -58,7 +58,7 @@
         <TabControl Grid.Row="3">
 
             <TabItem Header="标签">
-                <DataGrid ItemsSource="{Binding Tags}"
+                <DataGrid ItemsSource="{Binding Channel.Tags}"
                           AutoGenerateColumns="False"
                           CanUserSortColumns="True"
                           CanUserReorderColumns="True">
@@ -71,9 +71,9 @@
                         <DataGridTextColumn SortMemberPath="ValueQuality" Header="质量" Binding="{Binding ValueQuality}" Width="80" />
                         <DataGridTextColumn SortMemberPath="Timestamp" Header="时间戳" Binding="{Binding Timestamp, StringFormat=HH:mm:ss.fff}" Width="Auto"/>
 
-                        <DataGridTextColumn SortMemberPath="SlaveId" IsVisible="{Binding IsModbusProtocol}" Header="从站 Id" Binding="{Binding SlaveId}" Width="Auto"/>
-                        <DataGridTextColumn SortMemberPath="Address" IsVisible="{Binding IsModbusProtocol}" Header="起始地址" Binding="{Binding Address}" Width="Auto"/>
-                        <DataGridTextColumn SortMemberPath="FunctionCode" IsVisible="{Binding IsModbusProtocol}" Header="功能码" Binding="{Binding FunctionCode}" Width="Auto"/>
+                        <DataGridTextColumn SortMemberPath="SlaveId" IsVisible="{Binding Channel.IsModbusProtocol}" Header="从站 Id" Binding="{Binding SlaveId}" Width="Auto"/>
+                        <DataGridTextColumn SortMemberPath="Address" IsVisible="{Binding Channel.IsModbusProtocol}" Header="起始地址" Binding="{Binding Address}" Width="Auto"/>
+                        <DataGridTextColumn SortMemberPath="FunctionCode" IsVisible="{Binding Channel.IsModbusProtocol}" Header="功能码" Binding="{Binding FunctionCode}" Width="Auto"/>
 
                     </DataGrid.Columns>
 
@@ -86,7 +86,7 @@
 
             <TabItem Header="配置" IsSelected="True">
 
-                <ContentControl Content="{Binding Port}">
+                <ContentControl Content="{Binding Channel.Port}">
 
                     <ContentControl.Styles>
 

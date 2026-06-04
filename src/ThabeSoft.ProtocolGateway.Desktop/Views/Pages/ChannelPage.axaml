@@ -65,9 +65,11 @@
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <Button Content="连接"
+                                        IsVisible="{Binding CanConnect}"
                                         Command="{Binding ConnectCommand}"
                                         Classes="DataGridButton"/>
                                 <Button Content="断开"
+                                        IsVisible="{Binding CanDisconnect}"
                                         Command="{Binding DisconnectCommand}"
                                         Classes="DataGridButton"/>
                                 <Button Content="暂停"

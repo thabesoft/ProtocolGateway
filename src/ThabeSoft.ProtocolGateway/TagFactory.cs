@@ -6,7 +6,7 @@ namespace ThabeSoft.ProtocolGateway;
 /// <summary>
 /// 预设Tag
 /// </summary>
-public static class Tag
+public static class TagFactory
 {
     #region --地址标签--
 

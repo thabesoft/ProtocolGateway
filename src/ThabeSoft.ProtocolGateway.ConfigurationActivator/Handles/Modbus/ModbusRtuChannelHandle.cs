@@ -1,4 +1,5 @@
-﻿using ThabeSoft.Ports;
+﻿using Microsoft.Extensions.Options;
+using ThabeSoft.Ports;
 using ThabeSoft.Primitives;
 using ThabeSoft.Startable;
 
@@ -12,6 +13,7 @@ public sealed class ModbusRtuChannelHandle(ChannelName name, IChannel channel, S
     public ProtocolType Protocol => ProtocolType.ModbusRtu;
     public StartableState State => transport.State;
 
+    public event Action<StartableState> StateChanged { add => transport.StateChanged += value; remove => transport.StateChanged -= value; }
 
     public ValueTask<Result> StartAsync(CancellationToken cancellationToken = default)
     {

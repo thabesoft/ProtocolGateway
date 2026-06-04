@@ -28,7 +28,7 @@ public class GatewayTests
         ModbusChannel channel = new(master);
 
         // 发送数据
-        var read_tag = Tag.Bool(ModbusAddress.ReadCoils(slaveId, address));
+        var read_tag = TagFactory.Bool(ModbusAddress.ReadCoils(slaveId, address));
         var read_result = await channel.ReadAsync(read_tag, TestContext.CancellationToken);
 
         // 验证
@@ -87,7 +87,7 @@ public class GatewayTests
         ModbusChannel channel = new(master);
 
         // 发送数据
-        var read_tag = Tag.UInt16(ModbusAddress.ReadHoldingRegisters(slave_id, address));
+        var read_tag = TagFactory.UInt16(ModbusAddress.ReadHoldingRegisters(slave_id, address));
         var read_result = await channel.ReadAsync(read_tag, TestContext.CancellationToken);
 
         // 验证

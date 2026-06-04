@@ -22,7 +22,7 @@ internal static class ModbusTest
         gateway.AddModbusChannel(channel_name, master);
 
         // 轮询
-        var tag = ModbusTag.ReadHoldingRegisterDWord(channel_name, 1, 100);
+        var tag = ModbusTagFactory.ReadHoldingRegisterDWord(channel_name, 1, 100);
         gateway.Poll(tag)
             .Subscribe(result =>
             {

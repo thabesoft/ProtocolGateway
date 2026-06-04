@@ -9,7 +9,7 @@ internal static class ModbusTagExtensions
     {
         public Result<ITag> ToTag(ChannelName channelName)
         {
-            return ModbusTag.CreateRoutableTag(channelName, config.SlaveId, config.FunctionCode, config.Address, config.ValueType);
+            return ModbusTagModel.CreateRoutableTag(channelName, config.SlaveId, config.FunctionCode, config.Address, config.ValueType);
         }
     }
 }

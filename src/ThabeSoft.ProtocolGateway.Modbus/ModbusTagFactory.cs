@@ -7,7 +7,7 @@ namespace ThabeSoft.ProtocolGateway;
 /// <summary>
 /// Modbus Tag
 /// </summary>
-public static class ModbusTag
+public static class ModbusTagFactory
 {
     #region --常规标签--
 

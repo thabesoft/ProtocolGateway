@@ -109,27 +109,18 @@ public sealed partial class ChannelPageViewModel : ViewModelBase, IDisposable
     [RelayCommand(CanExecute = nameof(OpenDetailsPageCommandCanExecute))]
     private void OpenDetailsPage(ChannelConfigViewModel item)
     {
-        if (ChannelRuntimeService is null)
-        {
-            TryNotification(x => x.Error("通道运行时业务未初始化").Title("详情页打开失败").Show());
-            return;
-        }
         if (NavigationService is null)
         {
             TryNotification(x => x.Error("导航业务未初始化").Title("详情页打开失败").Show());
             return;
         }
 
-
-        var context = ChannelRuntimeService.ActiveChannels.FirstOrDefault(ctx => ctx.Config.Name == item.Name);
-
-        if (context is not null)
+        var detailsPage = new ChannelDetailsPageViewModel
         {
-            var detailsPage = new ChannelDetailsPageViewModel();
-            detailsPage.LoadContext(context);
+            Channel = item
+        };
 
-            NavigationService.NavigateTo(detailsPage);
-        }
+        NavigationService.NavigateTo(detailsPage);
     }
 
     // 重载
@@ -159,7 +150,7 @@ public sealed partial class ChannelPageViewModel : ViewModelBase, IDisposable
                 {
                     var vm = new ChannelConfigViewModel
                     {
-                        NotificationService = NotificationService
+                        _notificationService = NotificationService
                     };
 
                     vm.LoadContext(ctx);

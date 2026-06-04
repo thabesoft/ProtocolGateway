@@ -82,6 +82,25 @@ public sealed class PortConfigViewModel : ViewModelBase
 
     #endregion
 
+    public static PortConfigViewModel CreateFromConfig(PortConfig config)
+    {
+        var port = new PortConfigViewModel();
+        port.LoadConfig(config);
+
+        return port;
+    }
+
+
+    /// <summary>
+    /// 从配置加载
+    /// </summary>
+    public void LoadConfig(PortConfig config)
+    {
+        if(config is SerialPortConfig serialPortConfig)
+        {
+            LoadConfig(serialPortConfig);
+        }
+    }
 
     /// <summary>
     /// 从串口配置加载
@@ -90,16 +109,12 @@ public sealed class PortConfigViewModel : ViewModelBase
     {
         using var _ = _lock.EnterScope();
 
-        Dispatcher.UIThread.Post(() =>
-        {
-            IsSerialPort = true;
-            PortName = config.PortName;
-            BaudRate = config.BaudRate;
-            Parity = config.Parity;
-            DataBits = config.DataBits;
-            StopBits = config.StopBits;
-            DuplexMode = config.DuplexMode;
-
-        }, DispatcherPriority.Background);
+        IsSerialPort = true;
+        PortName = config.PortName;
+        BaudRate = config.BaudRate;
+        Parity = config.Parity;
+        DataBits = config.DataBits;
+        StopBits = config.StopBits;
+        DuplexMode = config.DuplexMode;
     }
 }

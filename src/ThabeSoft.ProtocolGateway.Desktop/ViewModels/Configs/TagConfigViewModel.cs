@@ -1,5 +1,4 @@
 ﻿using Avalonia.Controls;
-using Avalonia.Threading;
 using ThabeSoft.Modbus;
 using ThabeSoft.Mvvm;
 using ThabeSoft.ProtocolGateway.Configuration;
@@ -50,6 +49,23 @@ public sealed class TagConfigViewModel : ViewModelBase
         }
     }
 
+    public static TagConfigViewModel CreateFromConfig(TagConfig config)
+    {
+        var tag = new TagConfigViewModel();
+        tag.LoadConfig(config);
+
+        return tag;
+    }
+
+
+    public void LoadConfig(TagConfig config)
+    {
+        if(config is ModbusTagConfig modbus)
+        {
+            LoadConfig(modbus);
+        }
+    }
+
     /// <summary>
     /// 从配置加载
     /// </summary>
@@ -57,16 +73,12 @@ public sealed class TagConfigViewModel : ViewModelBase
     {
         using var _ = _lock.EnterScope();
 
-        Dispatcher.UIThread.Post(() =>
-        {
-            IsModbusTag = true;
-            Name = config.Name;
-            ValueType = config.ValueType;
-            SlaveId = config.SlaveId;
-            Address = config.Address;
-            FunctionCode = config.FunctionCode;
-
-        }, DispatcherPriority.Background);
+        IsModbusTag = true;
+        Name = config.Name;
+        ValueType = config.ValueType;
+        SlaveId = config.SlaveId;
+        Address = config.Address;
+        FunctionCode = config.FunctionCode;
     }
 
 
@@ -75,12 +87,10 @@ public sealed class TagConfigViewModel : ViewModelBase
     /// </summary>
     public void UpdateValue(object value, ValueQuality quality)
     {
-        Dispatcher.UIThread.Post(() =>
-        {
-            Value = value;
-            ValueQuality = quality;
-            Timestamp = DateTime.Now;
+        using var _ = _lock.EnterScope();
 
-        }, DispatcherPriority.Input);
+        Value = value;
+        ValueQuality = quality;
+        Timestamp = DateTime.Now;
     }
 }
