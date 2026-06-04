@@ -28,13 +28,13 @@ public sealed class DWordSerializer(DWordLayout layout) :
 
 
 
-    Result<uint> IBinarySerializer<uint>.From(ReadOnlySpan<byte> source) => From(source);
-    Result<int> IBinarySerializer<int>.From(ReadOnlySpan<byte> source) => From(source).Map(x => (int)x);
-    Result<float> IBinarySerializer<float>.From(ReadOnlySpan<byte> source) => From(source).Map(x => (float)x);
+    Result<uint> IBinarySerializer<uint>.Deserialize(ReadOnlySpan<byte> source) => From(source);
+    Result<int> IBinarySerializer<int>.Deserialize(ReadOnlySpan<byte> source) => From(source).Map(x => (int)x);
+    Result<float> IBinarySerializer<float>.Deserialize(ReadOnlySpan<byte> source) => From(source).Map(x => (float)x);
 
     
 
-    Result IBinarySerializer<uint>.To(uint source, Span<byte> destination) => To(source, destination);
-    Result IBinarySerializer<int>.To(int source, Span<byte> destination) => To((ushort)source, destination);
-    Result IBinarySerializer<float>.To(float source, Span<byte> destination) => To((ushort)source, destination);
+    Result IBinarySerializer<uint>.Serialize(uint source, Span<byte> destination) => To(source, destination);
+    Result IBinarySerializer<int>.Serialize(int source, Span<byte> destination) => To((ushort)source, destination);
+    Result IBinarySerializer<float>.Serialize(float source, Span<byte> destination) => To((ushort)source, destination);
 }

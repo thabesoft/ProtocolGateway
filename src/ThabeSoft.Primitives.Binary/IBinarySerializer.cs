@@ -10,10 +10,10 @@ public interface IBinarySerializer<TValue>
     /// <summary>
     /// 从字节转为具体类型
     /// </summary>
-    Result<TValue> From(ReadOnlySpan<byte> source);
+    Result<TValue> Deserialize(ReadOnlySpan<byte> source);
 
     /// <summary>
     /// 从具体类型转为字节组
     /// </summary>
-    Result To(TValue source, Span<byte> destination);
+    Result Serialize(TValue source, Span<byte> destination);
 }

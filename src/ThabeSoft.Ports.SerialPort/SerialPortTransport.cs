@@ -1,7 +1,6 @@
-﻿using System.Diagnostics;
-using System.IO.Ports;
+﻿using System.IO.Ports;
+using ThabeSoft.Lifecycle;
 using ThabeSoft.Primitives;
-using ThabeSoft.Startable;
 
 namespace ThabeSoft.Ports;
 
@@ -44,7 +43,7 @@ public sealed class SerialPortTransport : LifecycleObject, ITransport
 
 
     // 改变配置
-    public Result ChangeOptions(ISerialPortOptions options)
+    public Result SetOptions(ISerialPortOptions options)
     {
         using var _ = LockAsync();
 

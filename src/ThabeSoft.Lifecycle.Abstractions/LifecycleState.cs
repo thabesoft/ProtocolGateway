@@ -1,4 +1,4 @@
-﻿namespace ThabeSoft.Startable;
+﻿namespace ThabeSoft.Lifecycle;
 
 
 /// <summary>

@@ -1,9 +1,9 @@
 ﻿using System.Buffers;
 using System.ComponentModel;
+using ThabeSoft.Lifecycle;
 using ThabeSoft.Modbus;
 using ThabeSoft.Primitives;
 using ThabeSoft.Primitives.Binary;
-using ThabeSoft.Startable;
 
 namespace ThabeSoft.ProtocolGateway;
 
@@ -43,26 +43,26 @@ public sealed class ModbusChannel(IModbusMaster master) : IReadWriteChannel
             if (address.FunctionCode == FunctionCode.ReadCoils)
             {
                 await ReadCoilsToByteAsync(data_mem, address.SlaveId, address.Start, master.ReadCoilsAsync, ct: cancellationToken);
-                return tag.Converter.From(data_mem.Span);
+                return tag.Serializer.Deserialize(data_mem.Span);
             }
             // 读离散输入
             if (address.FunctionCode == FunctionCode.ReadDiscreteInputs)
             {
                 await ReadCoilsToByteAsync(data_mem, address.SlaveId, address.Start, master.ReadDiscreteInputsAsync, ct: cancellationToken);
-                return tag.Converter.From(data_mem.Span);
+                return tag.Serializer.Deserialize(data_mem.Span);
             }
 
             // 读保持寄存器
             if (address.FunctionCode == FunctionCode.ReadHoldingRegisters)
             {
                 await ReadRegistersToByteAsync(data_mem, address.SlaveId, address.Start, master.ReadHoldingRegistersAsync, ct: cancellationToken);
-                return tag.Converter.From(data_mem.Span);
+                return tag.Serializer.Deserialize(data_mem.Span);
             }
             // 读输入寄存器
             if (address.FunctionCode == FunctionCode.ReadInputRegisters)
             {
                 await ReadRegistersToByteAsync(data_mem, address.SlaveId, address.Start, master.ReadInputRegistersAsync, ct: cancellationToken);
-                return tag.Converter.From(data_mem.Span);
+                return tag.Serializer.Deserialize(data_mem.Span);
             }
         }
         finally
@@ -87,7 +87,7 @@ public sealed class ModbusChannel(IModbusMaster master) : IReadWriteChannel
             //await master.WriteMultipleCoilsAsync(address.SlaveId, address.Start,  cancellationToken);
             Span<byte> c = stackalloc byte[1];
 
-            return tag.Converter.From(c);
+            return tag.Serializer.Deserialize(c);
         }
 
         if (address.FunctionCode == FunctionCode.WriteMultipleRegisters)
@@ -99,7 +99,7 @@ public sealed class ModbusChannel(IModbusMaster master) : IReadWriteChannel
         {
             //await master.ReadInputRegistersAsync(buffer, address.SlaveId, address.Start, 1, cancellationToken);
             Span<byte> c = stackalloc byte[1];
-            return tag.Converter.From(c);
+            return tag.Serializer.Deserialize(c);
         }
 
         if (address.FunctionCode == FunctionCode.WriteSingleRegister)

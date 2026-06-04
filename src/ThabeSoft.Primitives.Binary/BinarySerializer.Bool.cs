@@ -12,12 +12,12 @@ public sealed class BoolSerializer :
 
 
 
-    public Result<bool> From(ReadOnlySpan<byte> source)
+    public Result<bool> Deserialize(ReadOnlySpan<byte> source)
     {
         if (source.Length < 1) return Result.Error<bool>("读取失败, 没有数据");
         return Result.Success(source[0] != 0);
     }
-    public Result To(bool source, Span<byte> destination)
+    public Result Serialize(bool source, Span<byte> destination)
     {
         if (destination.Length < 1) return Result.Error("布尔转为字节组失败, 至少需要1字节缓冲区");
 

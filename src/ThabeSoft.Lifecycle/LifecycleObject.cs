@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using ThabeSoft.Primitives;
 
-namespace ThabeSoft.Startable;
+namespace ThabeSoft.Lifecycle;
 
 /// <summary>
 /// 一个可通知状态的启动对象

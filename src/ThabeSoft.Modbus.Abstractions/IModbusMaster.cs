@@ -1,5 +1,5 @@
-﻿using ThabeSoft.Primitives;
-using ThabeSoft.Startable;
+﻿using ThabeSoft.Lifecycle;
+using ThabeSoft.Primitives;
 
 namespace ThabeSoft.Modbus;
 

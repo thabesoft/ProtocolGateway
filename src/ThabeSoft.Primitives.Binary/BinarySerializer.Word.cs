@@ -34,11 +34,11 @@ public sealed class WordSerializer :
     }
 
 
-    Result<ushort> IBinarySerializer<ushort>.From(ReadOnlySpan<byte> source) => From(source);
-    Result<short> IBinarySerializer<short>.From(ReadOnlySpan<byte> source) => From(source).Map(x => (short)x);
-    Result<char> IBinarySerializer<char>.From(ReadOnlySpan<byte> source) => From(source).Map(x => (char)x);
+    Result<ushort> IBinarySerializer<ushort>.Deserialize(ReadOnlySpan<byte> source) => From(source);
+    Result<short> IBinarySerializer<short>.Deserialize(ReadOnlySpan<byte> source) => From(source).Map(x => (short)x);
+    Result<char> IBinarySerializer<char>.Deserialize(ReadOnlySpan<byte> source) => From(source).Map(x => (char)x);
 
-    Result IBinarySerializer<ushort>.To(ushort source, Span<byte> destination) => To(source, destination);
-    Result IBinarySerializer<short>.To(short source, Span<byte> destination) => To((ushort)source, destination);
-    Result IBinarySerializer<char>.To(char source, Span<byte> destination) => To(source, destination);
+    Result IBinarySerializer<ushort>.Serialize(ushort source, Span<byte> destination) => To(source, destination);
+    Result IBinarySerializer<short>.Serialize(short source, Span<byte> destination) => To((ushort)source, destination);
+    Result IBinarySerializer<char>.Serialize(char source, Span<byte> destination) => To(source, destination);
 }

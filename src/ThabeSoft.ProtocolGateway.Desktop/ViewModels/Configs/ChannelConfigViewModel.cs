@@ -1,12 +1,12 @@
 ﻿using Avalonia.Collections;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.Input;
+using ThabeSoft.Lifecycle;
 using ThabeSoft.Mvvm;
 using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Configuration;
 using ThabeSoft.ProtocolGateway.Runtime;
 using ThabeSoft.ProtocolGateway.Services;
-using ThabeSoft.Startable;
 
 namespace ThabeSoft.ProtocolGateway.ViewModels;
 

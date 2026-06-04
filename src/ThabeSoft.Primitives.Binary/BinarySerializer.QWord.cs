@@ -28,11 +28,11 @@ public sealed class QWordSerializer(QWordLayout layout) :
     }
 
 
-    Result<ulong> IBinarySerializer<ulong>.From(ReadOnlySpan<byte> source) => From(source);
-    Result<long> IBinarySerializer<long>.From(ReadOnlySpan<byte> source) => From(source).Map(x => (long)x);
-    Result<double> IBinarySerializer<double>.From(ReadOnlySpan<byte> source) => From(source).Map(x => (double)x);
+    Result<ulong> IBinarySerializer<ulong>.Deserialize(ReadOnlySpan<byte> source) => From(source);
+    Result<long> IBinarySerializer<long>.Deserialize(ReadOnlySpan<byte> source) => From(source).Map(x => (long)x);
+    Result<double> IBinarySerializer<double>.Deserialize(ReadOnlySpan<byte> source) => From(source).Map(x => (double)x);
 
-    Result IBinarySerializer<ulong>.To(ulong source, Span<byte> destination) => To(source, destination);
-    Result IBinarySerializer<long>.To(long source, Span<byte> destination) => To((ulong)source, destination);
-    Result IBinarySerializer<double>.To(double source, Span<byte> destination) => To((ulong)source, destination);
+    Result IBinarySerializer<ulong>.Serialize(ulong source, Span<byte> destination) => To(source, destination);
+    Result IBinarySerializer<long>.Serialize(long source, Span<byte> destination) => To((ulong)source, destination);
+    Result IBinarySerializer<double>.Serialize(double source, Span<byte> destination) => To((ulong)source, destination);
 }

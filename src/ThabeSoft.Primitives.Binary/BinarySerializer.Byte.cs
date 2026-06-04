@@ -22,7 +22,7 @@ public readonly struct ByteSerializer :
     }
 
 
-    public Result<byte> From(ReadOnlySpan<byte> source)
+    public Result<byte> Deserialize(ReadOnlySpan<byte> source)
     {
         if (source.Length < 1) return Result.Error<byte>("至少需要1字节");
         Span<bool> bits = stackalloc bool[8];
@@ -32,7 +32,7 @@ public readonly struct ByteSerializer :
         if (!bits_result.IsSuccess) return bits_result.Cast<byte>();
         return bits.ToByte();
     }
-    public Result To(byte source, Span<byte> destination)
+    public Result Serialize(byte source, Span<byte> destination)
     {
         if (destination.Length < 1) return Result.Error("缓冲区至少需要1字节");
         destination[0] = source;
@@ -40,12 +40,12 @@ public readonly struct ByteSerializer :
     }
 
 
-    Result<sbyte> IBinarySerializer<sbyte>.From(ReadOnlySpan<byte> source)
+    Result<sbyte> IBinarySerializer<sbyte>.Deserialize(ReadOnlySpan<byte> source)
     {
-        return From(source).Map(x => (sbyte)x);
+        return Deserialize(source).Map(x => (sbyte)x);
     }
-    Result IBinarySerializer<sbyte>.To(sbyte source, Span<byte> destination)
+    Result IBinarySerializer<sbyte>.Serialize(sbyte source, Span<byte> destination)
     {
-        return To((byte)source, destination);
+        return Serialize((byte)source, destination);
     }
 }

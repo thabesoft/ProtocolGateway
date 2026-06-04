@@ -1,5 +1,6 @@
 ﻿using System.Buffers;
 using System.ComponentModel;
+using ThabeSoft.Lifecycle;
 using ThabeSoft.Modbus.Encoding;
 using ThabeSoft.Modbus.Headers;
 using ThabeSoft.Modbus.Layouts;
@@ -7,7 +8,6 @@ using ThabeSoft.Modbus.Primitives;
 using ThabeSoft.Ports;
 using ThabeSoft.Primitives;
 using ThabeSoft.Primitives.Binary;
-using ThabeSoft.Startable;
 
 namespace ThabeSoft.Modbus;
 

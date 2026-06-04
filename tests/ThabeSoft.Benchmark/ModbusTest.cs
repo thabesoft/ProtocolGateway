@@ -11,9 +11,9 @@ internal static class ModbusTest
     public static async Task Fuck(CancellationToken cancellationToken = default)
     {
         // 端口
-        SerialPortTransport transport = new();
-        transport.ChangeOptions(SerialPortOptions.Create("Com2"));
-        await transport.StartAsync(cancellationToken);
+        var transport = new SerialPortTransport();
+        transport.SetOptions(SerialPortOptions.Create("Com2"));
+        await ((ITransport)transport).StartAsync(cancellationToken);
 
         // 网关
         IRuntimeGateway gateway = default!;
@@ -21,7 +21,7 @@ internal static class ModbusTest
 
         // 通道
         ModbusRtuMaster master = new(transport);
-        gateway.AddModbusChannel(channel_name, master);
+        //gateway.AddModbusChannel(channel_name, master);
 
         // 轮询
         var tag = ModbusTagFactory.ReadHoldingRegisterDWord(channel_name, 1, 100);

@@ -60,7 +60,7 @@ public static class PortConfigExtensions
 
             // 创建
             var transport = new SerialPortTransport();
-            transport.ChangeOptions(options_result.Value);
+            transport.SetOptions(options_result.Value);
 
             return Result.Success(transport);
         }
