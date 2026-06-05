@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Diagnostics;
 using ThabeSoft.ProtocolGateway.Services;
-using ThabeSoft.ProtocolGateway.Services.Application;
 
 namespace ThabeSoft.ProtocolGateway;
 

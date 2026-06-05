@@ -6,6 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+		<RootNamespace>ThabeSoft</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -13,13 +14,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\src\ThabeSoft.Modbus.Rtu.Master\ThabeSoft.Modbus.Rtu.Master.csproj" />
-	  <ProjectReference Include="..\..\src\ThabeSoft.Modbus.Rtu.Slave\ThabeSoft.Modbus.Rtu.Slave.csproj" />
-	  <ProjectReference Include="..\..\src\ThabeSoft.Modbus.Rtu\ThabeSoft.Modbus.Rtu.csproj" />
-	  <ProjectReference Include="..\..\src\ThabeSoft.Ports.SerialPort\ThabeSoft.Ports.SerialPort.csproj" />
-	  <ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.Abstractions\ThabeSoft.ProtocolGateway.Abstractions.csproj" />
-	  <ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.ConfigurationActivator\ThabeSoft.ProtocolGateway.Runtime.csproj" />
-	  <ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.Modbus\ThabeSoft.ProtocolGateway.Modbus.csproj" />
+		<ProjectReference Include="..\..\src\ThabeSoft.Modbus.Rtu.Master\ThabeSoft.Modbus.Rtu.Master.csproj" />
+		<ProjectReference Include="..\..\src\ThabeSoft.Modbus.Rtu.Slave\ThabeSoft.Modbus.Rtu.Slave.csproj" />
+		<ProjectReference Include="..\..\src\ThabeSoft.Modbus.Rtu\ThabeSoft.Modbus.Rtu.csproj" />
+		<ProjectReference Include="..\..\src\ThabeSoft.Ports.SerialPort\ThabeSoft.Ports.SerialPort.csproj" />
+		<ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.Abstractions\ThabeSoft.ProtocolGateway.Abstractions.csproj" />
+		<ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.Runtime\ThabeSoft.ProtocolGateway.Runtime.csproj" />
+		<ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.Modbus\ThabeSoft.ProtocolGateway.Modbus.csproj" />
 	</ItemGroup>
 
 </Project>

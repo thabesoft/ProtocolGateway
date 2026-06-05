@@ -1,4 +1,4 @@
-﻿using ThabeSoft.ProtocolGateway.ViewModels;
+﻿using ThabeSoft.ProtocolGateway.ViewModels.Pages;
 
 namespace ThabeSoft.ProtocolGateway.Messages;
 

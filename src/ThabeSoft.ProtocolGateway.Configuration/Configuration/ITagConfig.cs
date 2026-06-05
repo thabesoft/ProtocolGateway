@@ -3,7 +3,7 @@
 /// <summary>
 /// 只读配置
 /// </summary>
-public interface ITagConfig : IValidatable
+public interface ITagConfig
 {
     /// <summary>
     /// 名称

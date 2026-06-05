@@ -1,4 +1,5 @@
-﻿using System.IO.Ports;
+﻿using System.Diagnostics;
+using System.IO.Ports;
 using ThabeSoft.Lifecycle;
 using ThabeSoft.Primitives;
 
@@ -8,50 +9,57 @@ namespace ThabeSoft.Ports;
 /// <summary>
 /// 串口传输器
 /// </summary>
-public sealed class SerialPortTransport : LifecycleObject, ITransport
+public sealed class SerialPortTransport(ISerialPortOptions options) : LifecycleObject, ITransport
 {
-    private SerialPort? port;
-    private ISerialPortOptions? _options;
+    private SerialPort? _serialPort;
+    private ISerialPortOptions _options = options;
     private readonly DuplexLock _duplexLock = new();
 
 
     // 启动
-    protected override async ValueTask<Result> StartAsync(CancellationToken cancellationToken = default)
+    protected override async ValueTask<Result> StartProcessAsync(CancellationToken cancellationToken = default)
     {
-        if (_options is not ISerialPortOptions serialOptions)
-        {
-            return Result.Error("当前配置不持支创建串口链接");
-        }
+        var result = GetOrCreateSerialPort();
+        if (result.IsFailure) return result;
 
-        return CreateSerialPort(_options).Tap(x =>
-        {
-            port = x;
-            port.Open();
-        });
+        result.Value.Open();
+        return Result.Success();
     }
     // 结束
-    protected override async ValueTask<Result> StopAsync(CancellationToken cancellationToken = default)
+    protected override async ValueTask<Result> StopProcessAsync(CancellationToken cancellationToken = default)
     {
-        port?.Close();
+        var result = GetOrCreateSerialPort();
+        if (result.IsFailure) return result;
+
+        result.Value.Close();
         return Result.Success();
     }
     // 释放
-    protected override async ValueTask DisposeAsync()
+    protected override async ValueTask DisposeProcessAsync()
     {
-        await StopAsync();
+        await StopProcessAsync();
     }
 
 
-    // 改变配置
-    public Result SetOptions(ISerialPortOptions options)
+    /// <summary>
+    /// 更新配置 (更新之后会停止传输, 需要重新启动)
+    /// </summary>
+    public Result UpdateOptions(ISerialPortOptions options)
     {
-        using var _ = LockAsync();
+        using var _ = Lock();
+        if (IsRunning || !IsStopped) return Result.Error("无法在启动状态修改配置, 请停止传输后修改");
 
-        if (State == LifecycleState.Starting || State == LifecycleState.Running)
+        // 停止
+        try
         {
-            return Result.Error("无法在启动状态修改配置, 请停止传输后修改");
+            _serialPort?.Close();
+        }
+        catch(Exception ex)
+        {
+            Debug.WriteLine($"警告: 串口在变更配置时关闭失败, {ex.Message}");
         }
 
+        // 修改配置
         _options = options;
         return Result.Success();
     }
@@ -60,19 +68,20 @@ public sealed class SerialPortTransport : LifecycleObject, ITransport
     // 读取
     public async ValueTask<Result> ReadExactAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
     {
-        if (port?.IsOpen != true || State != LifecycleState.Running)
-            return Result.Error<int>("未连接无法读取数据");
+        if (!IsRunning) return Result.Error("无法读取, 串口未连接");
 
-        if (_options is null)
-            return Result.Error("串口未配置, 无法读取数据");
-
-
+        // 等待解锁
         using var _ = await _duplexLock.GetReadLockAsync(_options.DuplexMode, cancellationToken);
         using var __ = await LockAsync(cancellationToken);
+        if (!IsRunning) return Result.Error("无法读取, 串口未连接");
+
+        // 获取串口
+        var result = GetOrCreateSerialPort();
+        if (result.IsFailure) return result;
 
         try
         {
-            await port.BaseStream.ReadExactAsync(buffer, cancellationToken);
+            await result.Value.BaseStream.ReadExactAsync(buffer, cancellationToken);
             return Result.Success();
         }
         catch (InvalidOperationException)
@@ -87,19 +96,20 @@ public sealed class SerialPortTransport : LifecycleObject, ITransport
     // 写入
     public async ValueTask<Result> WriteAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
     {
-        if (port?.IsOpen != true || State != LifecycleState.Running)
-            return Result.Error("未连接无法写入数据");
+        if (!IsRunning) return Result.Error("无法读取, 串口未连接");
 
-        if (_options is null)
-            return Result.Error("串口未配置, 无法写入数据");
-
-
+        // 等待解锁
         using var _ = await _duplexLock.GetWriteLockAsync(_options.DuplexMode, cancellationToken);
         using var __ = await LockAsync(cancellationToken);
+        if (!IsRunning) return Result.Error("无法读取, 串口未连接");
+
+        // 获取串口
+        var result = GetOrCreateSerialPort();
+        if (result.IsFailure) return result;
 
         try
         {
-            await port.BaseStream.WriteAsync(data, cancellationToken);
+            await result.Value.BaseStream.WriteAsync(data, cancellationToken);
             return Result.Success();
         }
         catch (InvalidOperationException)
@@ -109,22 +119,24 @@ public sealed class SerialPortTransport : LifecycleObject, ITransport
     }
 
 
-    // 从配置创建串口
-    private static Result<SerialPort> CreateSerialPort(ISerialPortOptions options)
+    // 获取或创建串口
+    private Result<SerialPort> GetOrCreateSerialPort()
     {
+        if (_serialPort is not null) return Result.Success(_serialPort);
+
         try
         {
-            var value = new SerialPort(options.PortName, options.BaudRate, (System.IO.Ports.Parity)options.Parity, options.DataBits, (System.IO.Ports.StopBits)options.StopBits)
+            _serialPort = new SerialPort(_options.PortName, _options.BaudRate, (System.IO.Ports.Parity)_options.Parity, _options.DataBits, (System.IO.Ports.StopBits)_options.StopBits)
             {
-                ReadTimeout = (int)options.ReadTimeout.TotalMilliseconds,
-                WriteTimeout = (int)options.WriteTimeout.TotalMilliseconds
+                ReadTimeout = (int)_options.ReadTimeout.TotalMilliseconds,
+                WriteTimeout = (int)_options.WriteTimeout.TotalMilliseconds
             };
 
-            return Result.Success(value);
+            return Result.Success(_serialPort);
         }
-        catch (IOException ex)
+        catch(Exception ex)
         {
-            return Result.Error<SerialPort>($"无法创建串口: {ex.Message}");
+            return Result.Error<SerialPort>($"串口获取失败: {ex.Message}");
         }
     }
 }

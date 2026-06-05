@@ -4,14 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              
              xmlns:vm="using:ThabeSoft.ProtocolGateway.ViewModels"
+             xmlns:page_vm="using:ThabeSoft.ProtocolGateway.ViewModels.Pages"
              
-             x:Class="ThabeSoft.ProtocolGateway.Views.ChannelPage"
+             x:Class="ThabeSoft.ProtocolGateway.Views.Pages.ChannelPage"
 
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:DataType="vm:ChannelPageViewModel">
+             x:DataType="page_vm:ChannelPageViewModel">
 
     <UserControl.DataContext>
-        <vm:ChannelPageViewModel />
+        <page_vm:ChannelPageViewModel />
     </UserControl.DataContext>
 
     <Grid RowDefinitions="Auto,*">

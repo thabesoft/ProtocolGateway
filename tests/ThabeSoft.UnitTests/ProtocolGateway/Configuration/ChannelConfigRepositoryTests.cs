@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using Moq;
 using ThabeSoft.ProtocolGateway.Configuration.Internal;
-using ThabeSoft.ProtocolGateway.Configuration.Internal.Json;
+using ThabeSoft.ProtocolGateway.Configuration.Json;
 using ThabeSoft.ProtocolGateway.Configuration.Options;
 using ThabeSoft.ProtocolGateway.Infrastructure.Json;
 
@@ -20,7 +20,7 @@ public class ChannelConfigRepositoryTests
     public async Task FindByNameAsync_ShouldReturnConfig_WhenFileExists(string name)
     {
         // Arrange
-        var config = new GatewayConfig { Name = name };
+        var config = new Internal.GatewayConfig { Name = name };
         var tempFile = Path.GetTempFileName();
 
         var options = Mock.Of<IOptions<IConfigOptions>>(x =>
@@ -52,7 +52,7 @@ public class ChannelConfigRepositoryTests
         // Arrange
         var tempFile = Path.GetTempFileName();
 
-        var config = new GatewayConfig { Name = name, Channels = [] };
+        var config = new Internal.GatewayConfig { Name = name, Channels = [] };
 
         var options = Mock.Of<IOptions<IConfigOptions>>(x =>
             x.Value.GetGatewayConfigFilePath(name) == tempFile);

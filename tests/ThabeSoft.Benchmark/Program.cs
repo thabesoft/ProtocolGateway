@@ -1,9 +1,5 @@
 ﻿using BenchmarkDotNet.Running;
-using ThabeSoft.Benchmark;
-using ThabeSoft.Benchmark.Modbus.Encoding;
+using ThabeSoft.Primitives;
 
 //BenchmarkRunner.Run<Benchmark>();
-
-//BenchmarkRunner.Run<Benchmark>();
-
-await ModbusTest.Fuck();
+BenchmarkRunner.Run<ResultBenchmark>();

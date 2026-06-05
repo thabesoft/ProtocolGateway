@@ -4,14 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 
              xmlns:vm="using:ThabeSoft.ProtocolGateway.ViewModels"
+             xmlns:pageVM="using:ThabeSoft.ProtocolGateway.ViewModels.Pages"
 
-             x:Class="ThabeSoft.ProtocolGateway.Views.ChannelDetailsPage"
+             x:Class="ThabeSoft.ProtocolGateway.Views.Pages.ChannelDetailsPage"
 
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:DataType="vm:ChannelDetailsPageViewModel">
+             x:DataType="pageVM:ChannelDetailsPageViewModel">
 
     <UserControl.DataContext>
-        <vm:ChannelDetailsPageViewModel />
+        <pageVM:ChannelDetailsPageViewModel />
     </UserControl.DataContext>
 
 
@@ -121,7 +122,7 @@
 
                     <ContentControl.DataTemplates>
 
-                        <DataTemplate DataType="vm:PortConfigViewModel">
+                        <DataTemplate DataType="vm:RuntimePortViewModel">
 
                             <StackPanel Orientation="Vertical">
 

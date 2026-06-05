@@ -41,7 +41,7 @@ public interface ISerialPortOptions : ITransportOptions
 /// <summary>
 /// Modbus 串口选项
 /// </summary>
-public sealed class SerialPortOptions : TransportOptions, ISerialPortOptions
+public sealed record class SerialPortOptions : TransportOptions, ISerialPortOptions, IDeepCloneable<SerialPortOptions>
 {
     /// <summary>
     /// 端口名
@@ -125,5 +125,10 @@ public sealed class SerialPortOptions : TransportOptions, ISerialPortOptions
 
         DuplexMode = duplexMode;
         return this;
+    }
+
+    public SerialPortOptions DeepClone()
+    {
+        return this with { };
     }
 }

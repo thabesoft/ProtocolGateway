@@ -1,0 +1,106 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        
+        xmlns:chrome="using:Avalonia.Controls.Chrome"
+        xmlns:vm="using:ThabeSoft.ProtocolGateway.ViewModels"
+        xmlns:shell_vm="using:ThabeSoft.ProtocolGateway.ViewModels.Shells"
+        
+        x:Class="ThabeSoft.ProtocolGateway.Views.Shells.MainWindow"
+        x:DataType="shell_vm:MainWindowViewModel"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+
+        ExtendClientAreaToDecorationsHint="True"
+        SizeToContent="Manual"
+        WindowDecorations="BorderOnly"
+        Title="ProtocolGateway.Desktop">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+
+                <!-- 浅色主题 -->
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="TitleBarForeground" Color="#FFFFFF"/>
+                    <SolidColorBrush x:Key="TitleBarBackground" Color="#1d63ed"/>
+                    <SolidColorBrush x:Key="ContentForeground" Color="#333333"/>
+                    <SolidColorBrush x:Key="ContentBackground" Color="#FFFFFF"/>
+                </ResourceDictionary>
+
+                <!-- 深色主题 -->
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="TitleBarForeground" Color="#b3bfdc"/>
+                    <SolidColorBrush x:Key="TitleBarBackground" Color="#051b51"/>
+                    <SolidColorBrush x:Key="ContentForeground" Color="#EEEEEE"/>
+                    <SolidColorBrush x:Key="ContentBackground" Color="#10151b"/>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Window.Styles>
+
+        <!--标题栏按钮-->
+        <Style Selector="Button.TitleBar">
+
+            <Setter Property="Foreground" Value="{DynamicResource TitleBarForeground}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Width" Value="32"/>
+            <Setter Property="Height" Value="25"/>
+            <Setter Property="Padding" Value="2"/>
+
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="CornerRadius" Value="0"/>
+
+        </Style>
+
+    </Window.Styles>
+
+    <Grid RowDefinitions="60,*" Background="{DynamicResource ContentBackground}">
+
+        <!--标题栏-->
+        <DockPanel Grid.Row="0" Background="{DynamicResource TitleBarBackground}"
+                   chrome:WindowDecorationProperties.ElementRole="TitleBar">
+
+            <!--功能按钮-->
+            <StackPanel Margin="0 0 10 0" DockPanel.Dock="Right" Orientation="Horizontal">
+
+                <Button Classes="TitleBar" Content="⚙️"></Button>
+
+                <Separator Height="20" Width="1"></Separator>
+
+                <!--最小化-->
+                <Button x:Name="MinimizeButton"
+                        Classes="TitleBar"
+                        Content="―"
+                        chrome:WindowDecorationProperties.ElementRole="MinimizeButton"/>
+                <!--最大化-->
+                <Button x:Name="MaximizeButton"
+                        Classes="TitleBar"
+                        Content="□"
+                        chrome:WindowDecorationProperties.ElementRole="MaximizeButton"/>
+                <!--关闭-->
+                <Button x:Name="CloseButton"
+                        Classes="TitleBar"
+                        Content="✕"
+                        chrome:WindowDecorationProperties.ElementRole="CloseButton"/>
+
+            </StackPanel>
+
+            <!--标题-->
+            <TextBlock Foreground="{DynamicResource TitleBarForeground}"
+                       Margin="10 0"
+                       VerticalAlignment="Center"
+                       Text="{Binding $parent[Window].Title}"/>
+
+        </DockPanel>
+
+        <!--内容-->
+        <ContentControl Grid.Row="1" Content="{Binding Content}" />
+
+    </Grid>
+
+</Window>

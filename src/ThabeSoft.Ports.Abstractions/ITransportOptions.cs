@@ -30,7 +30,7 @@ public interface ITransportOptions
 /// <summary>
 /// 传输器配置
 /// </summary>
-public abstract class TransportOptions : ITransportOptions
+public abstract record class TransportOptions : ITransportOptions
 {
     public int RetryCount { get; } = 3;
     public TimeSpan RetryInterval { get; } = TimeSpan.FromSeconds(1);

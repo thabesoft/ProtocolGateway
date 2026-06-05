@@ -30,8 +30,18 @@ public abstract class LifecycleObject : ILifecycle
         }
     }
 
+    /// <summary>
+    /// 是否在运行
+    /// </summary>
+    public bool IsRunning => State == LifecycleState.Running;
+    /// <summary>
+    /// 是否已停止
+    /// </summary>
+    public bool IsStopped => State == LifecycleState.Stopped;
+
+
     // 启动
-    async ValueTask<Result> ILifecycle.StartAsync(CancellationToken cancellationToken)
+    public async ValueTask<Result> StartAsync(CancellationToken cancellationToken)
     {
         using var _ = await _lock.LockAsync(cancellationToken);
 
@@ -49,7 +59,7 @@ public abstract class LifecycleObject : ILifecycle
             State = LifecycleState.Starting;
 
             // 启动结果
-            var start_result = await StartAsync(cancellationToken);
+            var start_result = await StartProcessAsync(cancellationToken);
             State = can_start_result.IsSuccess ? LifecycleState.Running : LifecycleState.Faulted;
 
             // 返回结果
@@ -62,7 +72,7 @@ public abstract class LifecycleObject : ILifecycle
         }
     }
     // 停止
-    async ValueTask<Result> ILifecycle.StopAsync(CancellationToken cancellationToken)
+    public async ValueTask<Result> StopAsync(CancellationToken cancellationToken)
     {
         using var _ = await _lock.LockAsync(cancellationToken);
 
@@ -80,7 +90,7 @@ public abstract class LifecycleObject : ILifecycle
             State = LifecycleState.Stopping;
 
             // 停止结果
-            var start_result = await StopAsync(cancellationToken);
+            var start_result = await StopProcessAsync(cancellationToken);
             State = can_stop_result.IsSuccess ? LifecycleState.Stopped : LifecycleState.Faulted;
 
             // 返回结果
@@ -92,14 +102,15 @@ public abstract class LifecycleObject : ILifecycle
             return Result.Error($"停止失败, {ex.Message}");
         }
     }
-    async ValueTask IAsyncDisposable.DisposeAsync()
+    // 释放
+    public async ValueTask DisposeAsync()
     {
         if (State == LifecycleState.Disposed) return;
 
         using var _ = await _lock.LockAsync();
         try
         {
-            await DisposeAsync();
+            await DisposeProcessAsync();
             State = LifecycleState.Disposed;
         }
         finally
@@ -154,17 +165,25 @@ public abstract class LifecycleObject : ILifecycle
         return await _lock.LockAsync(cancellationToken);
     }
 
+    /// <summary>
+    /// 获取生命周期锁，确保状态转换的原子性
+    /// </summary>
+    protected IDisposable Lock()
+    {
+        return _lock.Lock();
+    }
+
 
     /// <summary>
     /// 启动过程
     /// </summary>
-    protected abstract ValueTask<Result> StartAsync(CancellationToken cancellationToken = default);
+    protected abstract ValueTask<Result> StartProcessAsync(CancellationToken cancellationToken = default);
     /// <summary>
     /// 停止过程
     /// </summary>
-    protected abstract ValueTask<Result> StopAsync(CancellationToken cancellationToken = default);
+    protected abstract ValueTask<Result> StopProcessAsync(CancellationToken cancellationToken = default);
     /// <summary>
     /// 释放过程
     /// </summary>
-    protected virtual ValueTask DisposeAsync() => default;
+    protected virtual ValueTask DisposeProcessAsync() => default;
 }

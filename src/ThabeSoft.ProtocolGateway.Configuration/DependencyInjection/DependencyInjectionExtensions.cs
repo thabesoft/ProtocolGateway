@@ -1,6 +1,5 @@
 ﻿using ThabeSoft.ProtocolGateway.Configuration;
-using ThabeSoft.ProtocolGateway.Configuration.Internal;
-using ThabeSoft.ProtocolGateway.Configuration.Internal.Json;
+using ThabeSoft.ProtocolGateway.Configuration.Json;
 using ThabeSoft.ProtocolGateway.Configuration.Options;
 using ThabeSoft.ProtocolGateway.Infrastructure.Json;
 

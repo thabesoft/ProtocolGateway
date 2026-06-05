@@ -3,15 +3,15 @@
 /// <summary>
 /// 网关配置
 /// </summary>
-public interface IGatewayConfig : IValidatable
+public interface IGatewayConfig
 {
     /// <summary>
-    /// 网关名称
+    /// 名称
     /// </summary>
-    string Name { get; }
+    string Name { get; init; }
 
     /// <summary>
-    /// 所有通道
+    /// 通道
     /// </summary>
     IReadOnlyList<IChannelConfig> Channels { get; }
 }

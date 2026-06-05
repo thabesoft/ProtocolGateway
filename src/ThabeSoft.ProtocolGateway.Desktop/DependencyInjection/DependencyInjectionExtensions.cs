@@ -1,16 +1,12 @@
-﻿using Avalonia;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+﻿using Microsoft.Extensions.DependencyInjection.Extensions;
 using ThabeSoft.ProtocolGateway;
 using ThabeSoft.ProtocolGateway.Services;
-using ThabeSoft.ProtocolGateway.Services.Application;
-using ThabeSoft.ProtocolGateway.Services.Channel;
-using ThabeSoft.ProtocolGateway.Services.Icon;
-using ThabeSoft.ProtocolGateway.Services.Menu;
-using ThabeSoft.ProtocolGateway.Services.Navigation;
-using ThabeSoft.ProtocolGateway.Services.View;
-using ThabeSoft.ProtocolGateway.Services.ViewModel;
+using ThabeSoft.ProtocolGateway.Services.Internals;
 using ThabeSoft.ProtocolGateway.ViewModels;
-using ThabeSoft.ProtocolGateway.Views;
+using ThabeSoft.ProtocolGateway.ViewModels.Pages;
+using ThabeSoft.ProtocolGateway.ViewModels.Shells;
+using ThabeSoft.ProtocolGateway.Views.Pages;
+using ThabeSoft.ProtocolGateway.Views.Shells;
 
 
 #pragma warning disable IDE0130 // 命名空间与文件夹结构不匹配
