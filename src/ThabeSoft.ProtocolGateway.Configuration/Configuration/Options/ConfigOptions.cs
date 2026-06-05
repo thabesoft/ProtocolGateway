@@ -4,20 +4,19 @@
 /// <summary>
 /// 配置选项
 /// </summary>
-public sealed class ConfigOptions
+public sealed class ConfigOptions : IConfigOptions
 {
     /// <summary>
-    /// 配置文件目录
+    /// 配置根目录
     /// </summary>
     public required string Directory { get; init; } = "Configs";
 
     /// <summary>
-    /// 获取网关配置文件路径
+    /// 网关配置文件路径
     /// </summary>
-    /// <param name="gatewayName">网关名称</param>
-    public string GetGatewayConfigFilePath(string gatewayName = "Default.json")
+    public string GetGatewayConfigFilePath(string gatewayName = "Default")
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(gatewayName);
-        return Path.Combine(Directory, gatewayName);
+        return Path.Combine(Directory, $"{gatewayName}.json");
     }
 }

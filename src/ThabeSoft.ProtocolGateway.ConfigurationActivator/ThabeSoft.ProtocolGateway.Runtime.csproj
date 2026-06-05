@@ -1,15 +1,17 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFrameworks>net8.0;net10.0</TargetFrameworks>
 		<RootNamespace>ThabeSoft.ProtocolGateway</RootNamespace>
 	</PropertyGroup>
 
+	<!--包引用-->
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.8" />
 		<PackageReference Include="System.Reactive" Version="6.1.0" />
 	</ItemGroup>
 
+	<!--项目应用-->
 	<ItemGroup>
 	  <ProjectReference Include="..\ThabeSoft.LanguageExtensions\ThabeSoft.LanguageExtensions.csproj" />
 	  <ProjectReference Include="..\ThabeSoft.Ports.SerialPort\ThabeSoft.Ports.SerialPort.csproj" />
@@ -17,10 +19,9 @@
 	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.Modbus\ThabeSoft.ProtocolGateway.Modbus.csproj" />
 	</ItemGroup>
 
+	<!--对测试项目开放-->
 	<ItemGroup>
-		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-			<_Parameter1>ThabeSoft.UnitTests</_Parameter1>
-		</AssemblyAttribute>
+		<InternalsVisibleTo Include="ThabeSoft.UnitTests" />
 	</ItemGroup>
 
 </Project>

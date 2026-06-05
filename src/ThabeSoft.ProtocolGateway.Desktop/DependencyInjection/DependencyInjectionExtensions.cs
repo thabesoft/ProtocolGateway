@@ -69,7 +69,7 @@ public static class DependencyInjectionExtensions
             services.TryAddTransient<ChannelDetailsPage>();
             services.TryAddTransient<ChannelDetailsPageViewModel>();
             // 通道配置
-            services.TryAddTransient<ChannelConfigViewModel>();
+            services.TryAddTransient<RuntimeChannelViewModel>();
 
 
             // 初始化

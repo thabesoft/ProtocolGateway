@@ -12,7 +12,7 @@ namespace ThabeSoft.ProtocolGateway.ViewModels;
 public sealed partial class ChannelDetailsPageViewModel : ViewModelBase
 {
     // 通道名称
-    public ChannelConfigViewModel? Channel
+    public RuntimeChannelViewModel? Channel
     {
         get; set => Apply(field, value, x => field = x);
     }

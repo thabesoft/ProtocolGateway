@@ -27,4 +27,8 @@
 		<ProjectReference Include="..\..\src\ThabeSoft.ProtocolGateway.Tags\ThabeSoft.ProtocolGateway.Tags.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="ProtocolGateway\Runtime\" />
+	</ItemGroup>
+
 </Project>

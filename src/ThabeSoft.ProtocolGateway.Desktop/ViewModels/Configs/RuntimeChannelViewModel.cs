@@ -12,9 +12,9 @@ namespace ThabeSoft.ProtocolGateway.ViewModels;
 
 
 /// <summary>
-/// 通道配置
+/// 运行时通道视图模型
 /// </summary>
-public sealed partial class ChannelConfigViewModel : ViewModelBase
+public sealed partial class RuntimeChannelViewModel : ViewModelBase
 {
     private readonly Lock _lock = new();
 
@@ -84,7 +84,7 @@ public sealed partial class ChannelConfigViewModel : ViewModelBase
     public bool IsModbusProtocol => Protocol is ProtocolType.ModbusRtu or ProtocolType.ModbusTcp or ProtocolType.ModbusUdp;
 
 
-    public ChannelConfigViewModel()
+    public RuntimeChannelViewModel()
     {
         if (Design.IsDesignMode)
         {
@@ -92,7 +92,7 @@ public sealed partial class ChannelConfigViewModel : ViewModelBase
             Protocol = ProtocolType.ModbusRtu;
         }
     }
-    public ChannelConfigViewModel(INotificationService notificationService)
+    public RuntimeChannelViewModel(INotificationService notificationService)
     {
         _notificationService = notificationService;
     }

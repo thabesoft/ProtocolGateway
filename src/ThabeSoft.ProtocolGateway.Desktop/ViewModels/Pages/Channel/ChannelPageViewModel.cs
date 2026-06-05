@@ -8,7 +8,6 @@ using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Messages;
 using ThabeSoft.ProtocolGateway.Runtime;
 using ThabeSoft.ProtocolGateway.Services;
-using ThabeSoft.ProtocolGateway.Services.Channel;
 using ThabeSoft.ProtocolGateway.Services.Navigation;
 
 namespace ThabeSoft.ProtocolGateway.ViewModels;
@@ -20,7 +19,7 @@ namespace ThabeSoft.ProtocolGateway.ViewModels;
 public sealed partial class ChannelPageViewModel : ViewModelBase, IDisposable
 {
     // 所有通道
-    private AvaloniaList<ChannelConfigViewModel> _channels = [];
+    private AvaloniaList<RuntimeChannelViewModel> _channels = [];
 
 
     public INotificationService? NotificationService
@@ -67,7 +66,7 @@ public sealed partial class ChannelPageViewModel : ViewModelBase, IDisposable
     /// <summary>
     /// 所有通道元素
     /// </summary>
-    public IReadOnlyCollection<ChannelConfigViewModel> Channels
+    public IReadOnlyCollection<RuntimeChannelViewModel> Channels
     {
         get => _channels;
         private set => Apply(_channels, value, x => _channels = [.. x]);
@@ -84,7 +83,7 @@ public sealed partial class ChannelPageViewModel : ViewModelBase, IDisposable
     {
         if(Design.IsDesignMode)
         {
-            _channels = [.. Enumerable.Range(1, Random.Shared.Next(1, 10)).Select(x => new ChannelConfigViewModel() { Name = $"测试通道{x}" })];
+            _channels = [.. Enumerable.Range(1, Random.Shared.Next(1, 10)).Select(x => new RuntimeChannelViewModel() { Name = $"测试通道{x}" })];
         }
     }
     public ChannelPageViewModel(INavigationService navigationService, IRuntimeChannel runtimeService, INotificationService notificationService)
@@ -108,7 +107,7 @@ public sealed partial class ChannelPageViewModel : ViewModelBase, IDisposable
 
     // 打开详情
     [RelayCommand(CanExecute = nameof(OpenDetailsPageCommandCanExecute))]
-    private void OpenDetailsPage(ChannelConfigViewModel item)
+    private void OpenDetailsPage(RuntimeChannelViewModel item)
     {
         if (NavigationService is null)
         {

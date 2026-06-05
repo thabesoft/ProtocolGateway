@@ -1,7 +1,5 @@
 ﻿using System.Text.Json.Serialization;
 using ThabeSoft.Modbus;
-using ThabeSoft.Ports;
-using ThabeSoft.ProtocolGateway.Configuration;
 using ThabeSoft.ProtocolGateway.Configuration.Internal;
 using ThabeSoft.ProtocolGateway.Configuration.Internal.Json.Converters;
 
@@ -17,19 +15,22 @@ namespace ThabeSoft.ProtocolGateway.Infrastructure.Json;
     PropertyNameCaseInsensitive = true,
     // 格式化输出
     WriteIndented = true,
+    // 使用枚举名称转换器
+    UseStringEnumConverter = true,
+
     // 转换器
     Converters = [
         typeof(ChannelNameConverter),
         typeof(FunctionCodeConverter),
         typeof(BaudRateConverter),
-        typeof(JsonStringEnumConverter<ChannelType>),
-        typeof(JsonStringEnumConverter<ProtocolType>),
-        typeof(JsonStringEnumConverter<PortType>),
-        typeof(JsonStringEnumConverter<TagValueType>),
+        //typeof(JsonStringEnumConverter<ChannelType>),
+        //typeof(JsonStringEnumConverter<ProtocolType>),
+        //typeof(JsonStringEnumConverter<PortType>),
+        //typeof(JsonStringEnumConverter<TagValueType>),
 
-        typeof(JsonStringEnumConverter<Parity>),
-        typeof(JsonStringEnumConverter<StopBits>),
-        typeof(JsonStringEnumConverter<DuplexMode>),
+        //typeof(JsonStringEnumConverter<Parity>),
+        //typeof(JsonStringEnumConverter<StopBits>),
+        //typeof(JsonStringEnumConverter<DuplexMode>),
     ]
 )]
 // 网关
