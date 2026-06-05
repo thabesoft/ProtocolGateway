@@ -1,8 +1,10 @@
 ﻿using System.Collections;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using ThabeSoft.Mvvm.Internals;
 
 namespace ThabeSoft.Mvvm;
+
 
 /// <summary>
 /// 视图模型
@@ -13,7 +15,7 @@ public interface IViewModel : INotifyPropertyChanged, INotifyPropertyChanging;
 /// <summary>
 /// 视图模型基类
 /// </summary>
-public abstract class ViewModel : INotifyDataErrorInfo, IErrorContainer, IPropertyChangeNotifier, IViewModel
+public abstract class ViewModel : IViewModel, INotifyDataErrorInfo, IErrorContainer, IPropertyChangeNotifier
 {
     #region --属性通知--
 
@@ -137,9 +139,13 @@ public abstract class ViewModel : INotifyDataErrorInfo, IErrorContainer, IProper
     #endregion
 
 
-    #region --更新验证--
+    #region --通知属性缓存--
 
-    protected INotifyProperty<T> Change<T>(T oldValue, T newValue,  [CallerMemberName] string? propertyName = null)
+
+    private readonly NotifyPropertyFactorty factorty = new();
+
+
+    protected INotifyProperty<T> SetProperty<T>(T oldValue, T newValue, [CallerMemberName] string? propertyName = null)
     {
         if (string.IsNullOrWhiteSpace(propertyName))
         {
@@ -153,14 +159,41 @@ public abstract class ViewModel : INotifyDataErrorInfo, IErrorContainer, IProper
             return EmptyNotifyProperty<T>.Empty;
         }
 
-        return new NotifyProperty<T>(
-            propertyName: propertyName!,
-            oldValue: oldValue,
-            newValue: newValue,
-            errorContainer: this,
-            changeNotifier: this,
-            changeHandler: (name, _, @new) => Update(name, oldValue, @new, update));
+        var property = NotifyPropertyFactorty<T>.GetOrCreate(propertyName!, this, (_, state) => new NotifyProperty<T>(state, state));
+        property.OnChanged
+        var context = new PropertyChangeContext<T>(propertyName!, oldValue, newValue);
+
+        return new NotifyProperty<T>(changeNotifier: this, errorContainer: this);
     }
+
+    #endregion
+
+    #region --更新验证--
+
+    protected INotifyProperty<T> Change<T>(T oldValue, T newValue, Action<T> update, [CallerMemberName] string? propertyName = null)
+    {
+        if (string.IsNullOrWhiteSpace(propertyName))
+        {
+            throw new ArgumentNullException(nameof(propertyName), "属性名不可为空");
+        }
+
+        ClearError(propertyName!);
+
+        if (EqualityComparer<T>.Default.Equals(oldValue, newValue))
+        {
+            return EmptyNotifyProperty<T>.Empty;
+        }
+
+        var property = new NotifyProperty<T>(
+            context: new PropertyChangeContext<T>(propertyName!, oldValue, newValue),
+            changeNotifier: this,
+            errorContainer: this);
+        property.OnChanged(x => update(x.NewValue));
+
+        return property;
+    }
+
+
     protected INotifyProperty<T> Change<T>(T oldValue, T newValue, Action<T> update, [CallerMemberName] string? propertyName = null)
     {
         if (string.IsNullOrWhiteSpace(propertyName))
@@ -203,22 +236,81 @@ public abstract class ViewModel : INotifyDataErrorInfo, IErrorContainer, IProper
 
 
 
-    protected virtual void Update<T>(string propertyName, T oldValue, T newValue, Action<T> update)
+    protected virtual void OnChange<T>(PropertyChangeContext<T> context, Action<T> update)
     {
         try
         {
-            if (HasError(propertyName))
+            if (HasError(context.Name))
             {
-                update(oldValue);
+                update(context.OldValue);
             }
             else
             {
-                update(newValue);
+                update(context.NewValue);
             }
         }
         catch(Exception ex)
         {
-            AddError(propertyName, ex.Message);
+            AddError(context.Name, ex.Message);
         }
     }
+
+
+
+    
+}
+
+
+
+internal static class NotifyPropertyFactoryExtensions
+{
+    extension<TViewModel>(TViewModel viewModel) where TViewModel : IViewModel, IPropertyChangeNotifier, IErrorContainer
+    {
+        public INotifyProperty<TValue> GetNotifyProperty<TValue>(string name)
+        {
+            return InternalFactory<TViewModel, TValue>.GetOrCreate(name, viewModel, (_, state) => new NotifyProperty<TValue>(state, state));
+        }
+    }
+
+    private static class InternalFactory<TOwer, TValue>
+    {
+        private static readonly object _lock = new();
+        private static readonly Dictionary<string, NotifyProperty<TValue>> _properties = [];
+
+        public static NotifyProperty<TValue> GetOrCreate(string name, Func<string, NotifyProperty<TValue>> factory)
+        {
+            if (_properties.TryGetValue(name, out var property))
+            {
+                return property;
+            }
+
+            lock (_lock)
+            {
+                if (_properties.TryGetValue(name, out var exists))
+                {
+                    return exists;
+                }
+
+                return _properties[name] = factory(name);
+            }
+        }
+
+        public static NotifyProperty<TValue> GetOrCreate<TState>(string name, TState state, Func<string, TState, NotifyProperty<TValue>> factory)
+        {
+            if (_properties.TryGetValue(name, out var property))
+            {
+                return property;
+            }
+
+            lock (_lock)
+            {
+                if (_properties.TryGetValue(name, out var exists))
+                {
+                    return exists;
+                }
+
+                return _properties[name] = factory(name, state);
+            }
+        }
+    };
 }

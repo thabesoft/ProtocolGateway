@@ -14,4 +14,9 @@ public interface ITagConfig
     /// 值类型
     /// </summary>
     TagValueType ValueType { get; }
+
+    /// <summary>
+    /// 标签类型
+    /// </summary>
+    ChannelType Type { get; }
 }

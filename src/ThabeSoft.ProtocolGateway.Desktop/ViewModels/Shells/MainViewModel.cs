@@ -1,9 +1,10 @@
 ﻿using Avalonia.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
-using ThabeSoft.Mvvm;
 using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Services;
+using ThabeSoft.ProtocolGateway.ViewModels.Components;
 
 namespace ThabeSoft.ProtocolGateway.ViewModels.Shells;
 
@@ -11,35 +12,17 @@ namespace ThabeSoft.ProtocolGateway.ViewModels.Shells;
 /// <summary>
 /// 主视图
 /// </summary>
-public sealed partial class MainViewModel : ViewModelBase, INavigationService, IMenuService
+public sealed partial class MainViewModel : ViewModel, INavigationService, IMenuService
 {
+    private IViewModelProvider? _viewModelProvider;
     private ObservableCollection<NavigationMenuItemViewModel> _menuItems = [];
 
-
-    public MainViewModel()
-    {
-        if(Design.IsDesignMode)
-        {
-
-        }
-    }
-    public MainViewModel(IViewModelProvider viewModelProvider)
-    {
-        ViewModelProvider = viewModelProvider;
-    }
-
-    public IViewModelProvider? ViewModelProvider
-    {
-        get; private set => Apply(field, value, x => field = x);
-    }
 
     /// <summary>
     /// 选中的导航元素
     /// </summary>
-    public NavigationMenuItemViewModel? SelectedMenuItem
-    {
-        get; private set => Apply(field, value, x => field = x);
-    }
+    [ObservableProperty]
+    public partial NavigationMenuItemViewModel? SelectedMenuItem { get; private set;  }
 
     /// <summary>
     /// 所有导航元素
@@ -47,13 +30,39 @@ public sealed partial class MainViewModel : ViewModelBase, INavigationService, I
     public IReadOnlyCollection<NavigationMenuItemViewModel> MenuItemsSource
     {
         get => _menuItems;
-        private set => Apply(_menuItems, value, x => _menuItems = [.. x]);
+        private set => SetProperty(_menuItems, value, x => _menuItems = [.. x]);
     }
 
     /// <summary>
     /// 内容
     /// </summary>
-    public IViewModel? Content { get; private set => Apply(field, value, x => field = x); }
+    [ObservableProperty]
+    public partial IViewModel? Content { get; private set; }
+
+
+
+    public MainViewModel()
+    {
+        if (Design.IsDesignMode)
+        {
+
+        }
+    }
+    public MainViewModel(IViewModelProvider viewModelProvider)
+    {
+        _viewModelProvider = viewModelProvider;
+    }
+
+
+    /// <summary>
+    /// 更新视图模型提供者
+    /// </summary>
+    public void UpdateViewModelProvider(IViewModelProvider provider)
+    {
+        _viewModelProvider = provider;
+    }
+
+
 
 
     /// <summary>
@@ -73,7 +82,6 @@ public sealed partial class MainViewModel : ViewModelBase, INavigationService, I
         // 导航到目标
         NavigateTo(SelectedMenuItem.Target);
     }
-
     /// <summary>
     /// 添加菜单
     /// </summary>
@@ -136,7 +144,6 @@ public sealed partial class MainViewModel : ViewModelBase, INavigationService, I
     public Result NavigateTo(IViewModel target)
     {
         Content = target;
-        OnPropertyChanged(nameof(Content));
 
         // 查询菜单
         var vm_type = target.GetType();
@@ -152,18 +159,17 @@ public sealed partial class MainViewModel : ViewModelBase, INavigationService, I
 
         return Result.Success();
     }
-
     /// <summary>
     /// 导航到目标
     /// </summary>
     public Result NavigateTo(Type target)
     {
-        if (ViewModelProvider is null)
+        if (_viewModelProvider is null)
         {
             return Result.Error($"导航失败, 视图模型提供者未初始化");
         }
 
-        var target_vm = ViewModelProvider.Get(target);
+        var target_vm = _viewModelProvider.Get(target);
         if (target_vm is null)
         {
             return Result.Error($"导航失败, 目标页面无法创建实例: {target}");

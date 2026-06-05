@@ -16,6 +16,17 @@
 		<PublishTrimmed>True</PublishTrimmed>
 	</PropertyGroup>
 
+	<ItemGroup>
+	  <Compile Remove="ViewModels\RuntimeChannelViewModel.cs" />
+	  <Compile Remove="ViewModels\RuntimeGatewayViewModel.cs" />
+	  
+	  <Compile Remove="ViewModels\RuntimeTagViewModel.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="Views\Pages\cxiwcyic.akp~" />
+	</ItemGroup>
+
 	<!--依赖包-->
 	<ItemGroup>
 		<PackageReference Include="Avalonia" Version="12.0.4" />
@@ -30,11 +41,11 @@
 		</PackageReference>
 		<PackageReference Include="Xaml.Behaviors.Avalonia" Version="12.0.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.8" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
 	</ItemGroup>
 	
 	<!--依赖项目-->
 	<ItemGroup>
-	  <ProjectReference Include="..\ThabeSoft.Mvvm\ThabeSoft.Mvvm.csproj" />
 	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.Runtime\ThabeSoft.ProtocolGateway.Runtime.csproj" />
 	  <ProjectReference Include="..\ThabeSoft.ProtocolGateway.Configuration\ThabeSoft.ProtocolGateway.Configuration.csproj" />
 	</ItemGroup>

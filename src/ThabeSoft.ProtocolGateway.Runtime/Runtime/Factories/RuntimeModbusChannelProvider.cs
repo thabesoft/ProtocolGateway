@@ -39,7 +39,7 @@ public class RuntimeModbusChannel(ChannelConfig config) : LifecycleObject, IRunt
     public bool IsEnable { get; }
     public IReadOnlyCollection<IRuntimeTag> Tags => _tags;
 
-
+    public IRuntimePort Port => throw new NotImplementedException();
 
     protected override async ValueTask<Result> StartProcessAsync(CancellationToken cancellationToken = default)
     {

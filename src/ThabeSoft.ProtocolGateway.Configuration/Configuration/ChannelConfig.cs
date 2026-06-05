@@ -11,6 +11,11 @@ public sealed record class ChannelConfig : IChannelConfig, IValidatable, IDeepCl
 
 
     /// <summary>
+    /// 通道类型
+    /// </summary>
+    public ChannelType Type => Protocol.ToChannelType();
+
+    /// <summary>
     /// 名称
     /// </summary>
     public required ChannelName Name { get; init; }
@@ -29,6 +34,8 @@ public sealed record class ChannelConfig : IChannelConfig, IValidatable, IDeepCl
     /// 标签
     /// </summary>
     public IReadOnlyList<TagConfig> Tags { get; init; } = [];
+
+    
 
 
     public Result Validate()
@@ -60,14 +67,5 @@ public sealed record class ChannelConfig : IChannelConfig, IValidatable, IDeepCl
             Port = Port.DeepClone(),
             Tags = [.. Tags.Select(x => x.DeepClone())]
         };
-    }
-}
-
-public static class ChannelTypeExtensions
-{
-    extension(ChannelConfig config)
-    {
-        public ChannelType Type => config.Protocol.ToChannelType();
-        public PortType PortType => config.Port.GetPortType();
     }
 }

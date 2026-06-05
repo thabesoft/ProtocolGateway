@@ -18,10 +18,17 @@ internal sealed class RuntimeChannel(
     ) : LifecycleObject, IRuntimeChannel
 {
     public IChannelConfig Config => config;
-    public bool IsEnable { get; private set; } = true;
+    public bool IsEnable { get; } = true;
+
+
+    // TODO: 运行时端口
+    public IRuntimePort Port => throw new NotImplementedException();
 
     //TODO: 运行时标签
     public IReadOnlyCollection<IRuntimeTag> Tags => [];
+
+
+
 
     protected override ValueTask<Result> StartProcessAsync(CancellationToken cancellationToken = default)
     {

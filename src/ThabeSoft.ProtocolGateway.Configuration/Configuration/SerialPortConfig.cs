@@ -8,6 +8,7 @@ namespace ThabeSoft.ProtocolGateway.Configuration;
 /// </summary>
 public sealed record class SerialPortConfig : PortConfig, ISerialPortConfig, IDeepCloneable<SerialPortConfig>
 {
+    public override PortType Type => PortType.SerialPort;
     public required string PortName { get; set; }
     public BaudRate BaudRate { get; set; } = BaudRate.Rate9600;
     public Parity Parity { get; set; } = Parity.None;

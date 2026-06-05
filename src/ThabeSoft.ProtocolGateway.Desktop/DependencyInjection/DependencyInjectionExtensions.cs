@@ -26,15 +26,15 @@ public static class DependencyInjectionExtensions
         /// </summary>
         public void AddProtocolGatewayDesktop(App application)
         {
-            // 模板注册器
-            services.AddSingleton<IDataTemplateRegistry>(application);
             // UI 程序生命周期
             services.AddSingleton<IApplicationLifetimeAccessor>(application);
-
+            // 运行时上下文
+            services.AddSingleton<IRuntimeContext, RuntimeContext>();
+            // 模板注册器
+            services.AddSingleton<IDataTemplateRegistry>(application);
             // 视图模型提供者
             services.TryAddSingleton<IViewModelProvider, ViewModelProvider>();
-            // 通道运行时业务
-            //services.AddSingleton<IChannelRuntimeService, ChannelRuntimeService>();
+
 
             // 图标
             services.TryAddSingleton<ProtocolTypeIconLocator>(); // 协议类型图标
@@ -64,8 +64,7 @@ public static class DependencyInjectionExtensions
             // 通道详情页面
             services.TryAddTransient<ChannelDetailsPage>();
             services.TryAddTransient<ChannelDetailsPageViewModel>();
-            // 通道配置
-            services.TryAddTransient<RuntimeChannelViewModel>();
+            
 
 
             // 初始化

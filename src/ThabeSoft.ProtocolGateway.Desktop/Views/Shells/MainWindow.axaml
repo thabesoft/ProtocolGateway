@@ -4,7 +4,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         
         xmlns:chrome="using:Avalonia.Controls.Chrome"
-        xmlns:vm="using:ThabeSoft.ProtocolGateway.ViewModels"
         xmlns:shell_vm="using:ThabeSoft.ProtocolGateway.ViewModels.Shells"
         
         x:Class="ThabeSoft.ProtocolGateway.Views.Shells.MainWindow"

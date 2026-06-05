@@ -1,26 +1,19 @@
-﻿using Avalonia.Collections;
-using Avalonia.Controls;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.Messaging;
 using ThabeSoft.Lifecycle;
-using ThabeSoft.Ports;
 using ThabeSoft.ProtocolGateway.Configuration;
-using ThabeSoft.ProtocolGateway.Extensions;
-using ThabeSoft.ProtocolGateway.Messages;
 using ThabeSoft.ProtocolGateway.Services;
-using ThabeSoft.ProtocolGateway.ViewModels.Components;
 
-namespace ThabeSoft.ProtocolGateway.ViewModels.Pages;
+namespace ThabeSoft.ProtocolGateway.ViewModels.Components;
 
 
 /// <summary>
-/// 通道页面
+/// 通道元素
 /// </summary>
-public sealed partial class ChannelDetailsPageViewModel : NotificationViewModel
+public sealed partial class ChannelItemViewModel : NotificationViewModel
 {
     private IRuntimeChannel? _runtimeChannel;
-    private AvaloniaList<TagItemViewModel> _tags = [];
+
 
     // 名称
     [ObservableProperty]
@@ -28,40 +21,30 @@ public sealed partial class ChannelDetailsPageViewModel : NotificationViewModel
 
     // 通道类型
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsModbusChannel))]
     public partial ChannelType Type { get; private set; }
 
     // 协议类型
     [ObservableProperty]
     public partial ProtocolType Protocol { get; private set; }
 
-    // 端口
-    [ObservableProperty]
-    public partial PortItemViewModel Port { get; private set; }
 
-    // 标签
-    public IReadOnlyCollection<TagItemViewModel> Tags => _tags;
-
-
-    public bool IsModbusChannel => Type == ChannelType.Modbus;
     public bool CanStart => _runtimeChannel?.CanStart == true;
     public bool CanStop => _runtimeChannel?.CanStop == true;
 
 
 
-    public ChannelDetailsPageViewModel()
+    public ChannelItemViewModel()
     {
-        if (Design.IsDesignMode)
-        {
-            Name = ChannelName.Create(string.RandomChinese(3, 6)).Value;
-            Type = Enum.GetValues<ChannelType>().RandomElement();
-            Protocol = Enum.GetValues<ProtocolType>().RandomElement();
-        }
+
     }
-    public ChannelDetailsPageViewModel(IRuntimeChannel channel, INotificationService notificationService) : base(notificationService)
+    public ChannelItemViewModel(IRuntimeChannel runtimeChannel)
     {
-        UpdateRuntimeChannel(channel);
+        UpdateRuntimeChannel(runtimeChannel);
     }
+
+    /// <summary>
+    /// 更新运行时通道
+    /// </summary>
     public void UpdateRuntimeChannel(IRuntimeChannel runtimeChannel)
     {
         _runtimeChannel = runtimeChannel;
@@ -70,13 +53,9 @@ public sealed partial class ChannelDetailsPageViewModel : NotificationViewModel
         Type = runtimeChannel.Config.Type;
         Protocol = runtimeChannel.Config.Protocol;
 
-        _tags = runtimeChannel.Tags.Select(x => new TagItemViewModel(x)).ToAvaloniaList();
-        OnErrorsChanged(nameof(Tags));
-
-        Port = new PortItemViewModel(runtimeChannel.Port);
-
         OnStateChanged();
     }
+
 
 
 
@@ -106,12 +85,6 @@ public sealed partial class ChannelDetailsPageViewModel : NotificationViewModel
 
         var result = await _runtimeChannel.StopAsync();
         TryNotify(x => x.Result(result).Title("停止失败"));
-    }
-
-    [RelayCommand]
-    private void Back()
-    {
-        WeakReferenceMessenger.Default.Send(new ChannelDetailsClosed(this));
     }
 
 

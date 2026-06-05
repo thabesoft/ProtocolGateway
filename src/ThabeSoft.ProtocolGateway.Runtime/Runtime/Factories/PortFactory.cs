@@ -24,6 +24,19 @@ internal static class PortFactory
         return Result.Error<ITransport>($"端口构建失败, 未知的配置类型: {config.GetType()}");
     }
 
+    public static IResult<IRuntimePort> CreateRuntime(ITransportConfig config)
+    {
+        // 串口
+        if (config is ISerialPortConfig serialPort)
+        {
+            return RuntimeSerialPort.CreateFromConfig(serialPort);
+        }
+
+        return Result.Error<IRuntimePort>($"端口构建失败, 未知的配置类型: {config.GetType()}");
+    }
+
+    
+
 
     /// <summary>
     /// 从串口配置创建串口传输器

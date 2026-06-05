@@ -19,6 +19,11 @@ public interface IRuntimeChannel : IChannel
     bool IsEnable { get; }
 
     /// <summary>
+    /// 使用的端口
+    /// </summary>
+    IRuntimePort Port { get; }
+
+    /// <summary>
     /// 所有标签
     /// </summary>
     IReadOnlyCollection<IRuntimeTag> Tags { get; }

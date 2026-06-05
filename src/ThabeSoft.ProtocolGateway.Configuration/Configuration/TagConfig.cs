@@ -12,6 +12,7 @@ public abstract record class TagConfig : ITagConfig, IValidatable, IDeepCloneabl
 {
     public required string Name { get; set; }
     public required TagValueType ValueType { get; set; }
+    public abstract ChannelType Type { get; }
 
 
     public virtual Result Validate()

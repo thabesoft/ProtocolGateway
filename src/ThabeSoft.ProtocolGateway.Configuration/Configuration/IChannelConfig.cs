@@ -5,11 +5,9 @@
 /// </summary>
 public interface IChannelConfig : IValidatable
 {
+    ChannelType Type { get; }
     ChannelName Name { get; }
     ProtocolType Protocol { get; }
     PortConfig Port { get; }
     IReadOnlyList<ITagConfig> Tags { get; }
-
-
-    void ChangeName(ChannelName name);
 }

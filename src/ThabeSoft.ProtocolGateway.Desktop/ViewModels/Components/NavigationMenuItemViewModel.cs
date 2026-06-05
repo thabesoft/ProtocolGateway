@@ -1,32 +1,31 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using ThabeSoft.Mvvm;
 using ThabeSoft.Primitives;
 
-namespace ThabeSoft.ProtocolGateway.ViewModels.Shells;
+namespace ThabeSoft.ProtocolGateway.ViewModels.Components;
 
 
 /// <summary>
 /// 导航菜单元素
 /// </summary>
-public sealed partial class NavigationMenuItemViewModel : ObservableObject, IViewModel, IEquatable<NavigationMenuItemViewModel>
+public sealed partial class NavigationMenuItemViewModel : ViewModel, IEquatable<NavigationMenuItemViewModel>
 {
     /// <summary>
     /// 图标
     /// </summary>
     [ObservableProperty]
-    public partial IconName Icon { get; private set; }
+    public partial IconName Icon { get; set; }
 
     /// <summary>
     /// 标题
     /// </summary>
     [ObservableProperty]
-    public partial string Header { get; private set; }
+    public partial string Header { get; set; }
 
     /// <summary>
     /// 目标视图模型类型
     /// </summary>
     [ObservableProperty]
-    public partial Type Target { get; private set; }
+    public partial Type Target { get; internal set; }
 
     /// <summary>
     /// 是否已选中
@@ -43,6 +42,19 @@ public sealed partial class NavigationMenuItemViewModel : ObservableObject, IVie
     }
 
 
+    public void Select()
+    {
+        IsSelected = true;
+    }
+
+    public void Unselect()
+    {
+        IsSelected = false;
+    }
+
+
+
+
     internal static NavigationMenuItemViewModel Create<T>(IconName icon, string header) where T : IViewModel
     {
         return new(icon, header, typeof(T));
@@ -50,17 +62,6 @@ public sealed partial class NavigationMenuItemViewModel : ObservableObject, IVie
     internal static Result<NavigationMenuItemViewModel> Create<T>(string icon, string header) where T : IViewModel
     {
         return IconName.Create(icon).Bind(x => Create<T>(x, header));
-    }
-
-
-
-    internal void Select()
-    {
-        IsSelected = true;
-    }
-    internal void Unselect()
-    {
-        IsSelected = false;
     }
 
 

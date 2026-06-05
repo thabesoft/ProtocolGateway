@@ -1,5 +1,4 @@
-﻿using ThabeSoft.Mvvm;
-using ThabeSoft.Primitives;
+﻿using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.ViewModels;
 
 namespace ThabeSoft.ProtocolGateway.Services;

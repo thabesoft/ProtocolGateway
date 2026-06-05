@@ -21,6 +21,9 @@ public sealed record class ModbusTagConfig : TagConfig, IModbusTagConfig
     /// </summary>
     public required FunctionCode FunctionCode { get; set; }
 
+    // 标签类型
+    public override ChannelType Type => ChannelType.Modbus;
+
 
     public override Result Validate()
     {

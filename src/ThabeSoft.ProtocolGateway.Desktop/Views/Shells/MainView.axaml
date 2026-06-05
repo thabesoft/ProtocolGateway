@@ -5,8 +5,8 @@
 
              xmlns:i="using:Avalonia.Xaml.Interactivity"
              xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
-             xmlns:vm="using:ThabeSoft.ProtocolGateway.ViewModels"
              xmlns:shell_vm="using:ThabeSoft.ProtocolGateway.ViewModels.Shells"
+             xmlns:com_vm="using:ThabeSoft.ProtocolGateway.ViewModels.Components"
 
              x:Class="ThabeSoft.ProtocolGateway.Views.Shells.MainView"
 
@@ -67,7 +67,7 @@
             <ItemsControl ItemsSource="{Binding MenuItemsSource}">
 
                 <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="shell_vm:NavigationMenuItemViewModel">
+                    <DataTemplate DataType="com_vm:NavigationMenuItemViewModel">
 
                         <RadioButton GroupName="Navigation"
                                      IsChecked="{Binding IsSelected}"
