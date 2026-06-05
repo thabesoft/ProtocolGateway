@@ -24,3 +24,29 @@ public interface ILifecycle : IAsyncDisposable, INotifyPropertyChanged
     /// </summary>
     ValueTask<Result> StopAsync(CancellationToken cancellationToken = default);
 }
+
+public static class LifecycleExtensions
+{
+    extension(ILifecycle lifecycle)
+    {
+        /// <summary>
+        /// 是否已运行
+        /// </summary>
+        public bool IsRunning => lifecycle.State == LifecycleState.Running;
+
+        /// <summary>
+        /// 是否已暂停
+        /// </summary>
+        public bool IsStopped => lifecycle.State == LifecycleState.Stopped;
+
+        /// <summary>
+        /// 是否可以启动
+        /// </summary>
+        public bool CanStart => lifecycle.State is not (LifecycleState.Running or LifecycleState.Disposed);
+
+        /// <summary>
+        /// 是否可以停止
+        /// </summary>
+        public bool CanStop => lifecycle.State == LifecycleState.Running;
+    }
+}

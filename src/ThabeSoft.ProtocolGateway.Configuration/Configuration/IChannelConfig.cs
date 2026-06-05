@@ -9,4 +9,7 @@ public interface IChannelConfig : IValidatable
     ProtocolType Protocol { get; }
     PortConfig Port { get; }
     IReadOnlyList<ITagConfig> Tags { get; }
+
+
+    void ChangeName(ChannelName name);
 }

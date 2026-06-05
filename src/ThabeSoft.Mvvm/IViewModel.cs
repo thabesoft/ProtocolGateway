@@ -138,6 +138,29 @@ public abstract class ViewModel : INotifyDataErrorInfo, IErrorContainer, IProper
 
 
     #region --更新验证--
+
+    protected INotifyProperty<T> Change<T>(T oldValue, T newValue,  [CallerMemberName] string? propertyName = null)
+    {
+        if (string.IsNullOrWhiteSpace(propertyName))
+        {
+            throw new ArgumentNullException(nameof(propertyName), "属性名不可为空");
+        }
+
+        ClearError(propertyName!);
+
+        if (EqualityComparer<T>.Default.Equals(oldValue, newValue))
+        {
+            return EmptyNotifyProperty<T>.Empty;
+        }
+
+        return new NotifyProperty<T>(
+            propertyName: propertyName!,
+            oldValue: oldValue,
+            newValue: newValue,
+            errorContainer: this,
+            changeNotifier: this,
+            changeHandler: (name, _, @new) => Update(name, oldValue, @new, update));
+    }
     protected INotifyProperty<T> Change<T>(T oldValue, T newValue, Action<T> update, [CallerMemberName] string? propertyName = null)
     {
         if (string.IsNullOrWhiteSpace(propertyName))
