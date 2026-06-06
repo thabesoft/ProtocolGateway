@@ -38,7 +38,7 @@ public static class NotificationServiceExtensions
         public INotificationOptions Error(string message)
         {
             var notification = new Notification(
-                title: "错误",
+                title: "操作失败",
                 message: message,
                 type: NotificationType.Error,
                 expiration: TimeSpan.Zero);
@@ -49,7 +49,7 @@ public static class NotificationServiceExtensions
         public INotificationOptions Success(string message)
         {
             var notification = new Notification(
-                title: "成功",
+                title: "操作成功",
                 message: message,
                 type: NotificationType.Success,
                 expiration: TimeSpan.FromSeconds(2));
@@ -79,6 +79,24 @@ public static class NotificationServiceExtensions
             return new NotificationOptions(services, notification);
         }
     }
+
+    private sealed class NotificationOptions(INotificationService service, Notification notification) : INotificationOptions
+    {
+        public INotificationOptions Title(string title)
+        {
+            notification.Title = title;
+            return this;
+        }
+        public INotificationOptions Expiration(TimeSpan time)
+        {
+            notification.Expiration = time;
+            return this;
+        }
+        public void Show()
+        {
+            service.Show(notification);
+        }
+    }
 }
 
 public interface INotificationOptions
@@ -86,22 +104,4 @@ public interface INotificationOptions
     INotificationOptions Title(string title);
     INotificationOptions Expiration(TimeSpan time);
     void Show();
-}
-
-internal sealed class NotificationOptions(INotificationService service, Notification notification) : INotificationOptions
-{
-    public INotificationOptions Title(string title)
-    {
-        notification.Title = title;
-        return this;
-    }
-    public INotificationOptions Expiration(TimeSpan time)
-    {
-        notification.Expiration = time;
-        return this;
-    }
-    public void Show()
-    {
-        service.Show(notification);
-    }
 }

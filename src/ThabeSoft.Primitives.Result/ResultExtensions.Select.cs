@@ -30,7 +30,7 @@ public static partial class ResultExtensions
             return result.Cast<UValue>();
         }
         /// <summary>
-        /// 基于上一个结果的值, 返回一个新结果, 可携带自定义参数
+        /// 基于上一个结果的值, 携带参数返回一个新结果
         /// </summary>
         /// <typeparam name="UValue">新结果类型</typeparam>
         /// <typeparam name="TState">自定义参数类型</typeparam>
@@ -41,6 +41,17 @@ public static partial class ResultExtensions
 
             return result.Cast<UValue>();
         }
+        /// <summary>
+        /// 基于上一个结果, 携带参数返回一个新结果
+        /// </summary>
+        public Result Select<TState>(TState state, Func<TValue, TState, Result> handler)
+        {
+            if (result.IsSuccess) return handler(result.Value, state);
+
+            return result;
+        }
+
+
         /// <summary>
         /// 实现 LINQ 查询语法的 SelectMany，支持 from...from...select 连续绑定
         /// </summary>

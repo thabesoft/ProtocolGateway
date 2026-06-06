@@ -6,6 +6,20 @@
 /// </summary>
 public static partial class ResultExtensions
 {
+    extension(Result result)
+    {
+        public Result Where(Func<Result, bool> matcher, Func<Result, string> errorMessage)
+        {
+            if (result.IsSuccess && matcher(result))
+            {
+                return Result.Error(errorMessage.Invoke(result));
+            }
+
+            return result;
+        }
+    }
+
+
     // 有值结果
     extension<TValue>(Result<TValue> result) where TValue : notnull
     {

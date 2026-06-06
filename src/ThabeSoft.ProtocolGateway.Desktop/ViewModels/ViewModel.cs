@@ -3,6 +3,8 @@ using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Services;
 
 namespace ThabeSoft.ProtocolGateway.ViewModels;
@@ -94,9 +96,14 @@ public abstract class ViewModel : ObservableObject, IViewModel
 }
 
 
+
+
+
+
 /// <summary>
 /// 包含通知业务的视图模型
 /// </summary>
+[Obsolete("请使用扩展方法")]
 public abstract class NotificationViewModel : ViewModel
 {
     // 通知业务

@@ -64,7 +64,7 @@
 
         <!--菜单栏-->
         <ScrollViewer DockPanel.Dock="Left" Width="100">
-            <ItemsControl ItemsSource="{Binding MenuItemsSource}">
+            <ItemsControl ItemsSource="{Binding NavigationMenuItems}">
 
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="com_vm:NavigationMenuItemViewModel">
@@ -84,7 +84,7 @@
                             <!--点击处理-->
                             <i:Interaction.Behaviors>
                                 <ia:EventTriggerBehavior EventName="Click">
-                                    <ia:InvokeCommandAction Command="{Binding $parent[ItemsControl].DataContext.SelectMenuCommand}"
+                                    <ia:InvokeCommandAction Command="{Binding $parent[ItemsControl].DataContext.MenuNavigateCommand}"
                                                             CommandParameter="{Binding}"/>
                                 </ia:EventTriggerBehavior >
                             </i:Interaction.Behaviors>

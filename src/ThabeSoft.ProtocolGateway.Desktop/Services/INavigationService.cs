@@ -10,4 +10,9 @@ public interface INavigationService
 {
     Result NavigateTo(IViewModel target);
     Result NavigateTo(Type target);
+
+    /// <summary>
+    /// 返回上一页
+    /// </summary>
+    Result Back();
 }

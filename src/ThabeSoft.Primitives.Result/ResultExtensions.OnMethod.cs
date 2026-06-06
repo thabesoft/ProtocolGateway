@@ -19,11 +19,52 @@ public static partial class ResultExtensions
         }
 
         /// <summary>
+        /// 成功回调, 携带参数
+        /// </summary>
+        /// <typeparam name="TState">参数类型</typeparam>
+        /// <param name="state">参数</param>
+        public T OnSuccess<TState>(TState state, Action<TState> handler)
+        {
+            if (result.IsSuccess) handler(state);
+            return result;
+        }
+
+
+        /// <summary>
         /// 有消息时候回调
         /// </summary>
         public T OnMessage(Action<string> handler)
         {
             if (result.HasMessage) handler(result.Message!);
+            return result;
+        }
+
+        /// <summary>
+        /// 有消息时候回调, 携带参数
+        /// </summary>
+        /// <typeparam name="TState">参数类型</typeparam>
+        /// <param name="state">参数</param>
+        public T OnMessage<TState>(TState state, Action<string, TState> handler)
+        {
+            if (result.HasMessage) handler(result.Message!, state);
+            return result;
+        }
+
+        /// <summary>
+        /// 有问题回调
+        /// </summary>
+        public T OnProblem(Action<string?> handler)
+        {
+            if (result.IsProblem) handler(result.Message);
+            return result;
+        }
+
+        /// <summary>
+        /// 有问题回调
+        /// </summary>
+        public T OnProblem<TState>(TState state, Action<string, TState> handler)
+        {
+            if (result.IsProblem) handler(result.Message!, state);
             return result;
         }
     }

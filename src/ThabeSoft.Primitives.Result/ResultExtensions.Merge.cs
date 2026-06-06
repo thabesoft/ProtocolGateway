@@ -6,9 +6,31 @@
 /// </summary>
 public static partial class ResultExtensions
 {
+    extension(Result)
+    {
+        /// <summary>
+        /// 合并多个结果
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public static MergeResult Combine(params IEnumerable<Result> other)
+        {
+            MergeResult combineResult = new();
+
+            foreach (var i in other) combineResult.Merge(i);
+
+            return combineResult;
+        }
+    }
+
+
     extension(IEnumerable<Result> results)
     {
-        public MergeResult Merge()
+        /// <summary>
+        /// 聚合结果
+        /// </summary>
+        /// <returns></returns>
+        public MergeResult Aggregate()
         {
             MergeResult result = new();
 

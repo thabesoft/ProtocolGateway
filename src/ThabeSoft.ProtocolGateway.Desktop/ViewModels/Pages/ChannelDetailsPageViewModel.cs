@@ -1,13 +1,9 @@
-﻿using Avalonia.Collections;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.Messaging;
 using ThabeSoft.Lifecycle;
-using ThabeSoft.Ports;
-using ThabeSoft.ProtocolGateway.Configuration;
+using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Extensions;
-using ThabeSoft.ProtocolGateway.Messages;
 using ThabeSoft.ProtocolGateway.Runtime;
 using ThabeSoft.ProtocolGateway.Services;
 using ThabeSoft.ProtocolGateway.ViewModels.Components;
@@ -18,10 +14,9 @@ namespace ThabeSoft.ProtocolGateway.ViewModels.Pages;
 /// <summary>
 /// 通道页面
 /// </summary>
-public sealed partial class ChannelDetailsPageViewModel : NotificationViewModel
+public sealed partial class ChannelDetailsPageViewModel : ViewModel
 {
     private IRuntimeChannel? _runtimeChannel;
-    private AvaloniaList<TagItemViewModel> _tags = [];
 
     // 名称
     [ObservableProperty]
@@ -38,45 +33,68 @@ public sealed partial class ChannelDetailsPageViewModel : NotificationViewModel
 
     // 端口
     [ObservableProperty]
-    public partial PortItemViewModel Port { get; private set; }
+    public partial PortItemViewModel? Port { get; private set; } = default;
 
     // 标签
-    public IReadOnlyCollection<TagItemViewModel> Tags => _tags;
+    public IEnumerable<TagItemViewModel> Tags { get; private set => SetProperty(ref field, value.ToAvaloniaList()); } = [];
 
 
     public bool IsModbusChannel => Type == ChannelType.Modbus;
     public bool CanStart => _runtimeChannel?.CanStart == true;
     public bool CanStop => _runtimeChannel?.CanStop == true;
-
+    public bool CanBack => this.CanNotify;
 
 
     public ChannelDetailsPageViewModel()
     {
-        if (Design.IsDesignMode)
-        {
-            Name = ChannelName.Create(string.RandomChinese(3, 6)).Value;
-            Type = Enum.GetValues<ChannelType>().RandomElement();
-            Protocol = Enum.GetValues<ProtocolType>().RandomElement();
-        }
+        if (!Design.IsDesignMode) return;
+
+        Name = ChannelName.Create(string.RandomChinese(3, 6)).Value;
+        Type = Enum.GetValues<ChannelType>().RandomElement();
+        Protocol = Enum.GetValues<ProtocolType>().RandomElement();
+        Port = new PortItemViewModel();
+        Tags = TagItemViewModel.RandomRange(3, 5);
     }
-    public ChannelDetailsPageViewModel(IRuntimeChannel channel, INotificationService notificationService) : base(notificationService)
+    public ChannelDetailsPageViewModel(IRuntimeChannel channel, INotificationService notificationService, INavigationService navigationService)
     {
+        UpdateNavigationService(navigationService);
+        UpdateNotificationService(notificationService);
         UpdateRuntimeChannel(channel);
     }
-    public void UpdateRuntimeChannel(IRuntimeChannel runtimeChannel)
+
+    // 更新导航业务
+    public void UpdateNotificationService(INotificationService notificationService)
     {
-        _runtimeChannel = runtimeChannel;
+        this.RegisterNotificationService(notificationService);
+    }
+    // 更新导航业务
+    public void UpdateNavigationService(INavigationService navigationService)
+    {
+        this.RegisterNavigationService(navigationService)
+            .OnSuccess(this, state => state.OnPropertyChanged(nameof(CanBack)));
+    }
+    // 更新运行时通道
+    public void UpdateRuntimeChannel(IRuntimeChannel channel)
+    {
+        _runtimeChannel = channel;
 
-        Name = runtimeChannel.Config.Name;
-        Type = runtimeChannel.Config.Type;
-        Protocol = runtimeChannel.Config.Protocol;
+        // 基础
+        Name = channel.Config.Name;
+        Type = channel.Config.Type;
+        Protocol = channel.Config.Protocol;
 
-        _tags = runtimeChannel.Tags.Select(x => new TagItemViewModel(x)).ToAvaloniaList();
+        // 标签
+        Tags = channel.Tags.Select(x => new TagItemViewModel(x)).ToAvaloniaList();
         OnErrorsChanged(nameof(Tags));
 
-        Port = new PortItemViewModel(runtimeChannel.Port);
+        // 端口
+        Port = new PortItemViewModel(channel.Port);
 
-        OnStateChanged();
+        // 通知
+        StartCommand.NotifyCanExecuteChanged();
+        StopCommand.NotifyCanExecuteChanged();
+        OnPropertyChanged(nameof(CanStart));
+        OnPropertyChanged(nameof(CanStop));
     }
 
 
@@ -88,12 +106,12 @@ public sealed partial class ChannelDetailsPageViewModel : NotificationViewModel
 
         if (_runtimeChannel is null)
         {
-            TryNotify(x => x.Error("运行时通道未初始化").Title(notification_title));
+            this.TryNotify(x => x.Error("运行时通道未初始化").Title(notification_title));
             return;
         }
 
         var result = await _runtimeChannel.StartAsync();
-        TryNotify(x => x.Result(result).Title(notification_title));
+        this.TryNotify(x => x.Result(result).Title(notification_title));
     }
 
     [RelayCommand(CanExecute = nameof(StopCommandCanExecute))]
@@ -101,30 +119,27 @@ public sealed partial class ChannelDetailsPageViewModel : NotificationViewModel
     {
         if (_runtimeChannel is null)
         {
-            TryNotify(x => x.Warning("运行时通道未初始化").Title("无效操作"));
+            this.TryNotify(x => x.Warning("运行时通道未初始化").Title("无效操作"));
             return;
         }
 
         var result = await _runtimeChannel.StopAsync();
-        TryNotify(x => x.Result(result).Title("停止失败"));
+        this.TryNotify(x => x.Result(result).Title("停止失败"));
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(BackCommandCanExecute))]
     private void Back()
     {
-        WeakReferenceMessenger.Default.Send(new ChannelDetailsClosed(this));
+        if (!this.CanNavigate) return;
+
+        var result = this.TryNavigate(x => x.Back());
+        if (result.IsSuccess) return;
+
+        this.TryNotify(result, (x, state) => x.Result(state));
     }
 
 
     private bool StartCommandCanExecute() => CanStart;
     private bool StopCommandCanExecute() => CanStop;
-
-
-    private void OnStateChanged()
-    {
-        StartCommand.NotifyCanExecuteChanged();
-        StopCommand.NotifyCanExecuteChanged();
-        OnPropertyChanged(nameof(CanStart));
-        OnPropertyChanged(nameof(CanStop));
-    }
+    private bool BackCommandCanExecute() => CanBack;
 }
