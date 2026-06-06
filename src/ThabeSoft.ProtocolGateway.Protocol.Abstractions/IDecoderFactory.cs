@@ -5,6 +5,6 @@
 /// </summary>
 public interface IDecoderFactory
 {
-    IDecoder<TProtocol> Create<TProtocol>();
-    IDataDecoder<TProtocol, TData> CreateDataDecoder<TProtocol, TData>();
+    IDecoder<TProtocol> Create<TProtocol>() where TProtocol : notnull;
+    IDataDecoder<TProtocol, TData> CreateDataDecoder<TProtocol, TData>() where TProtocol : notnull;
 }

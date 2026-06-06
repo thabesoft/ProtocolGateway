@@ -6,6 +6,7 @@ namespace ThabeSoft.ProtocolGateway.Protocol;
 /// 含可变长度数据的协议解码器
 /// </summary>
 public interface IDataDecoder<TProtocol, TData>
+    where TProtocol : notnull
 {
     /// <summary>
     /// 解码协议

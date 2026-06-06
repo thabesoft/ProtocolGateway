@@ -8,7 +8,7 @@
 /// </summary>
 public sealed record class MergeResult : ICombineResult
 {
-    private List<Result> _results = [];
+    private readonly List<Result> _results = [];
 
     public ResultLevel Level { get; private set; }
     public bool HasMessage { get; private set; }
@@ -77,7 +77,7 @@ public sealed record class MergeResult : ICombineResult
 public sealed record class MergeResult<TValue> : ICombineResult<TValue>
     where TValue : notnull
 {
-    private List<Result<TValue>> _results = [];
+    private readonly List<Result<TValue>> _results = [];
 
 
     public bool HasMessage { get; private set; }
@@ -112,18 +112,19 @@ public sealed record class MergeResult<TValue> : ICombineResult<TValue>
     /// <summary>
     /// 转为常规结果
     /// </summary>
-    public static implicit operator Result<IReadOnlyList<TValue>>(MergeResult<TValue> result)
-    {
-        if (result.HasValue) return new(result.Level, result.Message, result.Value);
-        return new(result.Level, result.Message);
-    }
+    public static implicit operator Result<IReadOnlyList<TValue>>(MergeResult<TValue> result) => result.ToResult();
+
     /// <summary>
     /// 转为常规结果
     /// </summary>
-
-    public static implicit operator Result(MergeResult<TValue> result)
+    public Result<IReadOnlyList<TValue>> ToResult()
     {
-        return new(result.Level, result.Message);
+        if (HasValue)
+        {
+            return new(Level, Message, Value);
+        }
+
+        return new(Level, Message);
     }
 
 

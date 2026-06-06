@@ -34,7 +34,7 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
     public static Result<int> EncodeRequest(Span<byte> destination, in ReadRequestHeader header)
     {
         var layout = RtuReadRequestLayout.Instance;
-        return EncodeRequest(destination, header, layout).Then(layout.TotalLength);
+        return EncodeRequest(destination, header, layout).WithValue(layout.TotalLength);
     }
     public static Result EncodeRequest(Span<byte> destination, in ReadRequestHeader header, in RtuReadRequestLayout layout)
     {
@@ -145,7 +145,9 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
         var slave_id = source[RtuReadResponseLayout.SlaveIdIndex];
 
         // 功能码
-        var function_code_result = FunctionCode.FromCode(source[RtuReadResponseLayout.FunctionCodeIndex]).Where(x => x.IsRead);
+        var function_code_result = FunctionCode
+            .FromCode(source[RtuReadResponseLayout.FunctionCodeIndex])
+            .Where(x => x.IsRead, err => $"响应解码失败, 功能码不符合预期, 必须是读操作, 实际{err}");
         if (!function_code_result.IsSuccess) return function_code_result.Cast<RtuReadResponseHeader>();
 
         // 数据长度
@@ -163,6 +165,6 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
 
     private static Result BufferTooSmall(int required, int actual) => Result.Error(
         $"读响应编码所需建缓冲区不足，需要 {required} 字节，实际 {actual} 字节");
-    private static Result<T> BufferTooSmall<T>(int required, int actual) => Result.Error<T>(
-        $"读响应编码所需建缓冲区不足，需要 {required} 字节，实际 {actual} 字节");
+    private static Result<T> BufferTooSmall<T>(int required, int actual) where T : notnull
+        => Result.Error<T>($"读响应编码所需建缓冲区不足，需要 {required} 字节，实际 {actual} 字节");
 }

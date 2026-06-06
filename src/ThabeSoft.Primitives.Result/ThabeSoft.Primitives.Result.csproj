@@ -5,10 +5,21 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Extensions\Pipe\**" />
+	  <Compile Remove="Linq\**" />
+	  <Compile Remove="Pipes\**" />
+	  <EmbeddedResource Remove="Extensions\Pipe\**" />
+	  <EmbeddedResource Remove="Linq\**" />
+	  <EmbeddedResource Remove="Pipes\**" />
+	  <None Remove="Extensions\Pipe\**" />
+	  <None Remove="Linq\**" />
+	  <None Remove="Pipes\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <Compile Remove="Extensions\ResultExtensions.Bind.cs" />
 	  <Compile Remove="Extensions\ResultExtensions.Factory.cs" />
 	  <Compile Remove="Extensions\ResultExtensions.Map.cs" />
-	  <Compile Remove="Extensions\ResultExtensions.Merge.cs" />
 	  <Compile Remove="Extensions\ResultExtensions.OrElse.cs" />
 	  <Compile Remove="Extensions\ResultExtensions.Out.cs" />
 	  <Compile Remove="Extensions\ResultExtensions.Tap.cs" />
@@ -17,6 +28,12 @@
 	  <Compile Remove="Extensions\ResultExtensions.Then.cs" />
 	  <Compile Remove="Extensions\ResultExtensions.Value.cs" />
 	  <Compile Remove="Extensions\ResultExtensions.Where.cs" />
+	  <Compile Remove="IAsyncResultPipe.cs" />
+	  <Compile Remove="IResultPipe.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Extensions\" />
 	</ItemGroup>
 
 </Project>

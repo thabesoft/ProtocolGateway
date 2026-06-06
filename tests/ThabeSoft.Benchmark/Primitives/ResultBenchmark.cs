@@ -7,10 +7,12 @@ namespace ThabeSoft.Primitives;
 
 [MemoryDiagnoser(true)]
 [SimpleJob(RuntimeMoniker.Net10_0)]
+#pragma warning disable RCS1102 // Make class static
 public class ResultBenchmark
+#pragma warning restore RCS1102 // Make class static
 {
     [Benchmark(Baseline = true)]
-    public void Call()
+    public static void Call()
     {
         var result = TestResult1();
         if (!result.IsSuccess) return;
@@ -29,108 +31,29 @@ public class ResultBenchmark
     }
 
     [Benchmark]
-    public async Task CallAsync()
-    {
-        var result = await TestResult1Async();
-        if (!result.IsSuccess) return;
-
-        var result1 = await TestResult2Async(result.Value);
-        if (!result1.IsSuccess) return;
-
-        var result2 = await TestResult3Async(result1.Value);
-        if (!result2.IsSuccess) return;
-
-        var result3 = await TestResult4Async(result2.Value);
-        if (!result3.IsSuccess) return;
-
-        var result4 = await TestResult5Async(result3.Value);
-        if (!result4.IsSuccess) return;
-    }
-
-
-    [Benchmark]
-    public void PipeDelegate()
+    public static void PipeDelegate()
     {
         var result = TestResult1()
             .Select(TestResult2)
             .Select(TestResult3)
             .Select(TestResult4)
-            .Bind(TestResult5);
+            .Select(TestResult5);
     }
 
     [Benchmark]
-    public async Task PipeDelegateAsync()
-    {
-        var result = await TestResult1Async()
-            .BindAsync(TestResult2Async)
-            .BindAsync(TestResult3Async)
-            .BindAsync(TestResult4Async)
-            .BindAsync(TestResult5Async);
-    }
-
-    [Benchmark]
-    public void Pipe()
+    public static void PipeLambda()
     {
         var result = Result.Success(10)
-            .Select(x => Result.Success<double>(x))
-            .Select(x => Result.Success(x.ToString()))
-            .Select(x => Result.Success(x.Length))
-            .Bind(x => Result.Success());
-    }
-
-    [Benchmark]
-    public async Task PipeAsync()
-    {
-        var result = TestResult1Async()
-            .BindAsync(x => ValueTask.FromResult(Result.Success<double>(x)))
-            .BindAsync(x => ValueTask.FromResult(Result.Success(x.ToString())))
-            .BindAsync(x => ValueTask.FromResult(Result.Success(x.Length)))
-            .BindAsync(x => ValueTask.FromResult(Result.Success()));
+            .Select(static x => Result.Success<double>(x))
+            .Select(static x => Result.Success(x.ToString()))
+            .Select(static x => Result.Success(x.Length))
+            .Select(static _ => Result.Success());
     }
 
 
-    private static ValueTask<Result<int>> TestResult1Async()
-    {
-        return ValueTask.FromResult(Result.Success(10));
-    }
-    private static ValueTask<Result<double>> TestResult2Async(int x)
-    {
-        return ValueTask.FromResult(Result.Success<double>(x));
-    }
-    private static ValueTask<Result<string>> TestResult3Async(double x)
-    {
-        return ValueTask.FromResult(Result.Success(x.ToString()));
-    }
-    private static ValueTask<Result<int>> TestResult4Async(string x)
-    {
-        return ValueTask.FromResult(Result.Success(x.Length));
-    }
-    private static ValueTask<Result> TestResult5Async(int _)
-    {
-        return ValueTask.FromResult(Result.Success());
-    }
-
-
-
-
-    private static Result<int> TestResult1()
-    {
-        return Result.Success(10);
-    }
-    private static Result<double> TestResult2(int x)
-    {
-        return Result.Success<double>(x);
-    }
-    private static Result<string> TestResult3(double x)
-    {
-        return Result.Success(x.ToString());
-    }
-    private static Result<int> TestResult4(string x)
-    {
-        return Result.Success(x.Length);
-    }
-    private static Result TestResult5(int _)
-    {
-        return Result.Success();
-    }
+    private static Result<int> TestResult1() => Result.Success(10);
+    private static Result<double> TestResult2(int x) => Result.Success<double>(x);
+    private static Result<string> TestResult3(double x) => Result.Success(x.ToString());
+    private static Result<int> TestResult4(string x) => Result.Success(x.Length);
+    private static Result TestResult5(int _) => Result.Success();
 }

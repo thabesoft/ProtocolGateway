@@ -47,11 +47,21 @@ public sealed record class Result : IResult
 #endif
     }
 
+    
     /// <summary>
-    /// 转换结果
+    /// 转为目标类型的结果
     /// </summary>
+    /// <typeparam name="U">目标类型</typeparam>
     public Result<U> Cast<U>() where U : notnull
         => new(Level, Message);
+
+    /// <summary>
+    /// 转为指定值类型的结果
+    /// </summary>
+    /// <typeparam name="U">目标值类型</typeparam>
+    /// <param name="value">目标类型值</param>
+    public Result<U> WithValue<U>(U value) where U : notnull
+        => new(Level, Message, value);
 }
 
 
@@ -141,6 +151,11 @@ public sealed record class Result<TValue> : IResult<TValue>
     /// </summary>
     public static implicit operator Result(Result<TValue> result) => new(result.Level, result.Message);
 
+
+    public Result ToResult()
+    {
+        return new(Level, Message);
+    }
 
     /// <summary>
     /// 转换错误到指定类型 (必须是没有值的结果)

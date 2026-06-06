@@ -22,7 +22,7 @@ public class BinaryTest
     {
         byte[] source = [first, second];
 
-        source.ToWord(endianness).Tap(x => Assert.AreEqual(expected, x));
+        source.ToWord(endianness).OnValue(x => Assert.AreEqual(expected, x));
     }
 
     [TestMethod(DisplayName = "字节转位数组测试_LSB0")]

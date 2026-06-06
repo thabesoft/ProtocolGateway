@@ -6,6 +6,7 @@ namespace ThabeSoft.ProtocolGateway.Protocol;
 /// 协议解码器
 /// </summary>
 public interface IDecoder<TProtocol>
+    where TProtocol : notnull
 {
     /// <summary>
     /// 解码协议

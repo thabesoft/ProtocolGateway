@@ -21,7 +21,7 @@ public static class IconRegistryExtensions
     {
         public Result AddIcon(string name, Func<IconElement> factory)
         {
-            return IconName.Create(name).Tap(x => registry.AddIcon(x, factory));
+            return IconName.Create(name).OnValue(x => registry.AddIcon(x, factory));
         }
 
         public void AddPathIcon(IconName name, Action<PathIcon>? configure = null)
@@ -35,7 +35,7 @@ public static class IconRegistryExtensions
         }
         public Result AddPathIcon(string name, Action<PathIcon>? configure = null)
         {
-            return IconName.Create(name).Tap(x => registry.AddPathIcon(x, configure));
+            return IconName.Create(name).OnValue(configure, registry.AddPathIcon);
         }
     }
 }

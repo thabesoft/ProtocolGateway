@@ -44,17 +44,17 @@ public sealed class RtuMasterWriteMultipleCodec : IMasterWriteMultipleCodec
             .Select(RtuWriteMultipleRequestLayout.FromQuantity);
         if (!layout_result.IsSuccess) return layout_result.Cast<int>();
 
-        return EncodeCoilsRequest(destination, header, values, layout_result.Value).Then(layout_result.Value.TotalLength);
+        return EncodeCoilsRequest(destination, header, values, layout_result.Value).WithValue(layout_result.Value.TotalLength);
     }
     public static Result EncodeCoilsRequest(Span<byte> destination, in WriteMultipleRequestHeader header, ReadOnlySpan<bool> values, in RtuWriteMultipleRequestLayout layout)
     {
         // 协议布局无效
         if (layout == RtuWriteMultipleRequestLayout.Empty)
-            return Result.Error($"写多个线圈帧布局不可为空");
+            return Result.Error("写多个线圈帧布局不可为空");
 
         // 缺少请求头
         if (header == WriteMultipleRequestHeader.Empty)
-            return Result.Error($"写多个线圈请求头不可为空");
+            return Result.Error("写多个线圈请求头不可为空");
 
         // 缓冲区长度不足
         if (destination.Length < layout.TotalLength)
@@ -107,7 +107,7 @@ public sealed class RtuMasterWriteMultipleCodec : IMasterWriteMultipleCodec
             .Select(RtuWriteMultipleRequestLayout.FromQuantity);
         if (!layout_result.IsSuccess) return layout_result.Cast<int>();
 
-        return EncodeRegistersRequest(destination, header, values, layout_result.Value).Then(layout_result.Value.TotalLength);
+        return EncodeRegistersRequest(destination, header, values, layout_result.Value).WithValue(layout_result.Value.TotalLength);
     }
     public static Result EncodeRegistersRequest(Span<byte> destination, in WriteMultipleRequestHeader header, ReadOnlySpan<ushort> values, in RtuWriteMultipleRequestLayout layout)
     {
@@ -116,11 +116,11 @@ public sealed class RtuMasterWriteMultipleCodec : IMasterWriteMultipleCodec
 
         // 协议布局无效
         if (layout == RtuWriteMultipleRequestLayout.Empty)
-            return Result.Error($"写多个寄存器帧布局不可为空");
+            return Result.Error("写多个寄存器帧布局不可为空");
 
         // 缺少请求头
         if (header == WriteMultipleRequestHeader.Empty)
-            return Result.Error($"写多个寄存器请求头不可为空");
+            return Result.Error("写多个寄存器请求头不可为空");
 
         // 构建缓冲区长度不足
         if (destination.Length < layout.TotalLength)
@@ -171,7 +171,7 @@ public sealed class RtuMasterWriteMultipleCodec : IMasterWriteMultipleCodec
         // 功能码创建结果
         var function_code_result = FunctionCode
             .FromCode(source[layout.FunctionCodeIndex])
-            .Where(x => FunctionCode.WriteMultipleCoils == x);
+            .Where(x => FunctionCode.WriteMultipleCoils == x, err => $"解码失败, 功能码不符合预期, 预期{FunctionCode.WriteMultipleCoils}, 实际{err}");
         if (!function_code_result.IsSuccess) return function_code_result.Cast<RtuWriteMultipleResponseHeader>();
 
         // Crc
@@ -213,7 +213,7 @@ public sealed class RtuMasterWriteMultipleCodec : IMasterWriteMultipleCodec
         // 功能码创建结果
         var function_code_result = FunctionCode
             .FromCode(source[layout.FunctionCodeIndex])
-            .Where(x => FunctionCode.WriteMultipleRegisters == x);
+            .Where(x => FunctionCode.WriteMultipleRegisters == x, err => $"解码失败, 功能码不符合预期, 预期{FunctionCode.WriteMultipleRegisters}, 实际{err}");
         if (!function_code_result.IsSuccess) return function_code_result.Cast<RtuWriteMultipleResponseHeader>();
 
         // Crc
@@ -247,7 +247,5 @@ public sealed class RtuMasterWriteMultipleCodec : IMasterWriteMultipleCodec
 
 
     private static Result BufferTooSmall(string actionName, int required, int actual) => Result.Error(
-        $"[{actionName}] 编码所需建缓冲区不足，需要 {required} 字节，实际 {actual} 字节");
-    private static Result<T> BufferTooSmall<T>(string actionName, int required, int actual) => Result.Error<T>(
         $"[{actionName}] 编码所需建缓冲区不足，需要 {required} 字节，实际 {actual} 字节");
 }

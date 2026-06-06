@@ -33,7 +33,7 @@ public static class MenuServiceExtensions
         /// </summary>
         public Result AddMenu<T>(string iconName, string header) where T : IViewModel
         {
-            return IconName.Create(iconName).Tap(x => menu.AddMenu<T>(x, header));
+            return IconName.Create(iconName).OnValue(header, menu.AddMenu<T>);
         }
     }
 }

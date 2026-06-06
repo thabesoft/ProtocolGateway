@@ -1,10 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Reactive.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using ThabeSoft.Lifecycle;
 using ThabeSoft.Primitives;
-using ThabeSoft.Primitives.Linq;
 using ThabeSoft.ProtocolGateway.Configuration;
 
 namespace ThabeSoft.ProtocolGateway.Runtime;
@@ -238,7 +236,7 @@ public sealed class RuntimeGateway : LifecycleObject, IRuntimeGateway, IAsyncDis
         foreach (var i in _channels.Values.ToArray())
         {
             var result = await i.StopAsync();
-            if (result.IsProblem) errror_messages.AppendLine(result.Message!);
+            if (result.IsProblem) errror_messages.AppendLine(result.Message);
 
             if (i is IDisposable disposable)
             {
@@ -266,7 +264,8 @@ public sealed class RuntimeGateway : LifecycleObject, IRuntimeGateway, IAsyncDis
         return config.Channels
             .Select(RuntimeChannel.Create)
             .Merge()
-            .Map (x => new RuntimeGateway() { Config = config, Channels = [.. x] });
+            .ToResult()
+            .Select(x => new RuntimeGateway() { Config = config, Channels = [.. x] });
 
         //bool has_warning = false;
         //StringBuilder warning_message = new();
@@ -305,4 +304,4 @@ public sealed class RuntimeGateway : LifecycleObject, IRuntimeGateway, IAsyncDis
     }
 
     #endregion
-} 
+}

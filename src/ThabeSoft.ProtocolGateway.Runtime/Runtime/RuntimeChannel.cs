@@ -2,7 +2,6 @@
 using ThabeSoft.Lifecycle;
 using ThabeSoft.Modbus;
 using ThabeSoft.Primitives;
-using ThabeSoft.Primitives.Linq;
 using ThabeSoft.ProtocolGateway.Configuration;
 
 namespace ThabeSoft.ProtocolGateway.Runtime;

@@ -20,12 +20,12 @@ public sealed class RtuMasterWriteSingleCodec : IMasterWriteSingleCodec
     public Result<int> EncodeCoilRequest(Span<byte> destination, in WriteSingleCoilHeader header)
     {
         var layout = RtuWriteSingleLayout.Instance;
-        return EncodeCoilRequest(destination, header, layout).Then(layout.TotalLength);
+        return EncodeCoilRequest(destination, header, layout).WithValue(layout.TotalLength);
     }
     public Result<int> EncodeRegisterRequest(Span<byte> destination, in WriteSingleRegisterHeader header)
     {
         var layout = RtuWriteSingleLayout.Instance;
-        return EncodeRegisterRequest(destination, header, layout).Then(layout.TotalLength);
+        return EncodeRegisterRequest(destination, header, layout).WithValue(layout.TotalLength);
     }
 
     public Result<WriteSingleCoilHeader> DecodeCoilResponse(ReadOnlySpan<byte> source)
@@ -100,7 +100,7 @@ public sealed class RtuMasterWriteSingleCodec : IMasterWriteSingleCodec
         // 功能码创建结果
         var function_code_result = FunctionCode
             .FromCode(source[layout.FunctionCodeIndex])
-            .Where(x => FunctionCode.WriteSingleCoil == x);
+            .Where(x => FunctionCode.WriteSingleCoil == x, err => $"解码失败, 功能码不符合预期, 预期{FunctionCode.WriteSingleCoil}, 实际{err}");
         if (!function_code_result.IsSuccess) return function_code_result.Cast<RtuWriteSingleCoilResponseHeader>();
 
         // Crc
@@ -136,7 +136,7 @@ public sealed class RtuMasterWriteSingleCodec : IMasterWriteSingleCodec
         // 功能码创建结果
         var function_code_result = FunctionCode
             .FromCode(source[layout.FunctionCodeIndex])
-            .Where(x => FunctionCode.WriteSingleCoil == x);
+            .Where(x => FunctionCode.WriteSingleCoil == x, err => $"解码失败, 功能码不符合预期, 预期{FunctionCode.WriteSingleCoil}, 实际{err}");
         if (!function_code_result.IsSuccess) return function_code_result.Cast<RtuWriteSingleRegisterResponseHeader>();
 
         // Crc

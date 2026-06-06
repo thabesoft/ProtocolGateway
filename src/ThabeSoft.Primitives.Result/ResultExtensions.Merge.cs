@@ -51,7 +51,7 @@ public static partial class ResultExtensions
         }
     }
 
-    extension<T>(Result<TValue> result) where TValue : notnull
+    extension<TValue>(Result<TValue> result) where TValue : notnull
     {
         public MergeResult<TValue> Merge(Result<TValue> other)
         {

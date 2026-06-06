@@ -16,9 +16,9 @@ namespace ThabeSoft.ProtocolGateway.ViewModels.Pages;
 public sealed partial class ChannelPageViewModel : NotificationViewModel
 {
     // 导航业务
-    private INavigationService? _navigationService;
+    private readonly INavigationService? _navigationService;
     // 通道运行时
-    private IRuntimeGateway? _runtimeGateway;
+    private readonly IRuntimeGateway? _runtimeGateway;
 
 
     // 所有通道
@@ -40,18 +40,10 @@ public sealed partial class ChannelPageViewModel : NotificationViewModel
     }
     public ChannelPageViewModel(IRuntimeContext runtimeContext, INotificationService notificationService, INavigationService navigationService) : base(notificationService)
     {
-        UpdateRuntimeGateway(runtimeContext.Gateway);
-        UpdateNavigationService(navigationService);
-    }
-    public void UpdateRuntimeGateway(IRuntimeGateway service)
-    {
-        _runtimeGateway = service;
+        _runtimeGateway = runtimeContext.Gateway;
+        _navigationService = navigationService;
+
         ReloadCommand.NotifyCanExecuteChanged();
-        OpenDetailsPageCommand.NotifyCanExecuteChanged();
-    }
-    public void UpdateNavigationService(INavigationService service)
-    {
-        _navigationService = service;
         OpenDetailsPageCommand.NotifyCanExecuteChanged();
     }
 
@@ -96,7 +88,7 @@ public sealed partial class ChannelPageViewModel : NotificationViewModel
     [RelayCommand(CanExecute = nameof(ReloadCommandCanExecute))]
     private async Task ReloadAsync()
     {
-        var notification_title = "重载失败";
+        const string notification_title = "重载失败";
 
         if (_runtimeGateway is null)
         {

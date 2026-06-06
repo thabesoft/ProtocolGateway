@@ -82,7 +82,7 @@ public sealed class RtuSlaveReadCodec : ISlaveReadCodec
         if (!quantity_result.IsSuccess) return quantity_result.Cast<int>();
 
         var layout  = RtuReadResponseLayout.FromQuantity(quantity_result.Value);
-        return EncodeCoilsResponse(destination, header, values, layout).Then(layout.TotalLength);
+        return EncodeCoilsResponse(destination, header, values, layout).WithValue(layout.TotalLength);
     }
     public static Result EncodeCoilsResponse(Span<byte> destination, in ReadResponseHeader header, ReadOnlySpan<bool> values, in RtuReadResponseLayout layout)
     {
@@ -131,7 +131,7 @@ public sealed class RtuSlaveReadCodec : ISlaveReadCodec
         if (!quantity_result.IsSuccess) return quantity_result.Cast<int>();
 
         var layout = RtuReadResponseLayout.FromQuantity(quantity_result.Value);
-        return EncodeRegistersResponse(destination, header, values, layout).Then(layout.TotalLength);
+        return EncodeRegistersResponse(destination, header, values, layout).WithValue(layout.TotalLength);
     }
     public static Result EncodeRegistersResponse(Span<byte> destination, in ReadResponseHeader header, ReadOnlySpan<ushort> values, in RtuReadResponseLayout layout)
     {
@@ -173,10 +173,6 @@ public sealed class RtuSlaveReadCodec : ISlaveReadCodec
     }
 
 
-
-
     private static Result BufferTooSmall(int required, int actual) => Result.Error(
-        $"读响应编码所需建缓冲区不足，需要 {required} 字节，实际 {actual} 字节");
-    private static Result<T> BufferTooSmall<T>(int required, int actual) => Result.Error<T>(
         $"读响应编码所需建缓冲区不足，需要 {required} 字节，实际 {actual} 字节");
 }

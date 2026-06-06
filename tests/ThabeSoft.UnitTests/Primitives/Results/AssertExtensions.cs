@@ -10,26 +10,4 @@ public static class AssertExtensions
             return result;
         }
     }
-
-    extension<T>(ValueTask<T> task) where T : IResult
-    {
-        public async ValueTask<T> AssertIsTrue()
-        {
-            var result = await task;
-
-            Assert.IsTrue(result.IsSuccess, result.Message);
-            return result;
-        }
-    }
-
-    extension<T>(Task<T> task) where T : IResult
-    {
-        public async Task<T> AssertIsTrue()
-        {
-            var result = await task;
-
-            Assert.IsTrue(result.IsSuccess, result.Message);
-            return result;
-        }
-    }
 }
