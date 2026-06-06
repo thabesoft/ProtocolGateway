@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using Moq;
+﻿using Moq;
 using ThabeSoft.ProtocolGateway.Configuration.Json;
 using ThabeSoft.ProtocolGateway.Configuration.Options;
 using ThabeSoft.ProtocolGateway.Infrastructure.Json;

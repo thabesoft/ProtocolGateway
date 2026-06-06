@@ -66,21 +66,4 @@ public sealed record class Result<TValue> : IResult<TValue>
     /// <exception cref="ResultException"></exception>
     public Result<U> Cast<U>() where U : notnull
         => !HasValue ? new Result<U>(Level, Message) : throw new ResultException("Cannot propagate error from successful result");
-
-
-    #region --工厂--
-
-    public static Result<TValue> Success(TValue value) => new(ResultLevel.Success, null, value);
-
-    public static Result<TValue> Info(string message) => new(ResultLevel.Info, message);
-    public static Result<TValue> Info(string message, TValue value) => new(ResultLevel.Info, message, value);
-
-    public static Result<TValue> Warning(string message) => new(ResultLevel.Warning, message);
-    public static Result<TValue> Warning(string message, TValue value) => new(ResultLevel.Warning, message, value);
-
-
-    public static Result<TValue> Error(string message) => new(ResultLevel.Error, message);
-    public static Result<TValue> Error(string message, TValue value) => new(ResultLevel.Error, message, value);
-
-    #endregion
 }
