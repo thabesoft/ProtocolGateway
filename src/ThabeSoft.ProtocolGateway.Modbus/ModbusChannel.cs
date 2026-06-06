@@ -30,7 +30,7 @@ public sealed class ModbusChannel(IModbusMaster master) : IReadWriteChannel
         where TValue : unmanaged
     {
         if (tag.Address is not ModbusAddress address) return Result.Error<TValue>( "无效地址");
-        if (!address.FunctionCode.IsRead) Result.Error<TValue>( "不是有效的 Modbus 读值地址");
+        if (!address.FunctionCode.IsRead) return Result.Error<TValue>( "不是有效的 Modbus 读值地址");
 
         var byte_count = address.FunctionCode.IsReadCoils ? 1 : tag.DataLength;
         var buffer = ArrayPool<byte>.Shared.Rent(byte_count);
@@ -78,7 +78,7 @@ public sealed class ModbusChannel(IModbusMaster master) : IReadWriteChannel
     public async ValueTask<Result> WriteAsync<TValue>(ITag<TValue> tag, TValue value, CancellationToken cancellationToken = default) where TValue : unmanaged
     {
         if (tag.Address is not ModbusAddress address) return Result.Error("无效地址");
-        if (!address.FunctionCode.IsWrite) Result.Error<TValue>( "不是有效的 Modbus 写值地址");
+        if (!address.FunctionCode.IsWrite) return Result.Error<TValue>( "不是有效的 Modbus 写值地址");
 
 
         if (address.FunctionCode == FunctionCode.WriteMultipleCoils)

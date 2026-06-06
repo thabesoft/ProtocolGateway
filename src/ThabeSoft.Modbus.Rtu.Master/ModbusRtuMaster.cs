@@ -231,7 +231,7 @@ public sealed class ModbusRtuMaster(ITransport transport) : IModbusMaster
         {
             // 请求编码
             var span = buffer.AsSpan(0, send_layout.TotalLength);
-            var header = WriteMultipleRequestHeader.Coils(slaveId, address);
+            var header = WriteMultipleRequestHeader.Registers(slaveId, address);
             var encode_result = RtuMasterWriteMultipleCodec.EncodeRegistersRequest(span, header, values.Span, send_layout);
             if (!encode_result.IsSuccess) return encode_result;
 
@@ -247,7 +247,7 @@ public sealed class ModbusRtuMaster(ITransport transport) : IModbusMaster
             if (!receive_result.IsSuccess) return receive_result;
 
             // 响应解码
-            return RtuMasterWriteMultipleCodec.DecodeCoilsResponse(receive_mem.Span, receive_layout);
+            return RtuMasterWriteMultipleCodec.DecodeRegistersResponse(receive_mem.Span, receive_layout);
         }
         finally
         {

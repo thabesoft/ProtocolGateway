@@ -60,10 +60,10 @@ public abstract class LifecycleObject : ILifecycle
 
             // 启动结果
             var start_result = await StartProcessAsync(cancellationToken);
-            State = can_start_result.IsSuccess ? LifecycleState.Running : LifecycleState.Faulted;
+            State = start_result.IsFailure ? LifecycleState.Faulted : LifecycleState.Running;
 
             // 返回结果
-            return can_start_result;
+            return start_result;
         }
         catch (Exception ex)
         {
@@ -90,11 +90,11 @@ public abstract class LifecycleObject : ILifecycle
             State = LifecycleState.Stopping;
 
             // 停止结果
-            var start_result = await StopProcessAsync(cancellationToken);
-            State = can_stop_result.IsSuccess ? LifecycleState.Stopped : LifecycleState.Faulted;
+            var stop_result = await StopProcessAsync(cancellationToken);
+            State = stop_result.IsFailure ? LifecycleState.Faulted : LifecycleState.Stopped;
 
             // 返回结果
-            return can_stop_result;
+            return stop_result;
         }
         catch (Exception ex)
         {
@@ -108,15 +108,9 @@ public abstract class LifecycleObject : ILifecycle
         if (State == LifecycleState.Disposed) return;
 
         using var _ = await _lock.LockAsync();
-        try
-        {
-            await DisposeProcessAsync();
-            State = LifecycleState.Disposed;
-        }
-        finally
-        {
-            _lock.Release();
-        }
+
+        await DisposeProcessAsync();
+        State = LifecycleState.Disposed;
 
         GC.SuppressFinalize(this);
     }

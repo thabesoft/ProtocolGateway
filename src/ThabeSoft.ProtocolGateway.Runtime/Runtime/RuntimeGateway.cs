@@ -14,12 +14,12 @@ namespace ThabeSoft.ProtocolGateway.Runtime;
 public sealed class RuntimeGateway : LifecycleObject, IRuntimeGateway, IAsyncDisposable
 {
     private readonly SemaphoreSlim _addLock = new(1, 1);
-    private readonly Dictionary<ChannelName, IRuntimeChannel> _channels = [];
+    private Dictionary<ChannelName, IRuntimeChannel> _channels = [];
 
     // 配追
     public IGatewayConfig Config { get; internal set; } = default!;
     // 运行时通道 
-    public IReadOnlyCollection<IRuntimeChannel> Channels { get; internal set; } = default!;
+    public IReadOnlyCollection<IRuntimeChannel> Channels => _channels.Values;
 
     // 私有构造
     private RuntimeGateway() { }
@@ -64,7 +64,7 @@ public sealed class RuntimeGateway : LifecycleObject, IRuntimeGateway, IAsyncDis
             return Result.Error($"停止失败, 通道不存在 [{name}]");
         }
 
-        return await channel.StartAsync(cancellationToken);
+        return await channel.StopAsync(cancellationToken);
     }
     public async ValueTask<Result> RemoveChannelAsync(ChannelName name)
     {
@@ -235,14 +235,8 @@ public sealed class RuntimeGateway : LifecycleObject, IRuntimeGateway, IAsyncDis
 
         foreach (var i in _channels.Values.ToArray())
         {
-            var result = await i.StopAsync();
+            var result = await i.StopAsync(default);
             if (result.IsProblem) errror_messages.AppendLine(result.Message);
-
-            if (i is IDisposable disposable)
-            {
-                disposable.Dispose();
-                continue;
-            }
 
             if (i is IAsyncDisposable asyncDisposable)
             {
@@ -265,7 +259,11 @@ public sealed class RuntimeGateway : LifecycleObject, IRuntimeGateway, IAsyncDis
             .Select(RuntimeChannel.Create)
             .Merge()
             .ToResult()
-            .Select(x => new RuntimeGateway() { Config = config, Channels = [.. x] });
+            .Select(x => new RuntimeGateway()
+            {
+                Config = config,
+                _channels = x.ToDictionary(x => x.Config.Name, v => (IRuntimeChannel)v)
+            });
 
         //bool has_warning = false;
         //StringBuilder warning_message = new();
