@@ -8,5 +8,5 @@ public interface IRuntimeContext
     /// <summary>
     /// 网关
     /// </summary>
-    IRuntimeGateway RuntimeGateway { get; }
+    IRuntimeGateway? RuntimeGateway { get; }
 }

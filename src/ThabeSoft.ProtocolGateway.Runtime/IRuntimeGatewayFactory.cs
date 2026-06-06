@@ -1,4 +1,6 @@
-﻿namespace ThabeSoft.ProtocolGateway;
+﻿using ThabeSoft.Primitives;
+
+namespace ThabeSoft.ProtocolGateway;
 
 /// <summary>
 /// 运行时网关工厂
@@ -8,5 +10,5 @@ public interface IRuntimeGatewayFactory
     /// <summary>
     /// 创建
     /// </summary>
-    IRuntimeGateway Create();
+    ValueTask<Result<IRuntimeGateway>> CreateAsync(string name);
 }

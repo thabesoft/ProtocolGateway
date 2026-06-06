@@ -7,8 +7,13 @@
 public static partial class ResultExtensions
 {
     // Value
-    extension<T>(Result<T> result)
+    extension<T>(Result<T> result) where T : notnull
     {
+        public T? GetValueOrDefault()
+        {
+            return result.IsSuccess ? result.Value : default;
+        }
+
         public T GetValueOrDefault(T defaultValue)
         {
             return result.IsSuccess ? result.Value : defaultValue;

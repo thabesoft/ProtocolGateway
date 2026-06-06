@@ -14,7 +14,7 @@ internal sealed class RuntimeChannelFactory(IEnumerable<IRuntimeChannelProvider>
     /// <summary>
     /// 从配置创建
     /// </summary>
-    public Result<IRuntimeChannel> CreateFromConfig(ChannelConfig config)
+    public Result<IRuntimeChannel> CreateFromConfig(IChannelConfig config)
     {
         var result = config.Validate();
         if (!result.IsSuccess) return result.Cast<IRuntimeChannel>();

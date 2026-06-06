@@ -2,8 +2,7 @@
 using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Configuration;
 
-
-namespace ThabeSoft.ProtocolGateway.Runtime.Internal;
+namespace ThabeSoft.ProtocolGateway.Runtime;
 
 
 /// <summary>

@@ -8,13 +8,19 @@ namespace ThabeSoft.ProtocolGateway;
 /// </summary>
 public interface IRuntimeGateway : IGateway
 {
+    /// <summary>
+    /// 配置
+    /// </summary>
+    IGatewayConfig Config { get; }
+
+    // 运行时通道
     IReadOnlyCollection<IRuntimeChannel> Channels { get; }
 
 
     /// <summary>
     /// 添加通道
     /// </summary>
-    Result AddChannel(ChannelConfig config);
+    Result AddChannel(IChannelConfig config);
     /// <summary>
     /// 启动通道
     /// </summary>

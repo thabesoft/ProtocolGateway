@@ -18,7 +18,7 @@ internal class RuntimeModbusChannelProvider : IRuntimeChannelProvider
         return config.Protocol is ProtocolType.ModbusRtu or ProtocolType.ModbusTcp or ProtocolType.ModbusUdp;
     }
 
-    public Result<IRuntimeChannel> Create(ChannelConfig config)
+    public Result<IRuntimeChannel> Create(IChannelConfig config)
     {
         var value= new RuntimeModbusChannel(config);
         return Result.Success<IRuntimeChannel>(value);
@@ -27,7 +27,7 @@ internal class RuntimeModbusChannelProvider : IRuntimeChannelProvider
 
 
 
-public class RuntimeModbusChannel(ChannelConfig config) : LifecycleObject, IRuntimeChannel, IReadWriteChannel
+public class RuntimeModbusChannel(IChannelConfig config) : LifecycleObject, IRuntimeChannel, IReadWriteChannel
 {
     private ITransport _transport;
     private IModbusMaster _master;

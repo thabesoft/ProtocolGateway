@@ -28,8 +28,6 @@ public static class DependencyInjectionExtensions
         {
             // UI 程序生命周期
             services.AddSingleton<IApplicationLifetimeAccessor>(application);
-            // 运行时上下文
-            services.AddSingleton<IRuntimeContext, RuntimeContext>();
             // 模板注册器
             services.AddSingleton<IDataTemplateRegistry>(application);
             // 视图模型提供者
@@ -64,10 +62,13 @@ public static class DependencyInjectionExtensions
             // 通道详情页面
             services.TryAddTransient<ChannelDetailsPage>();
             services.TryAddTransient<ChannelDetailsPageViewModel>();
-            
 
+            // 运行时上下文
+            services.AddSingleton<RuntimeContext>();
+            services.AddSingleton<IRuntimeContext>(x => x.GetRequiredService<RuntimeContext>());
 
             // 初始化
+            services.AddHostedService(x => x.GetRequiredService<RuntimeContext>());
             services.AddHostedService<Initialization>();
         }
     }

@@ -10,16 +10,18 @@ namespace ThabeSoft.ProtocolGateway.Runtime;
 /// <summary>
 /// 运行时网关
 /// </summary>
-internal sealed class RuntimeGateway(IRuntimeChannelFactory factory) : LifecycleObject, IRuntimeGateway, IAsyncDisposable
+internal sealed class RuntimeGateway(IGatewayConfig config, IRuntimeChannelFactory factory) : LifecycleObject, IRuntimeGateway, IAsyncDisposable
 {
     private readonly SemaphoreSlim _addLock = new(1, 1);
     private readonly Dictionary<ChannelName, IRuntimeChannel> _channels = [];
 
 
+    public IGatewayConfig Config => config;
     /// <summary>
     /// 所有通道
     /// </summary>
     public IReadOnlyCollection<IRuntimeChannel> Channels => _channels.Values;
+
 
 
     #region --通道管理--
@@ -27,7 +29,7 @@ internal sealed class RuntimeGateway(IRuntimeChannelFactory factory) : Lifecycle
     /// <summary>
     /// 添加通道
     /// </summary>
-    public Result AddChannel(ChannelConfig config)
+    public Result AddChannel(IChannelConfig config)
     {
         using var _ = _addLock.Lock();
 

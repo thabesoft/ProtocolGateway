@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Infrastructure.Json;
 
 namespace ThabeSoft.ProtocolGateway.Configuration.Json;
@@ -9,23 +10,71 @@ namespace ThabeSoft.ProtocolGateway.Configuration.Json;
 /// </summary>
 internal sealed class ConfigJsonSerializer(ConfigJsonSerializerContext context)
 {
-    public ValueTask<GatewayConfig?> DeserializeAsync(Stream stream, CancellationToken cancellationToken = default)
+    public async ValueTask<Result<GatewayConfig>> DeserializeAsync(Stream stream, CancellationToken cancellationToken = default)
     {
-        return JsonSerializer.DeserializeAsync(stream, context.GatewayConfig, cancellationToken: cancellationToken);
+        if (!stream.CanRead)
+        {
+            return Result.Error<GatewayConfig>("无法反序列化Json, 目标流不支持读取");
+        }
+
+        try
+        {
+            var value = await JsonSerializer.DeserializeAsync(stream, context.GatewayConfig, cancellationToken: cancellationToken);
+            if (value is not null) return Result.Success(value);
+
+            return Result.Error<GatewayConfig>("无法反序列化Json, 未解析到内容");
+        }
+        catch (Exception ex)
+        {
+            return Result.Error<GatewayConfig>($"无法反序列化Json, {ex.Message}");
+        }
     }
-    public Task SerializeAsync(GatewayConfig config, Stream stream, CancellationToken cancellationToken = default)
+    public async Task<Result> SerializeAsync(GatewayConfig config, Stream stream, CancellationToken cancellationToken = default)
     {
-        return JsonSerializer.SerializeAsync(stream, config, context.GatewayConfig, cancellationToken: cancellationToken);
+        if (!stream.CanWrite)
+        {
+            return Result.Error("无法序列化为Json, 目标流不支持写入");
+        }
+
+        try
+        {
+            await JsonSerializer.SerializeAsync(stream, config, context.GatewayConfig, cancellationToken: cancellationToken);
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Error<GatewayConfig>($"无法序列化为Json, {ex.Message}");
+        }
     }
 
 
-    public GatewayConfig? Deserialize(string json)
+    public Result<GatewayConfig> Deserialize(string json)
     {
-        return JsonSerializer.Deserialize(json, context.GatewayConfig);
+        try
+        {
+            var value = JsonSerializer.Deserialize(json, context.GatewayConfig);
+            if (value is not null) return Result.Success(value);
+
+            return Result.Error<GatewayConfig>("无法反序列化Json, 未解析到内容");
+        }
+        catch (Exception ex)
+        {
+            return Result.Error<GatewayConfig>($"无法反序列化Json, {ex.Message}");
+        }
     }
-    public string Serialize(GatewayConfig config)
+    public Result<string> Serialize(GatewayConfig config)
     {
-        return JsonSerializer.Serialize(config, context.GatewayConfig);
+        try
+        {
+            var value = JsonSerializer.Serialize(config, context.GatewayConfig);
+            if (!string.IsNullOrWhiteSpace(value)) return Result.Success(value);
+
+            return Result.Error<string>("无法序列化为Json, 没有内容");
+        }
+        catch (Exception ex)
+        {
+            return Result.Error<string>($"无法序列化为Json, {ex.Message}");
+        }
     }
 }
 
@@ -34,25 +83,25 @@ internal static class ConfigJsonSerializerExtensions
 {
     extension(ConfigJsonSerializer serializer)
     {
-        public async ValueTask<GatewayConfig?> DeserializeFromFileAsync(string fiePath, CancellationToken cancellationToken = default)
+        public async ValueTask<Result<GatewayConfig>> DeserializeFromFileAsync(string fiePath, CancellationToken cancellationToken = default)
         {
-            if (!File.Exists(fiePath)) return default;
+            if (!File.Exists(fiePath))
+            {
+                return Result.Error<GatewayConfig>($"无法反序列化Json, 文件不存在: {fiePath}");
+            }
 
             try
             {
                 await using var fs = new FileStream(fiePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true);
                 return await serializer.DeserializeAsync(fs, cancellationToken);
             }
-            catch (IOException ex)
+            catch (Exception ex)
             {
-                throw new InvalidOperationException($"Failed to load config from {fiePath}", ex);
-            }
-            catch (JsonException ex)
-            {
-                throw new InvalidOperationException($"Invalid JSON format in {fiePath}", ex);
+                return Result.Error<GatewayConfig>($"无法反序列化Json文件, {ex.Message}");
             }
         }
-        public async Task SerializeToFileAsync(GatewayConfig config, string filePath, CancellationToken cancellationToken = default)
+
+        public async Task<Result> SerializeToFileAsync(GatewayConfig config, string filePath, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -61,10 +110,12 @@ internal static class ConfigJsonSerializerExtensions
 
                 await using var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, true);
                 await serializer.SerializeAsync(config, stream, cancellationToken);
+
+                return Result.Success();
             }
-            catch (IOException ex)
+            catch (Exception ex)
             {
-                throw new InvalidOperationException($"Failed to write config file: {filePath}", ex);
+                return Result.Error<GatewayConfig>($"无法序列化为Json文件, {ex.Message}");
             }
         }
     }

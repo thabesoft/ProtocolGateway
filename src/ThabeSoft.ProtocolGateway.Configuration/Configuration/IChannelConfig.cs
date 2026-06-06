@@ -3,7 +3,7 @@
 /// <summary>
 /// 通道配置
 /// </summary>
-public interface IChannelConfig : IValidatable
+public interface IChannelConfig : IValidatable, IDeepCloneable<ChannelConfig>
 {
     ChannelType Type { get; }
     ChannelName Name { get; }

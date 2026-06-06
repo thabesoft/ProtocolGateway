@@ -1,4 +1,6 @@
 ﻿using Avalonia.Controls.ApplicationLifetimes;
+using ThabeSoft.Primitives;
+using ThabeSoft.ProtocolGateway.ViewModels;
 
 namespace ThabeSoft.ProtocolGateway.Services;
 
@@ -8,9 +10,10 @@ namespace ThabeSoft.ProtocolGateway.Services;
 public interface IApplicationLifetimeAccessor
 {
     /// <summary>
-    /// 生命周期
+    /// 设置主视图
     /// </summary>
-    IApplicationLifetime? ApplicationLifetime { get; }
+    /// <param name="viewModel">主视图模型实例</param>
+    Result SetMainView(IViewModel viewModel);
 
     /// <summary>
     /// 关闭应用

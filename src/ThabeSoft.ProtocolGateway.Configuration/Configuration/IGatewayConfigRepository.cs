@@ -1,4 +1,6 @@
-﻿namespace ThabeSoft.ProtocolGateway.Configuration;
+﻿using ThabeSoft.Primitives;
+
+namespace ThabeSoft.ProtocolGateway.Configuration;
 
 
 /// <summary>
@@ -9,10 +11,10 @@ public interface IGatewayConfigRepository
     /// <summary>
     /// 根据名称获取配置
     /// </summary>
-    ValueTask<GatewayConfig?> FindBytNameAsync(string name, CancellationToken cancellationToken = default);
+    ValueTask<Result<GatewayConfig>> FindBytNameAsync(string name, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 更新配置
     /// </summary>
-    Task UpdateAsync(GatewayConfig config, CancellationToken cancellationToken = default);
+    Task<Result> UpdateAsync(GatewayConfig config, CancellationToken cancellationToken = default);
 }

@@ -12,5 +12,5 @@ internal interface IRuntimeChannelFactory
     /// <summary>
     /// 创建
     /// </summary>
-    Result<IRuntimeChannel> CreateFromConfig(ChannelConfig config);
+    Result<IRuntimeChannel> CreateFromConfig(IChannelConfig config);
 }

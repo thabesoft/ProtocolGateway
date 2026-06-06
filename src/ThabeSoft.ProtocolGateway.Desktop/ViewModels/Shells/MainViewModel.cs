@@ -14,7 +14,7 @@ namespace ThabeSoft.ProtocolGateway.ViewModels.Shells;
 /// </summary>
 public sealed partial class MainViewModel : ViewModel, INavigationService, IMenuService
 {
-    private IViewModelProvider? _viewModelProvider;
+    private readonly IViewModelProvider? _viewModelProvider;
     private ObservableCollection<NavigationMenuItemViewModel> _menuItems = [];
 
 
@@ -40,8 +40,8 @@ public sealed partial class MainViewModel : ViewModel, INavigationService, IMenu
     public partial IViewModel? Content { get; private set; }
 
 
-
-    public MainViewModel()
+    [Obsolete("仅供设计时使用")]
+    internal MainViewModel()
     {
         if (Design.IsDesignMode)
         {
@@ -52,17 +52,6 @@ public sealed partial class MainViewModel : ViewModel, INavigationService, IMenu
     {
         _viewModelProvider = viewModelProvider;
     }
-
-
-    /// <summary>
-    /// 更新视图模型提供者
-    /// </summary>
-    public void UpdateViewModelProvider(IViewModelProvider provider)
-    {
-        _viewModelProvider = provider;
-    }
-
-
 
 
     /// <summary>

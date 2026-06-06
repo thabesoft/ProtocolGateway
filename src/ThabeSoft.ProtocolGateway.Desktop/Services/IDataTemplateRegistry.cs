@@ -1,4 +1,5 @@
 using Avalonia.Controls.Templates;
+using ThabeSoft.Primitives;
 
 namespace ThabeSoft.ProtocolGateway.Services;
 
@@ -7,5 +8,5 @@ namespace ThabeSoft.ProtocolGateway.Services;
 /// </summary>
 public interface IDataTemplateRegistry
 {
-    void Add(IDataTemplate dataTemplate);
+    Result Add(IDataTemplate dataTemplate);
 }

@@ -1,4 +1,5 @@
 using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Templates;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
@@ -6,7 +7,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Diagnostics;
+using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Services;
+using ThabeSoft.ProtocolGateway.ViewModels;
+using ThabeSoft.ProtocolGateway.Views.Shells;
 
 namespace ThabeSoft.ProtocolGateway;
 
@@ -23,7 +27,7 @@ public class App : Application, IDataTemplateRegistry, IApplicationLifetimeAcces
                 // 核心
                 //services.AddProtocolGateway();
                 // 配置
-                services.AddGatewayConfiguration(x => context.Configuration.GetSection("Config").Bind(x));
+                services.AddGatewayConfiguration(x => context.Configuration.GetSection("Config")?.Bind(x));
                 // 配置实例创建
                 services.AddRuntimeGateway();
                 // 桌面
@@ -42,9 +46,15 @@ public class App : Application, IDataTemplateRegistry, IApplicationLifetimeAcces
         TaskScheduler.UnobservedTaskException += OnTaskUnobservedException;
         Dispatcher.UIThread.UnhandledException += OnDispatcherUnhandledException;
 
-
-        await _host.StartAsync();
-        base.OnFrameworkInitializationCompleted();
+        try
+        {
+            await _host.StartAsync();
+            base.OnFrameworkInitializationCompleted();
+        }
+        catch (Exception ex)
+        {
+            LogError(ex, "Host 启动异常");
+        }
     }
 
     private void OnAppDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -89,10 +99,44 @@ public class App : Application, IDataTemplateRegistry, IApplicationLifetimeAcces
 
 
 
-    void IDataTemplateRegistry.Add(IDataTemplate dataTemplate)
+    Result IDataTemplateRegistry.Add(IDataTemplate dataTemplate)
     {
-        if (DataTemplates.Contains(dataTemplate)) return;
-        DataTemplates.Add(dataTemplate);
+        return Dispatcher.Invoke(() =>
+        {
+            if (DataTemplates.Contains(dataTemplate))
+            {
+                return Result.Error("模板添加失败, 已存在相同实例");
+            }
+
+            DataTemplates.Add(dataTemplate);
+            return Result.Success();
+        });
+    }
+
+    Result IApplicationLifetimeAccessor.SetMainView(IViewModel vm)
+    {
+        Result UpdateAction()
+        {
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                desktop.MainWindow = new MainWindow() { DataContext = vm };
+                desktop.MainWindow.Closed += async delegate { await _host.StopAsync(); };
+                desktop.MainWindow.Show();
+
+                return Result.Success();
+            }
+
+            if (ApplicationLifetime is ISingleViewApplicationLifetime singleView)
+            {
+                singleView.MainView = new MainView() { DataContext = vm };
+
+                return Result.Success();
+            }
+
+            return Result.Warning("无法设置主视图, 不支持的应用生命周期类型");
+        }
+
+        return Dispatcher.UIThread.Invoke(UpdateAction);
     }
     async Task IApplicationLifetimeAccessor.ShutdownAsync()
     {

@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media;
+using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ThabeSoft.ProtocolGateway.ViewModels.Pages;
@@ -47,14 +48,8 @@ internal sealed class Initialization(IServiceProvider services) : IHostedService
     {
         var application = services.GetRequiredService<IApplicationLifetimeAccessor>();
 
-        // 桌面应用
-        if (application.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-        {
-            var vm = services.GetRequiredService<MainWindowViewModel>();
-
-            desktop.MainWindow = new MainWindow() { DataContext = vm };
-            desktop.MainWindow.Closed += async delegate { await application.ShutdownAsync(); };
-        }
+        var vm = services.GetRequiredService<MainWindowViewModel>();
+        application.SetMainView(vm);
     }
     // 注册菜单
     public static void RegisterMenus(MainViewModel mainViewModel)
