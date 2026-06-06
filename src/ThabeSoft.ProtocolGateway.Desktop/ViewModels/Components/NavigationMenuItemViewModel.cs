@@ -61,7 +61,7 @@ public sealed partial class NavigationMenuItemViewModel : ViewModel, IEquatable<
     }
     internal static Result<NavigationMenuItemViewModel> Create<T>(string icon, string header) where T : IViewModel
     {
-        return IconName.Create(icon).Map(x => Create<T>(x, header));
+        return IconName.Create(icon).Select(x => Create<T>(x, header));
     }
 
 

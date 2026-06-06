@@ -42,7 +42,7 @@ public readonly struct ByteSerializer :
 
     Result<sbyte> IBinarySerializer<sbyte>.Deserialize(ReadOnlySpan<byte> source)
     {
-        return Deserialize(source).Map(x => (sbyte)x);
+        return Deserialize(source).Select(x => (sbyte)x);
     }
     Result IBinarySerializer<sbyte>.Serialize(sbyte source, Span<byte> destination)
     {

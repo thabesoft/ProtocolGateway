@@ -52,9 +52,9 @@ public class ResultBenchmark
     public void PipeDelegate()
     {
         var result = TestResult1()
-            .Bind(TestResult2)
-            .Bind(TestResult3)
-            .Bind(TestResult4)
+            .Select(TestResult2)
+            .Select(TestResult3)
+            .Select(TestResult4)
             .Bind(TestResult5);
     }
 
@@ -72,9 +72,9 @@ public class ResultBenchmark
     public void Pipe()
     {
         var result = Result.Success(10)
-            .Bind(x => Result.Success<double>(x))
-            .Bind(x => Result.Success(x.ToString()))
-            .Bind(x => Result.Success(x.Length))
+            .Select(x => Result.Success<double>(x))
+            .Select(x => Result.Success(x.ToString()))
+            .Select(x => Result.Success(x.Length))
             .Bind(x => Result.Success());
     }
 

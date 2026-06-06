@@ -51,20 +51,20 @@ public static partial class ResultExtensions
         }
     }
 
-    extension<T>(Result<T> result) where T : notnull
+    extension<T>(Result<TValue> result) where TValue : notnull
     {
-        public MergeResult<T> Merge(Result<T> other)
+        public MergeResult<TValue> Merge(Result<TValue> other)
         {
-            MergeResult<T> combineResult = new();
+            MergeResult<TValue> combineResult = new();
             combineResult.Merge(result);
             combineResult.Merge(other);
 
             return combineResult;
         }
 
-        public MergeResult<T> Merge(MergeResult<T> other)
+        public MergeResult<TValue> Merge(MergeResult<TValue> other)
         {
-            MergeResult<T> combineResult = new();
+            MergeResult<TValue> combineResult = new();
             combineResult.Merge(result);
             combineResult.Merge(other);
 

@@ -19,7 +19,7 @@ public sealed class RtuSlaveReadCodec : ISlaveReadCodec
 
     Result<ReadRequestHeader> ISlaveReadCodec.DecodeRequest(ReadOnlySpan<byte> source)
     {
-        return DecodeRequest(source).Map(x => (ReadRequestHeader)x);
+        return DecodeRequest(source).Select(x => (ReadRequestHeader)x);
     }
     Result<int> ISlaveReadCodec.EncodeCoilsResponse(Span<byte> destination, in ReadResponseHeader header, Span<bool> values)
     {

@@ -15,8 +15,8 @@ public class BindTests
 
 
 
-        result.Bind(_ => result).AssertIsTrue();
-        result.Bind("State", (_, _) => result).AssertIsTrue();
+        result.Select(_ => result).AssertIsTrue();
+        result.Select("State", (_, _) => result).AssertIsTrue();
 
         _ = await result.BindAsync(_ => task_result).AssertIsTrue();
         await result.BindAsync((_, _) => task_result).AssertIsTrue();

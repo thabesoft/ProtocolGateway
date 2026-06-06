@@ -4,4 +4,19 @@
 		<RootNamespace>ThabeSoft.Primitives</RootNamespace>
 	</PropertyGroup>
 
+	<ItemGroup>
+	  <Compile Remove="Extensions\ResultExtensions.Bind.cs" />
+	  <Compile Remove="Extensions\ResultExtensions.Factory.cs" />
+	  <Compile Remove="Extensions\ResultExtensions.Map.cs" />
+	  <Compile Remove="Extensions\ResultExtensions.Merge.cs" />
+	  <Compile Remove="Extensions\ResultExtensions.OrElse.cs" />
+	  <Compile Remove="Extensions\ResultExtensions.Out.cs" />
+	  <Compile Remove="Extensions\ResultExtensions.Tap.cs" />
+	  <Compile Remove="Extensions\ResultExtensions.TapError.cs" />
+	  <Compile Remove="Extensions\ResultExtensions.Template.cs" />
+	  <Compile Remove="Extensions\ResultExtensions.Then.cs" />
+	  <Compile Remove="Extensions\ResultExtensions.Value.cs" />
+	  <Compile Remove="Extensions\ResultExtensions.Where.cs" />
+	</ItemGroup>
+
 </Project>

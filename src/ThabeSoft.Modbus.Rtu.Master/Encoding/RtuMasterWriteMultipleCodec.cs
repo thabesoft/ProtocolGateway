@@ -28,11 +28,11 @@ public sealed class RtuMasterWriteMultipleCodec : IMasterWriteMultipleCodec
     }
     Result<WriteMultipleResponseHeader> IMasterWriteMultipleCodec.DecodeCoilsResponse(ReadOnlySpan<byte> source)
     {
-        return DecodeCoilsResponse(source).Map(x => (WriteMultipleResponseHeader)x);
+        return DecodeCoilsResponse(source).Select(x => (WriteMultipleResponseHeader)x);
     }
     Result<WriteMultipleResponseHeader> IMasterWriteMultipleCodec.DecodeRegistersResponse(ReadOnlySpan<byte> source)
     {
-        return DecodeRegistersResponse(source).Map(x => (WriteMultipleResponseHeader)x);
+        return DecodeRegistersResponse(source).Select(x => (WriteMultipleResponseHeader)x);
     }
 
 
@@ -41,7 +41,7 @@ public sealed class RtuMasterWriteMultipleCodec : IMasterWriteMultipleCodec
     public static Result<int> EncodeCoilsRequest(Span<byte> destination, in WriteMultipleRequestHeader header, ReadOnlySpan<bool> values)
     {
         var layout_result = WriteCoilsQuantity.Create(values.Length)
-            .Map(RtuWriteMultipleRequestLayout.FromQuantity);
+            .Select(RtuWriteMultipleRequestLayout.FromQuantity);
         if (!layout_result.IsSuccess) return layout_result.Cast<int>();
 
         return EncodeCoilsRequest(destination, header, values, layout_result.Value).Then(layout_result.Value.TotalLength);
@@ -104,7 +104,7 @@ public sealed class RtuMasterWriteMultipleCodec : IMasterWriteMultipleCodec
     public static Result<int> EncodeRegistersRequest(Span<byte> destination, in WriteMultipleRequestHeader header, ReadOnlySpan<ushort> values)
     {
         var layout_result = WriteRegistersQuantity.Create(values.Length)
-            .Map(RtuWriteMultipleRequestLayout.FromQuantity);
+            .Select(RtuWriteMultipleRequestLayout.FromQuantity);
         if (!layout_result.IsSuccess) return layout_result.Cast<int>();
 
         return EncodeRegistersRequest(destination, header, values, layout_result.Value).Then(layout_result.Value.TotalLength);

@@ -23,11 +23,11 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
     }
     Result<ReadResponseHeader> IMasterReadCodec.DecodeCoilsResponse(ReadOnlySpan<byte> source, Span<bool> destination)
     {
-        return DecodeCoilsResponse(source, destination).Map(x => (ReadResponseHeader)x);
+        return DecodeCoilsResponse(source, destination).Select(x => (ReadResponseHeader)x);
     }
     Result<ReadResponseHeader> IMasterReadCodec.DecodeRegistersResponse(ReadOnlySpan<byte> source, Span<ushort> destination)
     {
-        return DecodeRegistersResponse(source, destination).Map(x => (ReadResponseHeader)x);
+        return DecodeRegistersResponse(source, destination).Select(x => (ReadResponseHeader)x);
     }
 
 
@@ -75,7 +75,7 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
 
     public static Result<RtuReadResponseHeader> DecodeCoilsResponse(ReadOnlySpan<byte> source, Span<bool> destination)
     {
-        var layout_result = ReadCoilsQuantity.Create(destination.Length).Map(RtuReadResponseLayout.FromQuantity);
+        var layout_result = ReadCoilsQuantity.Create(destination.Length).Select(RtuReadResponseLayout.FromQuantity);
         if (!layout_result.IsSuccess) return layout_result.Cast<RtuReadResponseHeader>();
 
         return DecodeCoilsResponse(source, destination, layout_result.Value);
@@ -101,7 +101,7 @@ public sealed class RtuMasterReadCodec : IMasterReadCodec
 
     public static Result<RtuReadResponseHeader> DecodeRegistersResponse(ReadOnlySpan<byte> source, Span<ushort> destination)
     {
-        var layout_result = ReadRegistersQuantity.Create(destination.Length).Map(RtuReadResponseLayout.FromQuantity);
+        var layout_result = ReadRegistersQuantity.Create(destination.Length).Select(RtuReadResponseLayout.FromQuantity);
         if (!layout_result.IsSuccess) return layout_result.Cast<RtuReadResponseHeader>();
 
         return DecodeRegistersResponse(source, destination, layout_result.Value);
