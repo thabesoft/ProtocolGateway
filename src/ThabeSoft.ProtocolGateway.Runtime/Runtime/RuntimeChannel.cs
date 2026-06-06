@@ -2,6 +2,7 @@
 using ThabeSoft.Lifecycle;
 using ThabeSoft.Modbus;
 using ThabeSoft.Primitives;
+using ThabeSoft.Primitives.Linq;
 using ThabeSoft.ProtocolGateway.Configuration;
 
 namespace ThabeSoft.ProtocolGateway.Runtime;
@@ -58,7 +59,7 @@ public sealed class RuntimeChannel : LifecycleObject, IRuntimeChannel
     {
         // 验证配置
         var validate_result = config.Validate();
-        if (!validate_result.IsSuccess) return validate_result.Cast<RuntimeChannel>();
+        if (validate_result.IsFailure) return validate_result.Cast<RuntimeChannel>();
 
         // 创建端口
         var runtime_port_result = RuntimePort.Create(config.Port);
@@ -83,7 +84,12 @@ public sealed class RuntimeChannel : LifecycleObject, IRuntimeChannel
             Port = runtime_port_result.Value,
             Tags = runtime_tag_result.Value
         };
-        return Result.Success(runtime_channel);
+
+        return validate_result
+            .Merge(runtime_port_result)
+            .Merge(channel_result)
+            .Merge(runtime_tag_result)
+            .WithValue(runtime_channel);
     }
 
     private static Result<IChannel> GetChannel(ChannelType type, IRuntimePort port)

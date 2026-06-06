@@ -85,6 +85,13 @@ public static partial class ResultExtensions
             if (result.IsSuccess) handler(result.Value);
             return result;
         }
+
+        public Result<T> Tap<TState>( TState state, Action<T, TState> handler)
+        {
+            if (result.IsSuccess) handler(result.Value, state);
+            return result;
+        }
+
         public async ValueTask<Result<T>> TapAsync(Func<T, ValueTask> handler)
         {
             if (result.IsSuccess) await handler(result.Value);

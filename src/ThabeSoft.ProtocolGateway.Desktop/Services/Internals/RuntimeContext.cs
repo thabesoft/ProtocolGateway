@@ -17,19 +17,10 @@ internal sealed class RuntimeContext(IGatewayConfigRepository gatewayConfigRepos
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         var result = await gatewayConfigRepository.FindBytNameAsync("Default", cancellationToken);
-        if(!result.IsFailure)
-        {
-            var create_result = RuntimeGateway.Create(result.Value);
-            if(!create_result.IsFailure)
-            {
-                Gateway = create_result.Value;
-                return;
-            }
 
-            Debug.WriteLine($"网关初始化失败: {create_result.Message}");
-        }
-
-        Debug.WriteLine($"运行时上下文初始化失败: {result.Message}");
+        result.Bind(RuntimeGateway.Create)
+            .Tap(this, static (x, state) => state.Gateway = x)
+            .TapError(static  (_, msg) => Debug.WriteLine($"网关初始化失败: {msg}"));
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

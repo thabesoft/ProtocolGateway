@@ -11,6 +11,7 @@ public static partial class ResultExtensions
             if (result.IsSuccess) return Result.Success(valueGetter(result.Value));
             return result.Cast<U>();
         }
+
         public async Task<Result<U>> BindAsync<U>(Func<T, Task<U>> valueGetterTask)
         {
             if (result.IsSuccess) return Result.Success(await valueGetterTask(result.Value));
@@ -39,6 +40,13 @@ public static partial class ResultExtensions
 
             return result.Cast<U>();
         }
+        public Result<U> Bind<U, TState>(TState state, Func<T, TState, Result<U>> resultGetter)
+        {
+            if (result.IsSuccess) return resultGetter(result.Value, state);
+
+            return result.Cast<U>();
+        }
+
         public async Task<Result<U>> BindAsync<U>(Func<T, Task<Result<U>>> resultGetterTask)
         {
             if (result.IsSuccess) return await resultGetterTask(result.Value);

@@ -1,8 +1,10 @@
 ﻿using System.Diagnostics;
 using System.Reactive.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using ThabeSoft.Lifecycle;
 using ThabeSoft.Primitives;
+using ThabeSoft.Primitives.Linq;
 using ThabeSoft.ProtocolGateway.Configuration;
 
 namespace ThabeSoft.ProtocolGateway.Runtime;
@@ -261,36 +263,46 @@ public sealed class RuntimeGateway : LifecycleObject, IRuntimeGateway, IAsyncDis
 
     public static Result<RuntimeGateway> Create(IGatewayConfig config)
     {
-        bool has_warning = false;
-        StringBuilder warning_message = new();
-        List<IRuntimeChannel> channels = [];
+        return config.Channels
+            .Select(RuntimeChannel.Create)
+            .Merge()
+            .Map (x => new RuntimeGateway() { Config = config, Channels = [.. x] });
 
-        foreach (var i in config.Channels)
-        {
-            var result = RuntimeChannel.Create(i);
-            if (result.IsFailure)
-            {
-                warning_message.AppendLine(result.Message);
-                continue;
-            }
+        //bool has_warning = false;
+        //StringBuilder warning_message = new();
+        //List<IRuntimeChannel> channels = [];
 
-            has_warning = true;
-            channels.Add(result.Value);
-        }
+        //var fuck = from i in config.Channels
+        //           let result = RuntimeChannel.Create(i)
+        //           select (has_error: !result.IsFailure, result);
 
 
-        var value = new RuntimeGateway() { Config = config, Channels = channels };
+        //foreach (var i in config.Channels)
+        //{
+        //    var result = RuntimeChannel.Create(i);
+        //    if (result.IsFailure)
+        //    {
+        //        warning_message.AppendLine(result.Message);
+        //        continue;
+        //    }
 
-        if (has_warning)
-        {
-            var message = $"通道没有完全加载成功{Environment.NewLine}{warning_message}";
-            return Result.Warning<RuntimeGateway>(message, value);
-        }
-        else
-        {
-            return Result.Success<RuntimeGateway>(value);
-        }
+        //    has_warning = true;
+        //    channels.Add(result.Value);
+        //}
+
+
+        //var value = new RuntimeGateway() { Config = config, Channels = channels };
+
+        //if (has_warning)
+        //{
+        //    var message = $"通道没有完全加载成功{Environment.NewLine}{warning_message}";
+        //    return Result.Warning<RuntimeGateway>(message, value);
+        //}
+        //else
+        //{
+        //    return Result.Success<RuntimeGateway>(value);
+        //}
     }
 
     #endregion
-}
+} 

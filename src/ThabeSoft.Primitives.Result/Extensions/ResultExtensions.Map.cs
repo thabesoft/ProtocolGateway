@@ -7,7 +7,7 @@
 public static partial class ResultExtensions
 {
     // Value
-    extension<T>(Result<T> result)
+    extension<T>(IResult<T> result) where T : notnull
     {
         public Result<U> Map<U>(Func<T, U> valueMapper)
         {

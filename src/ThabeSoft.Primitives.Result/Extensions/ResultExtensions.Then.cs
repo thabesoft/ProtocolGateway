@@ -51,6 +51,13 @@ public static partial class ResultExtensions
             if (result.IsSuccess) return returnResultGetter();
             return result.Cast<U>();
         }
+        public Result<U> Then<TState, U>(TState state, Func<TState, Result<U>> returnResultGetter)
+        {
+            if (result.IsSuccess) return returnResultGetter(state);
+            return result.Cast<U>();
+        }
+
+
         public async ValueTask<Result<U>> ThenAsync<U>(Func<Task<Result<U>>> returnResultGetterTask)
         {
             if (result.IsSuccess) return await returnResultGetterTask();
