@@ -1,12 +1,8 @@
 ﻿namespace ThabeSoft.Primitives;
 
-
-/// <summary>
-/// Template
-/// </summary>
+// State
 public static partial class ResultExtensions
 {
-    // Value
     extension<T>(T result) where T : IResult
     {
         /// <summary>

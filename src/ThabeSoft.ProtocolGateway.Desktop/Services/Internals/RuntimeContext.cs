@@ -10,7 +10,6 @@ namespace ThabeSoft.ProtocolGateway.Services.Internals;
 /// <summary>
 /// 运行时上下文
 /// </summary>
-/// <param name="factory"></param>
 internal sealed class RuntimeContext(IGatewayConfigRepository gatewayConfigRepository) : IRuntimeContext, IHostedService
 {
     public IRuntimeGateway? Gateway { get; private set; }

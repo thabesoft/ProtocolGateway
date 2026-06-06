@@ -6,15 +6,20 @@
 /// </summary>
 public interface IResult
 {
-    /// <summary> 等级 </summary>
+    /// <summary>
+    /// 分级
+    /// </summary>
     ResultLevel Level { get; }
-    /// <summary> 消息 </summary>
+
+    /// <summary>
+    /// 消息
+    /// </summary>
     string? Message { get; }
 
     /// <summary>
-    /// 传播错误到指定类型
+    /// 转换错误到指定类型 (必须是没有值的结果)
     /// </summary>
-    Result<U> Cast<U>();
+    Result<UValue> Cast<UValue>() where UValue : notnull;
 }
 
 /// <summary>
@@ -22,7 +27,15 @@ public interface IResult
 /// </summary>
 /// <typeparam name="TValue">包含值的类型</typeparam>
 public interface IResult<out TValue> : IResult
+    where TValue : notnull
 {
-    /// <summary> 值 </summary>
+    /// <summary>
+    /// 是否有值
+    /// </summary>
+    bool HasValue { get; }
+
+    /// <summary>
+    /// 值
+    /// </summary>
     TValue Value { get; }
 }

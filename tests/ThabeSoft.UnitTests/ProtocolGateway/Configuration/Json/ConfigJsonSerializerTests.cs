@@ -1,4 +1,5 @@
-﻿using ThabeSoft.ProtocolGateway.Infrastructure.Json;
+﻿using ThabeSoft.Primitives;
+using ThabeSoft.ProtocolGateway.Infrastructure.Json;
 
 namespace ThabeSoft.ProtocolGateway.Configuration.Json;
 
@@ -55,12 +56,12 @@ public class ConfigJsonSerializerTests
             await service.SerializeToFileAsync(config, tempFile, TestContext.CancellationToken);
 
             // Act - Load
-            var loaded = await service.DeserializeFromFileAsync(tempFile, TestContext.CancellationToken);
+            var loaded_esult = await service.DeserializeFromFileAsync(tempFile, TestContext.CancellationToken);
 
             // Assert
-            Assert.IsNotNull(loaded);
-            Assert.AreEqual(config.Name, loaded.Name);
-            Assert.HasCount(config.Channels.Count, loaded.Channels);
+            Assert.IsTrue(loaded_esult.IsSuccess, loaded_esult.Message);
+            Assert.AreEqual(config.Name, loaded_esult.Value.Name);
+            Assert.HasCount(config.Channels.Count, loaded_esult.Value.Channels);
 
             // 输出
             var json_content = await File.ReadAllTextAsync(tempFile);
@@ -115,12 +116,12 @@ public class ConfigJsonSerializerTests
 
 
         // Act - Save
-        var config = service.Deserialize(json);
+        var config_result = service.Deserialize(json);
 
         // Assert
-        Assert.IsNotNull(config);
-        Assert.AreEqual("测试网关", config.Name);
-        Assert.HasCount(1, config.Channels);
+        Assert.IsTrue(config_result.IsSuccess, config_result.Message);
+        Assert.AreEqual("测试网关", config_result.Value.Name);
+        Assert.HasCount(1, config_result.Value.Channels);
     }
 
 
@@ -164,7 +165,8 @@ public class ConfigJsonSerializerTests
 
 
         // Act - Save
-        var json = service.Serialize(config);
-        Console.WriteLine(json);
+        var json_result = service.Serialize(config);
+        Assert.IsTrue(json_result.IsSuccess, json_result.Message);
+        Console.WriteLine(json_result);
     }
 }

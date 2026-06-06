@@ -19,10 +19,10 @@ public static class DependencyInjectionExtensions
         /// <summary>
         /// 添加协议网关配置相关服务
         /// </summary>
-        public void AddGatewayConfiguration(Action<IConfigOptions> optionsAction)
+        public void AddGatewayConfiguration(Func<IConfigOptions> optionsFactory)
         {
             // 配置选项
-            services.Configure<ConfigOptions>(optionsAction);
+            services.AddSingleton(_ => optionsFactory());
 
             // 配置Json序列化
             services.AddSingleton(_ => ConfigJsonSerializerContext.Default);

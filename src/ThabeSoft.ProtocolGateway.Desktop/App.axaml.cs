@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Diagnostics;
 using ThabeSoft.Primitives;
+using ThabeSoft.ProtocolGateway.Configuration.Options;
 using ThabeSoft.ProtocolGateway.Services;
 using ThabeSoft.ProtocolGateway.ViewModels;
 using ThabeSoft.ProtocolGateway.Views.Shells;
@@ -24,10 +25,8 @@ public class App : Application, IDataTemplateRegistry, IApplicationLifetimeAcces
         _host = Host.CreateDefaultBuilder()
             .ConfigureServices((context, services) =>
             {
-                // 核心
-                //services.AddProtocolGateway();
                 // 配置
-                services.AddGatewayConfiguration(x => context.Configuration.GetSection("Config")?.Bind(x));
+                services.AddGatewayConfiguration(() => context.Configuration.GetValue<ConfigOptions>("Config"));
                 // 桌面
                 services.AddProtocolGatewayDesktop(this);
             })
