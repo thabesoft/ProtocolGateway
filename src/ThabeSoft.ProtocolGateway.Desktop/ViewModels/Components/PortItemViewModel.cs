@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using ThabeSoft.Ports;
 using ThabeSoft.ProtocolGateway.Configuration;
+using ThabeSoft.ProtocolGateway.Runtime;
 
 namespace ThabeSoft.ProtocolGateway.ViewModels.Components;
 

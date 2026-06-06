@@ -1,6 +1,6 @@
 ﻿using ThabeSoft.ProtocolGateway.Configuration;
 
-namespace ThabeSoft.ProtocolGateway;
+namespace ThabeSoft.ProtocolGateway.Runtime;
 
 /// <summary>
 /// 运行时标签

@@ -88,14 +88,14 @@ internal sealed class Tag<TValue> : IRoutableTag<TValue>
     public ChannelName ChannelName { get; }
     public IAddress Address { get; }
     public TagValueType ValueType { get; }
-    public int Length { get; }
+    public int DataLength { get; }
     public IBinarySerializer<TValue> Serializer { get; }
 
     internal Tag(IAddress address, TagValueType type, int length, IBinarySerializer<TValue> converter)
     {
         Address = address;
         ValueType = type;
-        Length = length;
+        DataLength = length;
         Serializer = converter;
     }
 }
@@ -108,7 +108,7 @@ internal sealed class RoutableTag<TValue> : IRoutableTag<TValue>
     public ChannelName ChannelName { get; }
     public IAddress Address { get; }
     public TagValueType ValueType { get; }
-    public int Length { get; }
+    public int DataLength { get; }
     public IBinarySerializer<TValue> Serializer { get; }
 
 
@@ -117,7 +117,7 @@ internal sealed class RoutableTag<TValue> : IRoutableTag<TValue>
         ChannelName = name;
         Address = address;
         ValueType = type;
-        Length = length;
+        DataLength = length;
         Serializer = converter;
     }
 }

@@ -313,7 +313,7 @@ internal sealed class ModbusTag<T>(
 {
     public IAddress Address => address;
     public TagValueType ValueType => dataType;
-    public int Length => length;
+    public int DataLength => length;
     public IBinarySerializer<T> Serializer => converter;
 }
 
@@ -332,6 +332,6 @@ internal sealed class ModbusRoutableTag<T>(
     public ChannelName ChannelName => channelName;
     public IAddress Address => address;
     public TagValueType ValueType => dataType;
-    public int Length => length;
+    public int DataLength => length;
     public IBinarySerializer<T> Serializer => converter;
 }

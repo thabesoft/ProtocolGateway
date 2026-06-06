@@ -16,7 +16,7 @@ public interface ITag
     /// <summary>
     /// 所占用的字节长度
     /// </summary>
-    int Length { get; }
+    int DataLength { get; }
 
     /// <summary>
     /// 值类型

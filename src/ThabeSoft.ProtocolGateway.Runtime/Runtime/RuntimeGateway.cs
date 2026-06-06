@@ -7,21 +7,22 @@ using ThabeSoft.ProtocolGateway.Configuration;
 
 namespace ThabeSoft.ProtocolGateway.Runtime;
 
+
 /// <summary>
 /// 运行时网关
 /// </summary>
-internal sealed class RuntimeGateway(IGatewayConfig config, IRuntimeChannelFactory factory) : LifecycleObject, IRuntimeGateway, IAsyncDisposable
+public sealed class RuntimeGateway : LifecycleObject, IRuntimeGateway, IAsyncDisposable
 {
     private readonly SemaphoreSlim _addLock = new(1, 1);
     private readonly Dictionary<ChannelName, IRuntimeChannel> _channels = [];
 
+    // 配追
+    public IGatewayConfig Config { get; internal set; } = default!;
+    // 运行时通道 
+    public IReadOnlyCollection<IRuntimeChannel> Channels { get; internal set; } = default!;
 
-    public IGatewayConfig Config => config;
-    /// <summary>
-    /// 所有通道
-    /// </summary>
-    public IReadOnlyCollection<IRuntimeChannel> Channels => _channels.Values;
-
+    // 私有构造
+    private RuntimeGateway() { }
 
 
     #region --通道管理--
@@ -39,7 +40,7 @@ internal sealed class RuntimeGateway(IGatewayConfig config, IRuntimeChannelFacto
         }
 
         // 创建运行时通道
-        var channel_result = factory.CreateFromConfig(config);
+        var channel_result = RuntimeChannel.Create(config);
         if (channel_result.IsFailure) return channel_result;
 
         // 添加
@@ -107,7 +108,6 @@ internal sealed class RuntimeGateway(IGatewayConfig config, IRuntimeChannelFacto
         // 读取
         return readable.ReadAsync(tag, cancellationToken);
     }
-
     public ValueTask<Result> WriteAsync<TValue>(IRoutableTag<TValue> tag, TValue value, CancellationToken cancellationToken = default)
         where TValue : unmanaged
     {
@@ -133,8 +133,6 @@ internal sealed class RuntimeGateway(IGatewayConfig config, IRuntimeChannelFacto
         // 写入
         return writable.WriteAsync(tag, value, cancellationToken);
     }
-
-
     public IObservable<Result<TValue>> Poll<TValue>(IRoutableTag<TValue> tag) where TValue : unmanaged
     {
         return Observable.Create<Result<TValue>>(async (observer, ct) =>
@@ -184,7 +182,6 @@ internal sealed class RuntimeGateway(IGatewayConfig config, IRuntimeChannelFacto
     }
 
     #endregion
-
 
 
     /// <summary>
@@ -255,4 +252,45 @@ internal sealed class RuntimeGateway(IGatewayConfig config, IRuntimeChannelFacto
 
         Debug.WriteLineIf(errror_messages.Length != 0, errror_messages);
     }
+
+
+
+
+    #region --工厂--
+
+
+    public static Result<RuntimeGateway> Create(IGatewayConfig config)
+    {
+        bool has_warning = false;
+        StringBuilder warning_message = new();
+        List<IRuntimeChannel> channels = [];
+
+        foreach (var i in config.Channels)
+        {
+            var result = RuntimeChannel.Create(i);
+            if (result.IsFailure)
+            {
+                warning_message.AppendLine(result.Message);
+                continue;
+            }
+
+            has_warning = true;
+            channels.Add(result.Value);
+        }
+
+
+        var value = new RuntimeGateway() { Config = config, Channels = channels };
+
+        if (has_warning)
+        {
+            var message = $"通道没有完全加载成功{Environment.NewLine}{warning_message}";
+            return Result.Warning<RuntimeGateway>(message, value);
+        }
+        else
+        {
+            return Result.Success<RuntimeGateway>(value);
+        }
+    }
+
+    #endregion
 }

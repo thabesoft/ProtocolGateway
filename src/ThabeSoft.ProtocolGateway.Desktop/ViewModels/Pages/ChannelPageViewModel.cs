@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using CommunityToolkit.Mvvm.Input;
 using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Extensions;
+using ThabeSoft.ProtocolGateway.Runtime;
 using ThabeSoft.ProtocolGateway.Services;
 using ThabeSoft.ProtocolGateway.ViewModels.Components;
 
@@ -39,7 +40,7 @@ public sealed partial class ChannelPageViewModel : NotificationViewModel
     }
     public ChannelPageViewModel(IRuntimeContext runtimeContext, INotificationService notificationService, INavigationService navigationService) : base(notificationService)
     {
-        UpdateRuntimeGateway(runtimeContext.RuntimeGateway);
+        UpdateRuntimeGateway(runtimeContext.Gateway);
         UpdateNavigationService(navigationService);
     }
     public void UpdateRuntimeGateway(IRuntimeGateway service)

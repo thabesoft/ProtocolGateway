@@ -1,4 +1,6 @@
-﻿namespace ThabeSoft.ProtocolGateway.Services;
+﻿using ThabeSoft.ProtocolGateway.Runtime;
+
+namespace ThabeSoft.ProtocolGateway.Services;
 
 /// <summary>
 /// 引用上下文
@@ -8,5 +10,5 @@ public interface IRuntimeContext
     /// <summary>
     /// 网关
     /// </summary>
-    IRuntimeGateway? RuntimeGateway { get; }
+    IRuntimeGateway? Gateway { get; }
 }

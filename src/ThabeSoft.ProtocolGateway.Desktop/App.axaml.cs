@@ -28,8 +28,6 @@ public class App : Application, IDataTemplateRegistry, IApplicationLifetimeAcces
                 //services.AddProtocolGateway();
                 // 配置
                 services.AddGatewayConfiguration(x => context.Configuration.GetSection("Config")?.Bind(x));
-                // 配置实例创建
-                services.AddRuntimeGateway();
                 // 桌面
                 services.AddProtocolGatewayDesktop(this);
             })
@@ -56,48 +54,6 @@ public class App : Application, IDataTemplateRegistry, IApplicationLifetimeAcces
             LogError(ex, "Host 启动异常");
         }
     }
-
-    private void OnAppDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
-    {
-        var exception = e.ExceptionObject as Exception;
-        LogError(exception, "AppDomain 未处理异常");
-
-        // 对于致命异常，可以选择关闭应用
-        if (e.IsTerminating)
-        {
-            // 记录日志后关闭
-        }
-    }
-
-    private void OnTaskUnobservedException(object? sender, UnobservedTaskExceptionEventArgs e)
-    {
-        LogError(e.Exception, "Task 未观察异常");
-        e.SetObserved(); // 标记已处理，避免进程崩溃
-    }
-
-    private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
-    {
-        LogError(e.Exception, "UI 线程未处理异常");
-
-        // 通知错误
-        var notificationService = _host.Services.GetService<INotificationService>();
-        notificationService?.Error(e.Exception.Message).Show();
-
-        // 标记已处理，避免应用崩溃
-        e.Handled = true;
-    }
-
-    private void LogError(Exception? ex, string context)
-    {
-        // 记录日志
-        Debug.WriteLine($"[{context}] {ex?.Message}\n{ex?.StackTrace}");
-
-        // 或者使用你的 Result/日志框架
-        // _logger.LogError(ex, context);
-    }
-
-
-
 
     Result IDataTemplateRegistry.Add(IDataTemplate dataTemplate)
     {
@@ -141,5 +97,33 @@ public class App : Application, IDataTemplateRegistry, IApplicationLifetimeAcces
     async Task IApplicationLifetimeAccessor.ShutdownAsync()
     {
         await _host.StopAsync();
+    }
+
+
+
+
+    private void OnAppDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
+    {
+        LogError(e.ExceptionObject as Exception, "AppDomain 未处理异常");
+        if (e.IsTerminating) { } // 对于致命异常，可以选择关闭应用
+    }
+    private void OnTaskUnobservedException(object? sender, UnobservedTaskExceptionEventArgs e)
+    {
+        LogError(e.Exception, "Task 未观察异常");
+        e.SetObserved(); // 标记已处理，避免进程崩溃
+    }
+    private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+    {
+        LogError(e.Exception, "UI 线程未处理异常");
+        e.Handled = true; // 标记已处理，避免应用崩溃
+    }
+    private void LogError(Exception? ex, string context)
+    {
+        // 记录日志
+        Debug.WriteLine($"[{context}] {ex?.Message}\n{ex?.StackTrace}");
+
+        // 通知错误
+        var notificationService = _host.Services.GetService<INotificationService>();
+        notificationService?.Error(ex?.Message ?? "未知错误").Title(context).Show();
     }
 }

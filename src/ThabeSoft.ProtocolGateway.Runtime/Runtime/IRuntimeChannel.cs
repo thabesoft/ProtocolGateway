@@ -1,6 +1,6 @@
 ﻿using ThabeSoft.ProtocolGateway.Configuration;
 
-namespace ThabeSoft.ProtocolGateway;
+namespace ThabeSoft.ProtocolGateway.Runtime;
 
 
 /// <summary>

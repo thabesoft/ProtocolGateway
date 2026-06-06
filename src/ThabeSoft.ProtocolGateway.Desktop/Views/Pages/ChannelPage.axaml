@@ -53,7 +53,7 @@
                         <DataTemplate>
                             <HyperlinkButton Content="{Binding Name}"
                                              Command="{Binding $parent[DataGrid].DataContext.OpenDetailsPageCommand}"
-                                             CommandParameter="{Binding}"
+                                             CommandParameter="{Binding Name}"
                                              Classes="TextButton"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>

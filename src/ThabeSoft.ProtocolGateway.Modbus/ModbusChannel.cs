@@ -32,7 +32,7 @@ public sealed class ModbusChannel(IModbusMaster master) : IReadWriteChannel
         if (tag.Address is not ModbusAddress address) return Result.Error<TValue>( "无效地址");
         if (!address.FunctionCode.IsRead) Result.Error<TValue>( "不是有效的 Modbus 读值地址");
 
-        var byte_count = address.FunctionCode.IsReadCoils ? 1 : tag.Length;
+        var byte_count = address.FunctionCode.IsReadCoils ? 1 : tag.DataLength;
         var buffer = ArrayPool<byte>.Shared.Rent(byte_count);
 
         try
