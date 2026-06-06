@@ -20,7 +20,7 @@ internal sealed class ProtocolTypeIconLocator(IIconProvider iconProvider) : IDat
         if (param is not ProtocolType type) return null;
 
         return IconName.Create(type.ToString())
-            .Bind(x => iconProvider.Get(x))
-            .GetValueOrDefault(null);
+            .Bind(iconProvider.Get)
+            .GetValueOrDefault();
     }
 }

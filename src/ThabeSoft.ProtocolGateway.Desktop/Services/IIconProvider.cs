@@ -1,4 +1,5 @@
 ﻿using Avalonia.Controls;
+using ThabeSoft.Primitives;
 
 namespace ThabeSoft.ProtocolGateway.Services;
 
@@ -10,5 +11,5 @@ public interface IIconProvider
     /// <summary>
     /// 根据名称获取图标
     /// </summary>
-    IconElement? Get(IconName name);
+    Result<IconElement> Get(IconName name);
 }

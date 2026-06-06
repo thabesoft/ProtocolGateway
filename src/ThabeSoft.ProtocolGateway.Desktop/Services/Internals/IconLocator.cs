@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.Templates;
+using ThabeSoft.Primitives;
 
 namespace ThabeSoft.ProtocolGateway.Services.Internals;
 
@@ -12,11 +13,16 @@ internal sealed class IconLocator : IIconProvider, IIconRegistry, IDataTemplate
     private readonly Dictionary<IconName, Func<IconElement>> _factories = [];
 
 
-    public IconElement? Get(IconName name)
+    public Result<IconElement> Get(IconName name)
     {
-        _factories.TryGetValue(name, out var factory);
-        return factory?.Invoke();
+        if(!_factories.TryGetValue(name, out var factory))
+        {
+            return Result.Error<IconElement>($"找不到图标 [{name}]");
+        }
+
+        return Result.Success(factory.Invoke());
     }
+
     public void AddIcon(IconName name, Func<IconElement> factory)
     {
         _factories[name] = factory;
@@ -29,7 +35,7 @@ internal sealed class IconLocator : IIconProvider, IIconRegistry, IDataTemplate
     }
     Control? ITemplate<object?, Control?>.Build(object? param)
     {
-        if (param is IconName name) return Get(name);
+        if (param is IconName name) return Get(name).GetValueOrDefault();
         return null;
     }
 }

@@ -8,29 +8,23 @@ public class BindTests
     [TestMethod(DisplayName = "Result")]
     public async Task FromResult()
     {
-        var value = 123456;
-        var task_value = Task.Run(() => "Task_Value");
-        var value_task_value = new ValueTask<double>(3.14);
-
         var result = Result.Success(10);
         var task_result = Task.Run(() => Result.Success(3.14));
         var value_task_result = new ValueTask<Result<string>>(Result.Success("Abc"));
 
 
-        Result<int> test_result = Result.Success(10);
-
-        test_result.Bind(x => value).AssertIsTrue();
-        await test_result.BindAsync(x => task_value).AssertIsTrue();
-        await test_result.BindAsync((x, _) => task_value).AssertIsTrue();
-        await test_result.BindAsync(x => value_task_value).AssertIsTrue();
-        await test_result.BindAsync((x, _) => value_task_value).AssertIsTrue();
 
 
-        test_result.Bind(x => result).AssertIsTrue();
-        await test_result.BindAsync(x => task_result).AssertIsTrue();
-        await test_result.BindAsync((x, _) => task_result).AssertIsTrue();
-        await test_result.BindAsync(x => value_task_result).AssertIsTrue();
-        await test_result.BindAsync((x, _) => value_task_result).AssertIsTrue();
+        result.Bind(_ => result).AssertIsTrue();
+        result.Bind("State", (_, _) => result).AssertIsTrue();
+
+        _ = await result.BindAsync(_ => task_result).AssertIsTrue();
+        await result.BindAsync((_, _) => task_result).AssertIsTrue();
+        await result.BindAsync("State", (_, _, _) => task_result).AssertIsTrue();
+
+        await result.BindAsync(_ => value_task_result).AssertIsTrue();
+        await result.BindAsync((_, _) => value_task_result).AssertIsTrue();
+        await result.BindAsync("State", (_, _, _) => value_task_result).AssertIsTrue();
     }
 
     [TestMethod(DisplayName = "Task<Result>")]

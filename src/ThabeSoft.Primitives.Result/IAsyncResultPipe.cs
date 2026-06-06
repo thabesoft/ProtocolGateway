@@ -1,4 +1,6 @@
-﻿namespace ThabeSoft.Primitives;
+﻿using System.Runtime.CompilerServices;
+
+namespace ThabeSoft.Primitives;
 
 
 /// <summary>
