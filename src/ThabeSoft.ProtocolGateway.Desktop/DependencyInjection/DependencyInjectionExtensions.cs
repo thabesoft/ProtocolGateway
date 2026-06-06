@@ -2,7 +2,6 @@
 using ThabeSoft.ProtocolGateway;
 using ThabeSoft.ProtocolGateway.Services;
 using ThabeSoft.ProtocolGateway.Services.Internals;
-using ThabeSoft.ProtocolGateway.ViewModels;
 using ThabeSoft.ProtocolGateway.ViewModels.Pages;
 using ThabeSoft.ProtocolGateway.ViewModels.Shells;
 using ThabeSoft.ProtocolGateway.Views.Pages;
@@ -27,7 +26,7 @@ public static class DependencyInjectionExtensions
         public void AddProtocolGatewayDesktop(App application)
         {
             // UI 程序生命周期
-            services.AddSingleton<IApplicationLifetimeAccessor>(application);
+            services.AddSingleton<IApplication>(application);
             // 模板注册器
             services.AddSingleton<IDataTemplateRegistry>(application);
             // 视图模型提供者

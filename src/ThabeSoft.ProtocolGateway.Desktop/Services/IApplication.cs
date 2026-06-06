@@ -1,5 +1,4 @@
-﻿using Avalonia.Controls.ApplicationLifetimes;
-using ThabeSoft.Primitives;
+﻿using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.ViewModels;
 
 namespace ThabeSoft.ProtocolGateway.Services;
@@ -7,7 +6,7 @@ namespace ThabeSoft.ProtocolGateway.Services;
 /// <summary>
 /// 应用生命周期提供者
 /// </summary>
-public interface IApplicationLifetimeAccessor
+public interface IApplication
 {
     /// <summary>
     /// 设置主视图

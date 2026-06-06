@@ -46,7 +46,7 @@ internal sealed class Initialization(IServiceProvider services) : IHostedService
     // 启动主视图
     public static void LaunchMainView(IServiceProvider services)
     {
-        var application = services.GetRequiredService<IApplicationLifetimeAccessor>();
+        var application = services.GetRequiredService<IApplication>();
 
         var vm = services.GetRequiredService<MainWindowViewModel>();
         application.SetMainView(vm);

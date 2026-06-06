@@ -16,7 +16,7 @@ using ThabeSoft.ProtocolGateway.Views.Shells;
 namespace ThabeSoft.ProtocolGateway;
 
 
-public class App : Application, IDataTemplateRegistry, IApplicationLifetimeAccessor
+public class App : Application, IDataTemplateRegistry, IApplication
 {
     private readonly IHost _host;
 
@@ -68,7 +68,7 @@ public class App : Application, IDataTemplateRegistry, IApplicationLifetimeAcces
         });
     }
 
-    Result IApplicationLifetimeAccessor.SetMainView(IViewModel vm)
+    Result IApplication.SetMainView(IViewModel vm)
     {
         Result UpdateAction()
         {
@@ -93,7 +93,7 @@ public class App : Application, IDataTemplateRegistry, IApplicationLifetimeAcces
 
         return Dispatcher.UIThread.Invoke(UpdateAction);
     }
-    async Task IApplicationLifetimeAccessor.ShutdownAsync()
+    async Task IApplication.ShutdownAsync()
     {
         await _host.StopAsync();
     }
