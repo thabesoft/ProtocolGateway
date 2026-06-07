@@ -27,7 +27,7 @@ public readonly record struct ErrorFunctionCode : IEquatable<ErrorFunctionCode>
         }
 
         return FunctionCode.FromCode((byte)(code & 0x7F))
-            .Select(x => new ErrorFunctionCode(x));
+            .Then(x => new ErrorFunctionCode(x));
     }
     public static bool TryFromCode(byte code, out ErrorFunctionCode errorFunctionCode)
     {

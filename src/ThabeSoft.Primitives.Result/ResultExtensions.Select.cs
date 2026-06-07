@@ -14,7 +14,7 @@ public static partial class ResultExtensions
         /// </summary>
         /// <typeparam name="UValue">新结果值类型</typeparam>
         /// <param name="handler">值转换器</param>
-        public Result<UValue> Select<UValue>(Func<TValue, UValue> handler) where UValue : notnull
+        public Result<UValue> Then<UValue>(Func<TValue, UValue> handler) where UValue : notnull
         {
             if (result.HasValue) return Result.Success(handler(result.Value));
             return result.Cast<UValue>();
@@ -23,7 +23,7 @@ public static partial class ResultExtensions
         /// 基于上一个结果的值, 返回一个新结果
         /// </summary>
         /// <typeparam name="UValue">新结果值类型</typeparam>
-        public Result<UValue> Select<UValue>(Func<TValue, Result<UValue>> handler) where UValue : notnull
+        public Result<UValue> Then<UValue>(Func<TValue, Result<UValue>> handler) where UValue : notnull
         {
             if (result.IsSuccess) return handler(result.Value);
 
@@ -35,7 +35,7 @@ public static partial class ResultExtensions
         /// <typeparam name="UValue">新结果类型</typeparam>
         /// <typeparam name="TState">自定义参数类型</typeparam>
         /// <param name="state">自定义参数值</param>
-        public Result<UValue> Select<UValue, TState>(TState state, Func<TValue, TState, Result<UValue>> handler) where UValue : notnull
+        public Result<UValue> Then<UValue, TState>(TState state, Func<TValue, TState, Result<UValue>> handler) where UValue : notnull
         {
             if (result.IsSuccess) return handler(result.Value, state);
 
@@ -44,7 +44,7 @@ public static partial class ResultExtensions
         /// <summary>
         /// 基于上一个结果, 携带参数返回一个新结果
         /// </summary>
-        public Result Select<TState>(TState state, Func<TValue, TState, Result> handler)
+        public Result Then<TState>(TState state, Func<TValue, TState, Result> handler)
         {
             if (result.IsSuccess) return handler(result.Value, state);
 

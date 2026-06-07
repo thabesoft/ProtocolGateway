@@ -1,9 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ThabeSoft.Avalonia.Notifications;
+using ThabeSoft.Avalonia.ViewModels;
 using ThabeSoft.Lifecycle;
-using ThabeSoft.ProtocolGateway.Configuration;
 using ThabeSoft.ProtocolGateway.Runtime;
-using ThabeSoft.ProtocolGateway.Services;
 
 namespace ThabeSoft.ProtocolGateway.ViewModels.Components;
 
@@ -11,7 +11,7 @@ namespace ThabeSoft.ProtocolGateway.ViewModels.Components;
 /// <summary>
 /// 通道元素
 /// </summary>
-public sealed partial class ChannelItemViewModel : NotificationViewModel
+public sealed partial class ChannelItemViewModel : ViewModel, INotifiable
 {
     private IRuntimeChannel? _runtimeChannel;
 
@@ -67,12 +67,12 @@ public sealed partial class ChannelItemViewModel : NotificationViewModel
 
         if (_runtimeChannel is null)
         {
-            TryNotify(x => x.Error("运行时通道未初始化").Title(notification_title));
+            this.TryNotify(x => x.Error("运行时通道未初始化").Title(notification_title));
             return;
         }
 
         var result = await _runtimeChannel.StartAsync();
-        TryNotify(x => x.Result(result).Title(notification_title));
+        this.TryNotify(x => x.Result(result).Title(notification_title));
     }
 
     [RelayCommand(CanExecute = nameof(StopCommandCanExecute))]
@@ -80,12 +80,12 @@ public sealed partial class ChannelItemViewModel : NotificationViewModel
     {
         if (_runtimeChannel is null)
         {
-            TryNotify(x => x.Warning("运行时通道未初始化").Title("无效操作"));
+            this.TryNotify(x => x.Warning("运行时通道未初始化").Title("无效操作"));
             return;
         }
 
         var result = await _runtimeChannel.StopAsync();
-        TryNotify(x => x.Result(result).Title("停止失败"));
+        this.TryNotify(x => x.Result(result).Title("停止失败"));
     }
 
 

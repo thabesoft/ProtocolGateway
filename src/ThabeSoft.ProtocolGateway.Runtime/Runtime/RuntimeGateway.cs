@@ -259,7 +259,7 @@ public sealed class RuntimeGateway : LifecycleObject, IRuntimeGateway, IAsyncDis
             .Select(RuntimeChannel.Create)
             .Merge()
             .ToResult()
-            .Select(x => new RuntimeGateway()
+            .Then(x => new RuntimeGateway()
             {
                 Config = config,
                 _channels = x.ToDictionary(x => x.Config.Name, v => (IRuntimeChannel)v)

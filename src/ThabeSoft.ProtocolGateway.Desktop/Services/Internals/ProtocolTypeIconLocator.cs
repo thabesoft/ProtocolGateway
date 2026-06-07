@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.Templates;
+using ThabeSoft.Avalonia.Icons;
 using ThabeSoft.Primitives;
 
 namespace ThabeSoft.ProtocolGateway.Services.Internals;
@@ -8,7 +9,7 @@ namespace ThabeSoft.ProtocolGateway.Services.Internals;
 /// <summary>
 /// 协议类型图标获取
 /// </summary>
-internal sealed class ProtocolTypeIconLocator(IIconProvider iconProvider) : IDataTemplate
+internal sealed class ProtocolTypeIconLocator(IIconLocator iconLocator) : IDataTemplate
 {
     bool IDataTemplate.Match(object? data)
     {
@@ -20,7 +21,7 @@ internal sealed class ProtocolTypeIconLocator(IIconProvider iconProvider) : IDat
         if (param is not ProtocolType type) return null;
 
         return IconName.Create(type.ToString())
-            .Select(iconProvider.Get)
+            .Then(iconLocator.Get)
             .GetValueOrDefault();
     }
 }

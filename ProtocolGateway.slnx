@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/App/">
+    <Project Path="src/ThabeSoft.Avalonia.Extensions/ThabeSoft.Avalonia.Extensions.csproj" />
     <Project Path="src/ThabeSoft.ProtocolGateway.Desktop/ThabeSoft.ProtocolGateway.Desktop.csproj" />
   </Folder>
   <Folder Name="/Core/">
@@ -14,7 +15,6 @@
   </Folder>
   <Folder Name="/Modules/">
     <Project Path="src/ThabeSoft.LanguageExtensions/ThabeSoft.LanguageExtensions.csproj" />
-    <Project Path="src/ThabeSoft.Mvvm/ThabeSoft.Mvvm.csproj" />
     <Project Path="src/ThabeSoft.Primitives.Binary/ThabeSoft.Primitives.Binary.csproj" />
     <Project Path="src/ThabeSoft.Primitives.Result/ThabeSoft.Primitives.Result.csproj" />
   </Folder>

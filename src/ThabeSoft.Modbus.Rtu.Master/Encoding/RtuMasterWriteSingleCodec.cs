@@ -31,12 +31,12 @@ public sealed class RtuMasterWriteSingleCodec : IMasterWriteSingleCodec
     public Result<WriteSingleCoilHeader> DecodeCoilResponse(ReadOnlySpan<byte> source)
     {
         var layout = RtuWriteSingleLayout.Instance;
-        return DecodeCoilResponse(source, layout).Select(x => (WriteSingleCoilHeader)x);
+        return DecodeCoilResponse(source, layout).Then(x => (WriteSingleCoilHeader)x);
     }
     public Result<WriteSingleRegisterHeader> DecodeRegisterResponse(ReadOnlySpan<byte> source)
     {
         var layout = RtuWriteSingleLayout.Instance;
-        return DecodeRegisterResponse(source, layout).Select(x => (WriteSingleRegisterHeader)x);
+        return DecodeRegisterResponse(source, layout).Then(x => (WriteSingleRegisterHeader)x);
     }
 
 
@@ -120,7 +120,7 @@ public sealed class RtuMasterWriteSingleCodec : IMasterWriteSingleCodec
         if (!address_result.IsSuccess) return address_result.Cast<RtuWriteSingleCoilResponseHeader>();
         // 数据
         var value_result = source[layout.DataRange].ToWord()
-            .Select(ModbusHelper.ToModbusCoilValue);
+            .Then(ModbusHelper.ToModbusCoilValue);
         if (!value_result.IsSuccess) return value_result.Cast<RtuWriteSingleCoilResponseHeader>();
 
         // 拷贝数据

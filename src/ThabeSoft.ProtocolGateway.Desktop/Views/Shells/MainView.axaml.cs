@@ -1,6 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
-using ThabeSoft.ProtocolGateway.Services;
+using ThabeSoft.Avalonia.Notifications;
 
 namespace ThabeSoft.ProtocolGateway.Views.Shells;
 

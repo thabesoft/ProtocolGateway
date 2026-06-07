@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using ThabeSoft.Avalonia.ViewModels;
 using ThabeSoft.Ports;
 using ThabeSoft.ProtocolGateway.Configuration;
 using ThabeSoft.ProtocolGateway.Runtime;

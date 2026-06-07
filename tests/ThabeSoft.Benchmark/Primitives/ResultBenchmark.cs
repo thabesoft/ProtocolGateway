@@ -34,20 +34,20 @@ public class ResultBenchmark
     public static void PipeDelegate()
     {
         var result = TestResult1()
-            .Select(TestResult2)
-            .Select(TestResult3)
-            .Select(TestResult4)
-            .Select(TestResult5);
+            .Then(TestResult2)
+            .Then(TestResult3)
+            .Then(TestResult4)
+            .Then(TestResult5);
     }
 
     [Benchmark]
     public static void PipeLambda()
     {
         var result = Result.Success(10)
-            .Select(static x => Result.Success<double>(x))
-            .Select(static x => Result.Success(x.ToString()))
-            .Select(static x => Result.Success(x.Length))
-            .Select(static _ => Result.Success());
+            .Then(static x => Result.Success<double>(x))
+            .Then(static x => Result.Success(x.ToString()))
+            .Then(static x => Result.Success(x.Length))
+            .Then(static _ => Result.Success());
     }
 
 

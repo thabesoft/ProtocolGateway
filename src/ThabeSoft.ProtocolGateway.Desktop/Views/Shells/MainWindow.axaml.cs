@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 
 namespace ThabeSoft.ProtocolGateway.Views.Shells;
 
@@ -13,11 +14,11 @@ public sealed partial class MainWindow : Window
         CloseButton.Click += OnClose;
     }
 
-    private void OnMinimized(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void OnMinimized(object? sender, RoutedEventArgs e)
     {
         WindowState = WindowState.Minimized;
     }
-    private void OnMaximize(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void OnMaximize(object? sender, RoutedEventArgs e)
     {
         if(WindowState == WindowState.Maximized)
         {
@@ -30,7 +31,7 @@ public sealed partial class MainWindow : Window
             WindowState = WindowState.Maximized;
         }
     }
-    private void OnClose(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void OnClose(object? sender, RoutedEventArgs e)
     {
         Close();
     }

@@ -5,8 +5,8 @@
 
              xmlns:i="using:Avalonia.Xaml.Interactivity"
              xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
+             xmlns:menus="using:ThabeSoft.Avalonia.Menus"
              xmlns:shell_vm="using:ThabeSoft.ProtocolGateway.ViewModels.Shells"
-             xmlns:com_vm="using:ThabeSoft.ProtocolGateway.ViewModels.Components"
 
              x:Class="ThabeSoft.ProtocolGateway.Views.Shells.MainView"
 
@@ -14,106 +14,143 @@
              Background="Transparent"
              x:DataType="shell_vm:MainViewModel">
 
+    <UserControl.DataContext>
+        <shell_vm:MainViewModel />
+    </UserControl.DataContext>
+
     <UserControl.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.ThemeDictionaries>
 
-                <!-- 浅色主题 -->
-                <ResourceDictionary x:Key="Light">
-                    <SolidColorBrush x:Key="NavagationBarForeground" Color="#333333"/>
-                    <SolidColorBrush x:Key="NavagationBarBackground" Color="#f9f9fa"/>
-                    <SolidColorBrush x:Key="ContentForeground" Color="#333333"/>
-                    <SolidColorBrush x:Key="ContentBackground" Color="#ffffff"/>
-                </ResourceDictionary>
+            <!--页面背景-->
+            <SolidColorBrush x:Key="ContentBackground" Color="{DynamicResource Gray0}"/>
 
-                <!-- 深色主题 -->
-                <ResourceDictionary x:Key="Dark">
-                    <SolidColorBrush x:Key="NavagationBarForeground" Color="#e8ffff"/>
-                    <SolidColorBrush x:Key="NavagationBarBackground" Color="#080b0e"/>
-                    <SolidColorBrush x:Key="ContentForeground" Color="#10151b"/>
-                    <SolidColorBrush x:Key="ContentBackground" Color="#10151b"/>
-                </ResourceDictionary>
-            </ResourceDictionary.ThemeDictionaries>
+            <!--导航栏-->
+            <SolidColorBrush x:Key="NavagationBarBackground" Color="{DynamicResource Gray1}"/>
+
+            <!--导航菜单-->
+            <SolidColorBrush x:Key="NavigationMenuItemSelectedForeground" Color="{DynamicResource Gray2}"/>
+            <SolidColorBrush x:Key="NavigationMenuItemSelectedBackground" Color="{DynamicResource Gray7}"/>
 
         </ResourceDictionary>
     </UserControl.Resources>
 
     <UserControl.Styles>
 
-        <Style Selector="ToggleButton.Navagate">
-            <Setter Property="Height" Value="30"/>
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Style Selector="ToggleButton.NavagateMenuItem">
 
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="{DynamicResource NavagationBarForeground}"/>
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource Gray7}" />
 
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <!--悬浮-->
+            <Style Selector="^:pointerover">
+                <Setter Property="Foreground" Value="{DynamicResource Gray7}"/>
+                <Setter Property="Background" Value="{DynamicResource Gray1}"/>
+            </Style>
+
+            <!--选中-->
+            <Style Selector="^:checked">
+                <Setter Property="Foreground" Value="{DynamicResource Gray7}"/>
+                <Setter Property="Background" Value="{DynamicResource Accent2}"/>
+            </Style>
+
         </Style>
 
     </UserControl.Styles>
 
 
-    <DockPanel Background="{DynamicResource NavagationBarBackground}">
-
-        <!--底栏-->
-        <DockPanel DockPanel.Dock="Bottom" Height="20">
-            <TextBlock DockPanel.Dock="Left" Text="{Binding Content, StringFormat='Current Content: {0}'}" />
-        </DockPanel>
+    <DockPanel Background="{DynamicResource Gary1}">
 
         <!--菜单栏-->
-        <ScrollViewer DockPanel.Dock="Left" Width="100">
-            <ItemsControl ItemsSource="{Binding NavigationMenuItems}">
+        <Border DockPanel.Dock="Left" Width="{Binding NavigationPaneWidth}">
+            <ScrollViewer>
+                <ItemsControl ItemsSource="{Binding NavigationMenuItems}">
 
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="com_vm:NavigationMenuItemViewModel">
+                    <!--元素模板-->
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="menus:NavigationMenuItemViewModel">
 
-                        <RadioButton GroupName="Navigation"
-                                     IsChecked="{Binding IsSelected}"
-                                     Classes="Navagate" >
+                            <ToggleButton IsChecked="{Binding IsSelected}"
+                                          Classes="NavagateMenuItem"
+                                          Height="30"
+                                          HorizontalAlignment="Stretch">
 
-                            <RadioButton.Content>
-                                <DockPanel>
-                                    <ContentPresenter DockPanel.Dock="Left"
+                                <Grid ColumnDefinitions="3,20,*">
+                                    <Border Grid.Column="0"
+                                            Width="3"
+                                            Height="18"
+                                            CornerRadius="2"
+                                            Background="{DynamicResource Gray0}"
+                                            IsVisible="{Binding IsSelected}" />
+                                    <!--图标-->
+                                    <ContentPresenter Grid.Column="1"
+                                                      HorizontalAlignment="Center"
+                                                      VerticalAlignment="Center"
                                                       Content="{Binding Icon}" />
-                                    <TextBlock Text="{Binding Header}" />
-                                </DockPanel>
-                            </RadioButton.Content>
+                                    <!--文本-->
+                                    <TextBlock Grid.Column="2"
+                                               Margin="10 0 0 0"
+                                               VerticalAlignment="Center"
+                                               FontSize="13"
+                                               IsVisible="{Binding $parent[ItemsControl].DataContext.IsNavigationPaneOpen}"
+                                               TextTrimming="CharacterEllipsis"
+                                               Text="{Binding Header}" />
+                                </Grid>
 
-                            <!--点击处理-->
-                            <i:Interaction.Behaviors>
-                                <ia:EventTriggerBehavior EventName="Click">
-                                    <ia:InvokeCommandAction Command="{Binding $parent[ItemsControl].DataContext.MenuNavigateCommand}"
-                                                            CommandParameter="{Binding}"/>
-                                </ia:EventTriggerBehavior >
-                            </i:Interaction.Behaviors>
+                                <!--点击处理-->
+                                <i:Interaction.Behaviors>
+                                    <ia:EventTriggerBehavior EventName="Click">
+                                        <ia:InvokeCommandAction Command="{Binding $parent[ItemsControl].DataContext.MenuNavigateCommand}"
+                                                                CommandParameter="{Binding}"/>
+                                    </ia:EventTriggerBehavior >
+                                </i:Interaction.Behaviors>
 
-                        </RadioButton>
+                            </ToggleButton>
 
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
 
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
+                    <!--容器-->
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
 
-                        <StackPanel Orientation="Vertical" />
+                            <StackPanel Orientation="Vertical" />
 
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
 
-            </ItemsControl>
-        </ScrollViewer>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
 
 
+        <!--内容-->
         <Panel>
+
             <!--内容-->
-            <ContentControl Padding="20" Background="{DynamicResource ContentBackground}" Content="{Binding Content}"/>
+            <ContentControl Padding="20"
+                            Background="{DynamicResource ContentBackground}"
+                            Foreground="{DynamicResource ContentForeground}"
+                            Content="{Binding CurrentNavigationContent}"/>
 
             <!--弹窗-->
             <WindowNotificationManager x:Name="NotificationManager"
                                        Position="BottomRight"
                                        MaxItems="5" />
+
+            <!--折叠按钮-->
+            <ToggleButton VerticalAlignment="Top"
+                          Margin="-15 15 0 0"
+                          CornerRadius="25"
+                          Width="25"
+                          Height="25"
+                          Padding="0"
+                          HorizontalContentAlignment="Center"
+                          VerticalContentAlignment="Center"
+                          HorizontalAlignment="Left"
+                          Classes="NavPaneToggle"
+                          IsChecked="{Binding IsNavigationPaneOpen}"
+                          Content="{Binding NavigationPaneToggleText}"
+                          ToolTip.Tip="Toggle navigation" />
 
         </Panel>
 

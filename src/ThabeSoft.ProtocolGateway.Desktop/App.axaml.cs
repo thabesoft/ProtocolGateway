@@ -7,10 +7,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Diagnostics;
+using ThabeSoft.Avalonia;
+using ThabeSoft.Avalonia.Initialization;
+using ThabeSoft.Avalonia.Notifications;
+using ThabeSoft.Avalonia.ViewModels;
 using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Configuration.Options;
-using ThabeSoft.ProtocolGateway.Services;
-using ThabeSoft.ProtocolGateway.ViewModels;
 using ThabeSoft.ProtocolGateway.Views.Shells;
 
 namespace ThabeSoft.ProtocolGateway;
@@ -27,6 +29,9 @@ public class App : Application, IDataTemplateRegistry, IApplication
             {
                 // 配置
                 services.AddGatewayConfiguration(() => context.Configuration.GetValue<ConfigOptions>("Config"));
+
+                // 添加UI扩展
+                services.AddAvaloniaExtensions();
                 // 桌面
                 services.AddProtocolGatewayDesktop(this);
             })

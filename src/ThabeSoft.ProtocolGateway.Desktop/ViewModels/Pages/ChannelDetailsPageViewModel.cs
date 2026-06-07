@@ -1,11 +1,14 @@
 ﻿using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ThabeSoft.Avalonia.Extensions;
+using ThabeSoft.Avalonia.Navigations;
+using ThabeSoft.Avalonia.Notifications;
+using ThabeSoft.Avalonia.ViewModels;
 using ThabeSoft.Lifecycle;
 using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Extensions;
 using ThabeSoft.ProtocolGateway.Runtime;
-using ThabeSoft.ProtocolGateway.Services;
 using ThabeSoft.ProtocolGateway.ViewModels.Components;
 
 namespace ThabeSoft.ProtocolGateway.ViewModels.Pages;
@@ -14,7 +17,7 @@ namespace ThabeSoft.ProtocolGateway.ViewModels.Pages;
 /// <summary>
 /// 通道页面
 /// </summary>
-public sealed partial class ChannelDetailsPageViewModel : ViewModel
+public sealed partial class ChannelDetailsPageViewModel : ViewModel, INotifiable, INavigatable
 {
     private IRuntimeChannel? _runtimeChannel;
 
@@ -47,8 +50,6 @@ public sealed partial class ChannelDetailsPageViewModel : ViewModel
 
     public ChannelDetailsPageViewModel()
     {
-        if (!Design.IsDesignMode) return;
-
         Name = ChannelName.Create(string.RandomChinese(3, 6)).Value;
         Type = Enum.GetValues<ChannelType>().RandomElement();
         Protocol = Enum.GetValues<ProtocolType>().RandomElement();

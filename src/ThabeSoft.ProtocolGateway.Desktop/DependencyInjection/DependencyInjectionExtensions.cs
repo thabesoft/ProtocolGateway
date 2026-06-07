@@ -1,6 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection.Extensions;
+using ThabeSoft.Avalonia;
+using ThabeSoft.Avalonia.Initialization;
+using ThabeSoft.Avalonia.Navigations;
+using ThabeSoft.Avalonia.Notifications;
 using ThabeSoft.ProtocolGateway;
 using ThabeSoft.ProtocolGateway.Services;
+using ThabeSoft.ProtocolGateway.Services.Initialization;
 using ThabeSoft.ProtocolGateway.Services.Internals;
 using ThabeSoft.ProtocolGateway.ViewModels.Pages;
 using ThabeSoft.ProtocolGateway.ViewModels.Shells;
@@ -29,20 +34,11 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<IApplication>(application);
             // 模板注册器
             services.AddSingleton<IDataTemplateRegistry>(application);
-            // 视图模型提供者
-            services.TryAddSingleton<IViewModelProvider, ViewModelProvider>();
 
 
             // 图标
             services.TryAddSingleton<ProtocolTypeIconLocator>(); // 协议类型图标
-            services.TryAddSingleton<IconLocator>();
-            services.TryAddSingleton<IIconRegistry>(x => x.GetRequiredService<IconLocator>());
-            services.TryAddSingleton<IIconProvider>(x => x.GetRequiredService<IconLocator>());
-            // 视图
-            services.TryAddSingleton<ViewLocator>();
-            services.TryAddSingleton<IViewRegistry>(x => x.GetRequiredService<ViewLocator>());
-            services.TryAddSingleton<IViewProvider>(x => x.GetRequiredService<ViewLocator>());
-
+            
 
             // 主窗口
             services.TryAddSingleton<MainWindow>();
@@ -51,9 +47,10 @@ public static class DependencyInjectionExtensions
             // 主视图
             services.TryAddSingleton<MainView>();
             services.TryAddSingleton<INotificationService>(x => x.GetRequiredService<MainView>());
-            services.TryAddSingleton<MainViewModel>();       // 视图模型
-            services.TryAddSingleton<INavigationService>(x => x.GetRequiredService<MainViewModel>()); // 导航业务
-            services.TryAddSingleton<IMenuService>(x => x.GetRequiredService<MainViewModel>());       // 菜单业务
+            services.TryAddSingleton<MainViewModel>();
+            services.AddSingleton<INavigationContext>(x => x.GetRequiredService<MainViewModel>());
+            services.AddSingleton<INavigationMenuContext>(x => x.GetRequiredService<MainViewModel>());
+
 
             // 通道页面
             services.TryAddTransient<ChannelPage>();
@@ -67,8 +64,11 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<IRuntimeContext>(x => x.GetRequiredService<RuntimeContext>());
 
             // 初始化
-            services.AddHostedService(x => x.GetRequiredService<RuntimeContext>());
-            services.AddHostedService<Initialization>();
+            services.AddSingleton<IDataTemplateInitializer, DataTemplateInitializer>();
+            services.AddSingleton<IIconInitializer, IconInitializer>();
+            services.AddSingleton<IViewMappinglInitializer, ViewMappinglInitializer>();
+            services.AddSingleton<IMenuInitializer, MenuInitializer>();
+            services.AddSingleton<IShellProvider, ShellProvider>();
         }
     }
 }

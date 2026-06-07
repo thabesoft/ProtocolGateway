@@ -1,0 +1,54 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ResourceDictionary.ThemeDictionaries>
+
+        <!-- 浅色主题 -->
+        <ResourceDictionary x:Key="Light">
+
+            <!--灰度-->
+            <Color x:Key="Gray0">#FFFFFF</Color>     <!-- 最深背景 -->
+            <Color x:Key="Gray1">#F7F8FA</Color>     <!-- 次级背景 -->
+            <Color x:Key="Gray2">#E8EBF0</Color>     <!-- 三级背景/卡片 -->
+            <Color x:Key="Gray3">#D2D8E2</Color>     <!-- 边框/分割线 -->
+            <Color x:Key="Gray4">#B0B8C4</Color>     <!-- 禁用背景/深色底纹 -->
+            <Color x:Key="Gray5">#8A94A3</Color>     <!-- 占位符/次要文字 -->
+            <Color x:Key="Gray6">#5E6778</Color>     <!-- 主要文字（稍亮） -->
+            <Color x:Key="Gray7">#2D3548</Color>     <!-- 高亮文字/标题 -->
+
+            <!--强调色-->
+            <Color x:Key="Accent1">#d6e1f8</Color>
+            <Color x:Key="Accent2">#1f7ad1</Color>
+            <Color x:Key="Accent3">#1d63ed</Color>
+            <Color x:Key="Accent4">#008000</Color>
+            <Color x:Key="Accent5">#df6100</Color>
+            <Color x:Key="Accent6">#ed0000</Color>
+
+        </ResourceDictionary>
+
+        <!-- 深色主题 -->
+        <ResourceDictionary x:Key="Dark">
+
+            <!--灰度-->
+            <Color x:Key="Gray0">#0A0D14</Color>   <!-- 最深背景 -->
+            <Color x:Key="Gray1">#141820</Color>   <!-- 次级背景 -->
+            <Color x:Key="Gray2">#1E232E</Color>   <!-- 三级背景/卡片 -->
+            <Color x:Key="Gray3">#2B3240</Color>   <!-- 边框/分割线 -->
+            <Color x:Key="Gray4">#3B4356</Color>   <!-- 禁用背景/深色底纹 -->
+            <Color x:Key="Gray5">#5A657C</Color>   <!-- 占位符/次要文字 -->
+            <Color x:Key="Gray6">#8C99B3</Color>   <!-- 主要文字（稍亮） -->
+            <Color x:Key="Gray7">#EFF2F8</Color>   <!-- 高亮文字/标题 -->
+
+            <!--强调色-->
+            <Color x:Key="Accent1">#2A3A5E</Color>
+            <Color x:Key="Accent2">#4D9EFF</Color>
+            <Color x:Key="Accent3">#3B82F6</Color>
+            <Color x:Key="Accent4">#00A86B</Color>
+            <Color x:Key="Accent5">#FF8C42</Color>
+            <Color x:Key="Accent6">#FF4D4D</Color>
+
+        </ResourceDictionary>
+
+    </ResourceDictionary.ThemeDictionaries>
+
+</ResourceDictionary>

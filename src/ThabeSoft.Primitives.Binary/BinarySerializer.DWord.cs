@@ -29,8 +29,8 @@ public sealed class DWordSerializer(DWordLayout layout) :
 
 
     Result<uint> IBinarySerializer<uint>.Deserialize(ReadOnlySpan<byte> source) => From(source);
-    Result<int> IBinarySerializer<int>.Deserialize(ReadOnlySpan<byte> source) => From(source).Select(x => (int)x);
-    Result<float> IBinarySerializer<float>.Deserialize(ReadOnlySpan<byte> source) => From(source).Select(x => (float)x);
+    Result<int> IBinarySerializer<int>.Deserialize(ReadOnlySpan<byte> source) => From(source).Then(x => (int)x);
+    Result<float> IBinarySerializer<float>.Deserialize(ReadOnlySpan<byte> source) => From(source).Then(x => (float)x);
 
     
 

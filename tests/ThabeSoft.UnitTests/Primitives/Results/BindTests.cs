@@ -10,7 +10,7 @@ public class BindTests
     {
         var value_result = Result.Success(10);
 
-        value_result.Select(_ => Result.Success(20)).AssertIsTrue();
-        value_result.Select("State", (value, state) => Result.Success($"{value}{state}")).AssertIsTrue();
+        value_result.Then(_ => Result.Success(20)).AssertIsTrue();
+        value_result.Then("State", (value, state) => Result.Success($"{value}{state}")).AssertIsTrue();
     }
 }

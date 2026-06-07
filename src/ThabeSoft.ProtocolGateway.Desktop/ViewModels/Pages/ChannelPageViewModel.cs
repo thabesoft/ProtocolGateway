@@ -1,6 +1,10 @@
 ﻿using Avalonia.Controls;
 using CommunityToolkit.Mvvm.Input;
 using System.Diagnostics;
+using ThabeSoft.Avalonia.Extensions;
+using ThabeSoft.Avalonia.Navigations;
+using ThabeSoft.Avalonia.Notifications;
+using ThabeSoft.Avalonia.ViewModels;
 using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Extensions;
 using ThabeSoft.ProtocolGateway.Runtime;
@@ -13,7 +17,7 @@ namespace ThabeSoft.ProtocolGateway.ViewModels.Pages;
 /// <summary>
 /// 通道页面
 /// </summary>
-public sealed partial class ChannelPageViewModel : ViewModel
+public sealed partial class ChannelPageViewModel : ViewModel, INavigatable, INotifiable
 {
     // 通道运行时
     private readonly IRuntimeGateway? _runtimeGateway;
@@ -38,8 +42,6 @@ public sealed partial class ChannelPageViewModel : ViewModel
 
     public ChannelPageViewModel()
     {
-        if (!Design.IsDesignMode) return;
-
         Channels = ChannelItemViewModel.RandomRange(3, 5);
     }
     public ChannelPageViewModel(IRuntimeContext runtimeContext, INotificationService notificationService, INavigationService navigationService)

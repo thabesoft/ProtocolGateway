@@ -18,7 +18,7 @@ internal sealed class RuntimeContext(IGatewayConfigRepository gatewayConfigRepos
     {
         var result = await gatewayConfigRepository.FindBytNameAsync("Default", cancellationToken);
 
-        result.Select(RuntimeGateway.Create)
+        result.Then(RuntimeGateway.Create)
             .OnValue(this, static (x, state) => state.Gateway = x)
             .OnMessage(static msg => Debug.WriteLine($"网关初始化失败: {msg}"));
     }
