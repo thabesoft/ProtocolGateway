@@ -81,12 +81,13 @@ internal sealed class NavigationService(INavigationContext context, INavigationM
             var target = viewModelProvider.GetService(targetViewModelType);
             if (target is not IViewModel vm) return Result.Error("导航失败, 无法创建视图模型");
 
-            if (context.CurrentNavigationContent?.Equals(vm) == true) return Result.Success();
-
             // 跳转页面
-            context.CurrentNavigationContent = vm;
-            context.NavigationHistory.Add(vm);
-            context.CanNavigationBack = true;
+            if (context.CurrentNavigationContent?.Equals(vm) != true)
+            {
+                context.CurrentNavigationContent = vm;
+                context.NavigationHistory.Add(vm);
+                context.CanNavigationBack = true;
+            }
 
             // 选择菜单
             menuService.Select(targetViewModelType);

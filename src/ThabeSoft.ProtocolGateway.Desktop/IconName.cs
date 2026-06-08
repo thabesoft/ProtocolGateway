@@ -1,4 +1,5 @@
 ﻿using ThabeSoft.Avalonia.Icons;
+using ThabeSoft.Primitives;
 
 namespace ThabeSoft.ProtocolGateway;
 
@@ -10,15 +11,15 @@ public static class IconNames
 {
     public static IconName ModbusRtu { get; }
     public static IconName ModbusTcp { get; }
-    public static IconName ModbusUdp { get; } 
+    public static IconName ModbusUdp { get; }
     public static IconName Channel { get; }
 
 
     static IconNames()
     {
-        ModbusRtu = IconName.Create(nameof(ProtocolType.ModbusRtu)).Value;
-        ModbusTcp = IconName.Create(nameof(ProtocolType.ModbusTcp)).Value;
-        ModbusUdp = IconName.Create(nameof(ProtocolType.ModbusUdp)).Value;
-        Channel = IconName.Create("Channel").Value;
+        ModbusRtu = IconName.Create(nameof(ProtocolType.ModbusRtu)).GetValueOrDefault();
+        ModbusTcp = IconName.Create(nameof(ProtocolType.ModbusTcp)).GetValueOrDefault();
+        ModbusUdp = IconName.Create(nameof(ProtocolType.ModbusUdp)).GetValueOrDefault();
+        Channel = IconName.Create("Channel").GetValueOrDefault();
     }
 }

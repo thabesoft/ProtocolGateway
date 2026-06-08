@@ -8,5 +8,5 @@ namespace ThabeSoft.Avalonia.Initialization;
 /// </summary>
 public interface IViewMappinglInitializer
 {
-    Result RegisterViewModel(IViewLocator registry);
+    Result Initializ(IViewLocator registry);
 }

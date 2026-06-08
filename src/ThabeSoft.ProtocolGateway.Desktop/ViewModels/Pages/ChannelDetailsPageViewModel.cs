@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia.Collections;
+using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ThabeSoft.Avalonia.Extensions;
@@ -28,11 +29,11 @@ public sealed partial class ChannelDetailsPageViewModel : ViewModel, INotifiable
     // 通道类型
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsModbusChannel))]
-    public partial ChannelType Type { get; private set; }
+    public partial ChannelType? Type { get; private set; }
 
     // 协议类型
     [ObservableProperty]
-    public partial ProtocolType Protocol { get; private set; }
+    public partial ProtocolType? Protocol { get; private set; }
 
     // 端口
     [ObservableProperty]
@@ -50,11 +51,14 @@ public sealed partial class ChannelDetailsPageViewModel : ViewModel, INotifiable
 
     public ChannelDetailsPageViewModel()
     {
-        Name = ChannelName.Create(string.RandomChinese(3, 6)).Value;
-        Type = Enum.GetValues<ChannelType>().RandomElement();
-        Protocol = Enum.GetValues<ProtocolType>().RandomElement();
-        Port = new PortItemViewModel();
-        Tags = TagItemViewModel.RandomRange(3, 5);
+        if (Design.IsDesignMode)
+        {
+            Name = ChannelName.Create(string.RandomChinese(3, 6)).Value;
+            Type = Enum.GetValues<ChannelType>().RandomElement();
+            Protocol = Enum.GetValues<ProtocolType>().RandomElement();
+            Port = new PortItemViewModel();
+            Tags = TagItemViewModel.RandomRange(3, 5);
+        }
     }
     public ChannelDetailsPageViewModel(IRuntimeChannel channel, INotificationService notificationService, INavigationService navigationService)
     {

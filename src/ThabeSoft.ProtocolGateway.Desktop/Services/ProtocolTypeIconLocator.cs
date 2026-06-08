@@ -3,7 +3,7 @@ using Avalonia.Controls.Templates;
 using ThabeSoft.Avalonia.Icons;
 using ThabeSoft.Primitives;
 
-namespace ThabeSoft.ProtocolGateway.Services.Internals;
+namespace ThabeSoft.ProtocolGateway.Services;
 
 
 /// <summary>

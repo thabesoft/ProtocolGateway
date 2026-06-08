@@ -2,23 +2,26 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Templates;
 using Avalonia.Markup.Xaml;
+using Avalonia.Styling;
 using Avalonia.Threading;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Diagnostics;
 using ThabeSoft.Avalonia;
-using ThabeSoft.Avalonia.Initialization;
+using ThabeSoft.Avalonia.Navigations;
 using ThabeSoft.Avalonia.Notifications;
-using ThabeSoft.Avalonia.ViewModels;
+using ThabeSoft.Avalonia.Themes;
 using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Configuration.Options;
+using ThabeSoft.ProtocolGateway.Services;
+using ThabeSoft.ProtocolGateway.ViewModels.Shells;
 using ThabeSoft.ProtocolGateway.Views.Shells;
 
 namespace ThabeSoft.ProtocolGateway;
 
 
-public class App : Application, IDataTemplateRegistry, IApplication
+public class App : Application, IDataTemplateService
 {
     private readonly IHost _host;
 
@@ -29,7 +32,6 @@ public class App : Application, IDataTemplateRegistry, IApplication
             {
                 // 配置
                 services.AddGatewayConfiguration(() => context.Configuration.GetValue<ConfigOptions>("Config"));
-
                 // 添加UI扩展
                 services.AddAvaloniaExtensions();
                 // 桌面
@@ -52,6 +54,37 @@ public class App : Application, IDataTemplateRegistry, IApplication
         {
             await _host.StartAsync();
             base.OnFrameworkInitializationCompleted();
+
+            var themeService = _host.Services.GetRequiredService<IThemeService>();
+            themeService.ChangeTheme(ThemeVariant.Light);
+            themeService.ChangeAccent(AccentVariant.Docker);
+
+            // 选择第一个菜单
+            var navigationService = _host.Services.GetRequiredService<INavigationService>();
+            var navigationMenuService = _host.Services.GetRequiredService<INavigationMenuService>();
+
+            if (navigationMenuService.Items.Count > 0)
+            {
+                var target = navigationMenuService.Items[0].TargetViewModelType;
+                navigationService.NavigateTo(target);
+            }
+
+            // 窗口程序
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                var vm = _host.Services.GetRequiredService<MainWindowViewModel>();
+                desktop.MainWindow = new MainWindow() { DataContext = vm };
+
+                desktop.MainWindow.Closed += async delegate { await _host.StopAsync(); };
+                desktop.MainWindow.Show();
+            }
+
+            // 单视图程序
+            else if (ApplicationLifetime is ISingleViewApplicationLifetime singleView)
+            {
+                var vm = _host.Services.GetRequiredService<MainViewModel>();
+                singleView.MainView = new MainView() { DataContext = vm };
+            }
         }
         catch (Exception ex)
         {
@@ -59,7 +92,7 @@ public class App : Application, IDataTemplateRegistry, IApplication
         }
     }
 
-    Result IDataTemplateRegistry.Add(IDataTemplate dataTemplate)
+    Result IDataTemplateService.Add(IDataTemplate dataTemplate)
     {
         return Dispatcher.Invoke(() =>
         {
@@ -72,38 +105,6 @@ public class App : Application, IDataTemplateRegistry, IApplication
             return Result.Success();
         });
     }
-
-    Result IApplication.SetMainView(IViewModel vm)
-    {
-        Result UpdateAction()
-        {
-            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-            {
-                desktop.MainWindow = new MainWindow() { DataContext = vm };
-                desktop.MainWindow.Closed += async delegate { await _host.StopAsync(); };
-                desktop.MainWindow.Show();
-
-                return Result.Success();
-            }
-
-            if (ApplicationLifetime is ISingleViewApplicationLifetime singleView)
-            {
-                singleView.MainView = new MainView() { DataContext = vm };
-
-                return Result.Success();
-            }
-
-            return Result.Warning("无法设置主视图, 不支持的应用生命周期类型");
-        }
-
-        return Dispatcher.UIThread.Invoke(UpdateAction);
-    }
-    async Task IApplication.ShutdownAsync()
-    {
-        await _host.StopAsync();
-    }
-
-
 
 
     private void OnAppDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -123,11 +124,16 @@ public class App : Application, IDataTemplateRegistry, IApplication
     }
     private void LogError(Exception? ex, string context)
     {
-        // 记录日志
-        Debug.WriteLine($"[{context}] {ex?.Message}\n{ex?.StackTrace}");
+        try
+        {
+            Debug.WriteLine($"[{context}] {ex?.Message}\n{ex?.StackTrace}");
 
-        // 通知错误
-        var notificationService = _host.Services.GetService<INotificationService>();
-        notificationService?.Error(ex?.Message ?? "未知错误").Title(context).Show();
+            var notificationService = _host.Services.GetRequiredService<INotificationService>();
+            notificationService.Error(ex?.Message ?? "未知错误").Title(context).Show();
+        }
+        catch(Exception notify_ex)
+        {
+            Debug.WriteLine(notify_ex.Message);
+        }
     }
 }

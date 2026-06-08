@@ -1,4 +1,6 @@
-﻿namespace ThabeSoft.Avalonia.Extensions;
+﻿using System.Numerics;
+
+namespace ThabeSoft.Avalonia.Extensions;
 
 public static class RandomExtensions
 {
@@ -68,6 +70,14 @@ public static class RandomExtensions
         {
             var count = Random.Shared.Next(min, max);
             return values.RandomElementRange(count);
+        }
+    }
+
+    extension(int)
+    {
+        public static int RandomValue(int min, int max)
+        {
+            return Random.Shared.Next(min, max);
         }
     }
 

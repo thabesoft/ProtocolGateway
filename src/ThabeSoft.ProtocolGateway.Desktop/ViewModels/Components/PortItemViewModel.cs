@@ -1,4 +1,7 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Avalonia.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
+using System.Xml.Linq;
+using ThabeSoft.Avalonia.Extensions;
 using ThabeSoft.Avalonia.ViewModels;
 using ThabeSoft.Ports;
 using ThabeSoft.ProtocolGateway.Configuration;
@@ -59,7 +62,12 @@ public sealed partial class PortItemViewModel : ViewModel
 
     public PortItemViewModel()
     {
-
+        if (Design.IsDesignMode)
+        {
+            IsSerialPort = true;
+            PortName = string.RandomChinese(3, 5);
+            BaudRate = int.RandomValue(1200, 9600);
+        }
     }
     public PortItemViewModel(IRuntimePort runtimePort)
     {

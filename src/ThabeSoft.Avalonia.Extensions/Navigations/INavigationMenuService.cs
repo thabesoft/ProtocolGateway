@@ -12,6 +12,11 @@ namespace ThabeSoft.Avalonia.Navigations;
 public interface INavigationMenuService
 {
     /// <summary>
+    /// 所有菜单
+    /// </summary>
+    IReadOnlyList<NavigationMenuItemViewModel> Items { get; }
+
+    /// <summary>
     /// 添加菜单
     /// </summary>
     Result Register(Type targetViewModelType, string header, IconName icon);
@@ -62,6 +67,8 @@ public static class NavigationMenuServiceExtensions
 internal sealed class NavigationMenuService(INavigationMenuContext context) : INavigationMenuService
 {
     private readonly object _lock = new();
+
+    public IReadOnlyList<NavigationMenuItemViewModel> Items => context.NavigationMenuItems.AsReadOnly();
 
     public Result Register(Type targetViewModelType, string header, IconName icon)
     {

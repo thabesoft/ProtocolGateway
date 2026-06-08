@@ -8,5 +8,5 @@ namespace ThabeSoft.Avalonia.Initialization;
 /// </summary>
 public interface IIconInitializer
 {
-    Result RegisterIcon(IIconLocator registry);
+    Result Initializ(IIconLocator registry);
 }

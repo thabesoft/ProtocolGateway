@@ -1,41 +1,16 @@
-﻿using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Media;
-using Avalonia.Threading;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using Avalonia.Media;
 using ThabeSoft.Avalonia.Icons;
 using ThabeSoft.Avalonia.Initialization;
-using ThabeSoft.Avalonia.Navigations;
-using ThabeSoft.Avalonia.ViewModels;
-using ThabeSoft.Avalonia.Views;
 using ThabeSoft.Primitives;
-using ThabeSoft.ProtocolGateway.Services.Internals;
-using ThabeSoft.ProtocolGateway.ViewModels.Pages;
-using ThabeSoft.ProtocolGateway.ViewModels.Shells;
-using ThabeSoft.ProtocolGateway.Views.Pages;
-using ThabeSoft.ProtocolGateway.Views.Shells;
 
 namespace ThabeSoft.ProtocolGateway.Services.Initialization;
-
-
-/// <summary>
-/// 模板初始化
-/// </summary>
-internal sealed class DataTemplateInitializer(ProtocolTypeIconLocator locator) : IDataTemplateInitializer
-{
-    public Result RegisterDataTemplate(IDataTemplateRegistry registry)
-    {
-        return registry.Add(locator);
-    }
-}
-
 
 /// <summary>
 /// 图标初始化
 /// </summary>
 internal sealed class IconInitializer : IIconInitializer
 {
-    public Result RegisterIcon(IIconLocator registry)
+    public Result Initializ(IIconLocator registry)
     {
         // 通道
         return registry.RegisterPathIcon(IconNames.Channel, icon =>
@@ -44,44 +19,5 @@ internal sealed class IconInitializer : IIconInitializer
             icon.Width = 18;
             icon.Height = 18;
         });
-    }
-}
-
-/// <summary>
-/// 视图映射
-/// </summary>
-internal sealed class ViewMappinglInitializer : IViewMappinglInitializer
-{
-    public Result RegisterViewModel(IViewLocator registry)
-    {
-        registry.Register<MainView, MainViewModel>();
-        registry.Register<ChannelPage, ChannelPageViewModel>();
-        registry.Register<ChannelDetailsPage, ChannelDetailsPageViewModel>();
-
-        return Result.Success();
-    }
-}
-
-/// <summary>
-/// 菜单初始化
-/// </summary>
-internal sealed class MenuInitializer : IMenuInitializer
-{
-    public Result RegisterMenu(INavigationMenuService registry)
-    {
-        registry.Register<ChannelPageViewModel>("通道", IconNames.Channel);
-
-        return Result.Success();
-    }
-}
-
-/// <summary>
-/// 主视图
-/// </summary>
-internal sealed class ShellProvider(MainWindowViewModel mainWindowView) : IShellProvider
-{
-    public Result<IViewModel> GetShellViewModel()
-    {
-        return Result.Success<IViewModel>(mainWindowView);
     }
 }

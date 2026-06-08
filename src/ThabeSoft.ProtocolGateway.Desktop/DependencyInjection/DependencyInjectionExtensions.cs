@@ -6,7 +6,6 @@ using ThabeSoft.Avalonia.Notifications;
 using ThabeSoft.ProtocolGateway;
 using ThabeSoft.ProtocolGateway.Services;
 using ThabeSoft.ProtocolGateway.Services.Initialization;
-using ThabeSoft.ProtocolGateway.Services.Internals;
 using ThabeSoft.ProtocolGateway.ViewModels.Pages;
 using ThabeSoft.ProtocolGateway.ViewModels.Shells;
 using ThabeSoft.ProtocolGateway.Views.Pages;
@@ -30,34 +29,30 @@ public static class DependencyInjectionExtensions
         /// </summary>
         public void AddProtocolGatewayDesktop(App application)
         {
-            // UI 程序生命周期
-            services.AddSingleton<IApplication>(application);
             // 模板注册器
-            services.AddSingleton<IDataTemplateRegistry>(application);
-
-
+            services.AddSingleton<IDataTemplateService>(application);
             // 图标
-            services.TryAddSingleton<ProtocolTypeIconLocator>(); // 协议类型图标
-            
+            services.AddSingleton<ProtocolTypeIconLocator>(); // 协议类型图标
+
 
             // 主窗口
-            services.TryAddSingleton<MainWindow>();
-            services.TryAddSingleton<MainWindowViewModel>();
+            services.AddSingleton<MainWindow>();
+            services.AddSingleton<MainWindowViewModel>();
 
             // 主视图
-            services.TryAddSingleton<MainView>();
-            services.TryAddSingleton<INotificationService>(x => x.GetRequiredService<MainView>());
-            services.TryAddSingleton<MainViewModel>();
+            services.AddSingleton<MainView>();
+            services.AddSingleton<INotificationService>(x => x.GetRequiredService<MainView>());
+            services.AddSingleton<MainViewModel>();
             services.AddSingleton<INavigationContext>(x => x.GetRequiredService<MainViewModel>());
             services.AddSingleton<INavigationMenuContext>(x => x.GetRequiredService<MainViewModel>());
 
 
             // 通道页面
-            services.TryAddTransient<ChannelPage>();
-            services.TryAddSingleton<ChannelPageViewModel>();
+            services.AddTransient<ChannelPage>();
+            services.AddSingleton<ChannelPageViewModel>();
             // 通道详情页面
-            services.TryAddTransient<ChannelDetailsPage>();
-            services.TryAddTransient<ChannelDetailsPageViewModel>();
+            services.AddTransient<ChannelDetailsPage>();
+            services.AddTransient<ChannelDetailsPageViewModel>();
 
             // 运行时上下文
             services.AddSingleton<RuntimeContext>();
@@ -68,7 +63,6 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<IIconInitializer, IconInitializer>();
             services.AddSingleton<IViewMappinglInitializer, ViewMappinglInitializer>();
             services.AddSingleton<IMenuInitializer, MenuInitializer>();
-            services.AddSingleton<IShellProvider, ShellProvider>();
         }
     }
 }

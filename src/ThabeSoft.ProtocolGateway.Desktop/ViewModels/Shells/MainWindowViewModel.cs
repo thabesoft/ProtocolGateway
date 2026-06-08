@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Avalonia.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 using ThabeSoft.Avalonia.ViewModels;
 
 namespace ThabeSoft.ProtocolGateway.ViewModels.Shells;
@@ -19,12 +20,15 @@ public sealed partial class MainWindowViewModel : ViewModel
     /// 内容
     /// </summary>
     [ObservableProperty]
-    public partial MainViewModel Content { get; private set; }
+    public partial IViewModel? Content { get; private set; }
 
 
     public MainWindowViewModel()
     {
-        Content = new();
+        if (Design.IsDesignMode)
+        {
+            Content = new MainViewModel();
+        }
     }
     public MainWindowViewModel(MainViewModel view)
     {

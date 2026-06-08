@@ -71,6 +71,11 @@ internal sealed class IconLocator : IIconLocator, IDataTemplate
     }
     public Result<IconElement> Get(IconName name)
     {
+        if(name == IconName.Empty)
+        {
+            return Result.Warning<IconElement>("未指定图标内容");
+        }
+
         if (!_factories.TryGetValue(name, out var factory))
         {
             return Result.Error<IconElement>($"找不到图标 [{name}]");

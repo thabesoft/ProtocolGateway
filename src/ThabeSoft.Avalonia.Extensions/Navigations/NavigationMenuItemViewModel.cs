@@ -1,5 +1,4 @@
-﻿using Avalonia.Controls;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using ThabeSoft.Avalonia.Extensions;
 using ThabeSoft.Avalonia.Icons;
 using ThabeSoft.Avalonia.ViewModels;

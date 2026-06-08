@@ -8,5 +8,5 @@ namespace ThabeSoft.Avalonia.Initialization;
 /// </summary>
 public interface IMenuInitializer
 {
-    Result RegisterMenu(INavigationMenuService registry);
+    Result Initializ(INavigationMenuService registry);
 }

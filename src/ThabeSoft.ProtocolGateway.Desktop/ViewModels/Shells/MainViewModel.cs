@@ -1,6 +1,8 @@
 ﻿using Avalonia.Collections;
+using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
 using ThabeSoft.Avalonia.Extensions;
 using ThabeSoft.Avalonia.Menus;
 using ThabeSoft.Avalonia.Navigations;
@@ -14,12 +16,15 @@ namespace ThabeSoft.ProtocolGateway.ViewModels.Shells;
 /// <summary>
 /// 主视图
 /// </summary>
-public sealed partial class MainViewModel : ViewModel, INavigationContext, INavigationMenuContext, INotifiable
+public sealed partial class MainViewModel : ViewModel, INavigationContext, INavigationMenuContext, INotifiable, INavigatable
 {
-    private Lazy<INavigationService>? _lazyNavigationService;
+    private readonly Lazy<INavigationService>? _lazyNavigationService;
 
 
     #region --导航--
+
+    // 是否可以导航
+    public bool CanNavigate => _lazyNavigationService is not null;
 
     // 是否可以导航返回
     [ObservableProperty]
@@ -65,15 +70,19 @@ public sealed partial class MainViewModel : ViewModel, INavigationContext, INavi
 
     public MainViewModel()
     {
-        CurrentNavigationContent = new ChannelPageViewModel();
-        NavigationMenuItems = NavigationMenuItemViewModel.RandomRange(5, 10).ToAvaloniaList();
+        if (Design.IsDesignMode)
+        {
+            CurrentNavigationContent = new ChannelPageViewModel();
+            NavigationMenuItems = NavigationMenuItemViewModel.RandomRange(5, 10).ToAvaloniaList();
+        }
     }
-    public MainViewModel(Lazy<INavigationService> navigationService, INotificationService notificationService)
+    public MainViewModel(IServiceProvider serviceProvider, INotificationService notificationService)
     {
         this.RegisterNotificationService(notificationService);
 
-        _lazyNavigationService = navigationService;
+        _lazyNavigationService = new Lazy<INavigationService>(serviceProvider.GetRequiredService<INavigationService>);
         MenuNavigateCommand.NotifyCanExecuteChanged();
+        OnPropertyChanged(nameof(CanNavigate));
     }
 
     partial void OnIsNavigationPaneOpenChanged(bool value)

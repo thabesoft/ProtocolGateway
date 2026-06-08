@@ -1,8 +1,11 @@
-﻿using ThabeSoft.Avalonia.Icons;
+﻿using Microsoft.Extensions.DependencyInjection.Extensions;
+using ThabeSoft.Avalonia;
+using ThabeSoft.Avalonia.Icons;
 using ThabeSoft.Avalonia.Initialization;
 using ThabeSoft.Avalonia.Navigations;
 using ThabeSoft.Avalonia.Notifications;
 using ThabeSoft.Avalonia.Views;
+using ThabeSoft.ProtocolGateway.Services;
 
 #pragma warning disable IDE0130 // 命名空间与文件夹结构不匹配
 namespace Microsoft.Extensions.DependencyInjection;
@@ -21,46 +24,43 @@ public static class DependencyInjectionExtensions
         /// </summary>
         public void AddAvaloniaExtensions()
         {
+            services.TryAddSingleton<IDataTemplateService>(EmptyDataTemplateManager.Empty);
+            services.TryAddSingleton<INotificationService>(EmptyNotificationService.Empty);
+
+
             services.AddIconLocator();
             services.AddViewLocator();
-
-            services.AddNavigation();
-            services.AddNotification();
+            services.AddNavigationService();
+            services.AddThemeService();
 
 
             services.AddHostedService<InitializationHostedService>();
         }
 
+        public void AddThemeService()
+        {
+            services.TryAddSingleton<IThemeService, ThemeService>();
+        }
 
         /// <summary>
         /// 添加导航模块
         /// </summary>
-        public void AddNavigation()
+        public void AddNavigationService()
         {
-            services.AddSingleton<INavigationService, NavigationService>();
-            services.AddSingleton<INavigationContext, NavigationContext>();
+            services.TryAddSingleton<INavigationService, NavigationService>();
+            services.TryAddSingleton<INavigationContext, NavigationContext>();
 
-            services.AddSingleton<INavigationMenuService, NavigationMenuService>();
-            services.AddSingleton<INavigationMenuContext, NavigationMenuContext>();
+            services.TryAddSingleton<INavigationMenuService, NavigationMenuService>();
+            services.TryAddSingleton<INavigationMenuContext, NavigationMenuContext>();
         }
-
-        /// <summary>
-        /// 添加通知模块
-        /// </summary>
-        public void AddNotification()
-        {
-            services.AddSingleton<INotificationService, EmptyNotificationService>();
-        }
-
-
 
         /// <summary>
         /// 添加图标定位
         /// </summary>
         public void AddIconLocator()
         {
-            services.AddSingleton<IconLocator>();
-            services.AddSingleton<IIconLocator>(sp => sp.GetRequiredService<IconLocator>());
+            services.TryAddSingleton<IconLocator>();
+            services.TryAddSingleton<IIconLocator>(sp => sp.GetRequiredService<IconLocator>());
         }
 
         /// <summary>
@@ -68,8 +68,8 @@ public static class DependencyInjectionExtensions
         /// </summary>
         public void AddViewLocator()
         {
-            services.AddSingleton<ViewLocator>();
-            services.AddSingleton<IViewLocator>(sp => sp.GetRequiredService<ViewLocator>());
+            services.TryAddSingleton<ViewLocator>();
+            services.TryAddSingleton<IViewLocator>(sp => sp.GetRequiredService<ViewLocator>());
         }
     }
 }

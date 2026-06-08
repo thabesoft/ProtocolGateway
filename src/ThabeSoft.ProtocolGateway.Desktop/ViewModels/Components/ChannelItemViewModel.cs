@@ -1,8 +1,11 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Avalonia.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ThabeSoft.Avalonia.Extensions;
 using ThabeSoft.Avalonia.Notifications;
 using ThabeSoft.Avalonia.ViewModels;
 using ThabeSoft.Lifecycle;
+using ThabeSoft.Primitives;
 using ThabeSoft.ProtocolGateway.Runtime;
 
 namespace ThabeSoft.ProtocolGateway.ViewModels.Components;
@@ -22,11 +25,11 @@ public sealed partial class ChannelItemViewModel : ViewModel, INotifiable
 
     // 通道类型
     [ObservableProperty]
-    public partial ChannelType Type { get; private set; }
+    public partial ChannelType? Type { get; private set; }
 
     // 协议类型
     [ObservableProperty]
-    public partial ProtocolType Protocol { get; private set; }
+    public partial ProtocolType? Protocol { get; private set; }
 
 
     public bool CanStart => _runtimeChannel?.CanStart == true;
@@ -36,6 +39,12 @@ public sealed partial class ChannelItemViewModel : ViewModel, INotifiable
 
     public ChannelItemViewModel()
     {
+        if(Design.IsDesignMode)
+        {
+            Name = ChannelName.Create(string.RandomChinese(5, 8)).GetValueOrDefault();
+            Type = Enum.GetValues<ChannelType>().RandomElement();
+            Protocol = Enum.GetValues<ProtocolType>().RandomElement();
+        }
 
     }
     public ChannelItemViewModel(IRuntimeChannel runtimeChannel)
